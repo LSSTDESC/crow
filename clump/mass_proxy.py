@@ -122,24 +122,12 @@ class MurataBinned(MassRichnessGaussian):
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
         # Updatable parameters
-        self.mu_p0 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P0
-        )
-        self.mu_p1 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P1
-        )
-        self.mu_p2 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P2
-        )
-        self.sigma_p0 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P0
-        )
-        self.sigma_p1 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P1
-        )
-        self.sigma_p2 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P2
-        )
+        self.mu_p0 = MURATA_DEFAULT_MU_P0
+        self.mu_p1 = MURATA_DEFAULT_MU_P1
+        self.mu_p2 = MURATA_DEFAULT_MU_P2
+        self.sigma_p0 = MURATA_DEFAULT_SIGMA_P0
+        self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
+        self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
 
         # Verify this gets called last or first
 
@@ -195,24 +183,12 @@ class MurataUnbinned(MassRichnessGaussian):
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
         # Updatable parameters
-        self.mu_p0 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P0
-        )
-        self.mu_p1 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P1
-        )
-        self.mu_p2 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_MU_P2
-        )
-        self.sigma_p0 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P0
-        )
-        self.sigma_p1 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P1
-        )
-        self.sigma_p2 = parameters.register_new_updatable_parameter(
-            default_value=MURATA_DEFAULT_SIGMA_P2
-        )
+        self.mu_p0 = MURATA_DEFAULT_MU_P0
+        self.mu_p1 = MURATA_DEFAULT_MU_P1
+        self.mu_p2 = MURATA_DEFAULT_MU_P2
+        self.sigma_p0 = MURATA_DEFAULT_SIGMA_P0
+        self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
+        self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
 
     def get_proxy_mean(
         self,

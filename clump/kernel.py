@@ -41,18 +41,10 @@ class Completeness(Updatable):
     ):
         super().__init__()
         # Updatable parameters
-        self.ac_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AC_NC
-        )
-        self.bc_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BC_NC
-        )
-        self.ac_mc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AC_MC
-        )
-        self.bc_mc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BC_MC
-        )
+        self.ac_nc = REDMAPPER_DEFAULT_AC_NC
+        self.bc_nc = REDMAPPER_DEFAULT_BC_NC
+        self.ac_mc = REDMAPPER_DEFAULT_AC_MC
+        self.bc_mc = REDMAPPER_DEFAULT_BC_MC
 
     def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ac_mc = self.ac_mc
@@ -97,18 +89,10 @@ class Purity(Updatable):
 
     def __init__(self):
         super().__init__()
-        self.ap_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AP_NC
-        )
-        self.bp_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BP_NC
-        )
-        self.ap_rc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AP_RC
-        )
-        self.bp_rc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BP_RC
-        )
+        self.ap_nc = REDMAPPER_DEFAULT_AP_NC
+        self.bp_nc = REDMAPPER_DEFAULT_BP_NC
+        self.ap_rc = REDMAPPER_DEFAULT_AP_RC
+        self.bp_rc = REDMAPPER_DEFAULT_BP_RC
 
     def _rc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ap_rc = self.ap_rc
