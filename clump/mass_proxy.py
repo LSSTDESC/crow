@@ -11,8 +11,6 @@ import numpy as np
 import numpy.typing as npt
 from scipy import special
 
-from firecrown import parameters
-
 
 class MassRichnessGaussian:
     """The representation of mass richness relations that are of a gaussian form."""

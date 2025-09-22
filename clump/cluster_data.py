@@ -5,8 +5,8 @@ import numpy as np
 import numpy.typing as npt
 import sacc
 from sacc.tracers import SurveyTracer
-from firecrown.models.cluster.properties import ClusterProperty
-from firecrown.models.cluster.binning import SaccBin
+from clump.properties import ClusterProperty
+from clump.binning import SaccBin
 
 
 class ClusterData:

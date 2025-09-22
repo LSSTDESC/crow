@@ -9,8 +9,6 @@ from enum import Enum
 import numpy.typing as npt
 import numpy as np
 
-from firecrown import parameters
-
 REDMAPPER_DEFAULT_AC_NC = 0.38
 REDMAPPER_DEFAULT_BC_NC = 1.2634
 REDMAPPER_DEFAULT_AC_MC = 13.31

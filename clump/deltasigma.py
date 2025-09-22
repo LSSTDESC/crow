@@ -10,11 +10,10 @@ import numpy.typing as npt
 import pyccl
 from scipy.stats import gamma
 from scipy.integrate import simpson
-from firecrown.models.cluster.integrator.numcosmo_integrator import NumCosmoIntegrator
+from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 import time
 import clmm  # pylint: disable=import-error
-from firecrown import parameters
-from firecrown.models.cluster.abundance import ClusterAbundance
+from clump.abundance import ClusterAbundance
 
 
 class ClusterDeltaSigma(ClusterAbundance):
