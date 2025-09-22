@@ -10,7 +10,6 @@ import numpy.typing as npt
 import numpy as np
 
 from firecrown import parameters
-from firecrown.updatable import Updatable
 
 REDMAPPER_DEFAULT_AC_NC = 0.38
 REDMAPPER_DEFAULT_BC_NC = 1.2634
@@ -29,7 +28,7 @@ class KernelType(Enum):
     PURITY = 6
 
 
-class Completeness(Updatable):
+class Completeness:
     """The completeness kernel for the numcosmo simulated survey.
 
     This kernel will affect the integrand by accounting for the incompleteness
@@ -39,8 +38,6 @@ class Completeness(Updatable):
     def __init__(
         self,
     ):
-        super().__init__()
-        # Updatable parameters
         self.ac_nc = REDMAPPER_DEFAULT_AC_NC
         self.bc_nc = REDMAPPER_DEFAULT_BC_NC
         self.ac_mc = REDMAPPER_DEFAULT_AC_MC
@@ -80,7 +77,7 @@ REDMAPPER_DEFAULT_AP_RC = 1.1839
 REDMAPPER_DEFAULT_BP_RC = -0.4077
 
 
-class Purity(Updatable):
+class Purity:
     """The purity kernel for the numcosmo simulated survey.
 
     This kernel will affect the integrand by accounting for the purity
