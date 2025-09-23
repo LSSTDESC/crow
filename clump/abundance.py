@@ -10,10 +10,9 @@ import numpy.typing as npt
 import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
-from firecrown.updatable import Updatable, UpdatableCollection
 
 
-class ClusterAbundance(Updatable):
+class ClusterAbundance:
     """The class that calculates the predicted number counts of galaxy clusters.
 
     The abundance is a function of a specific cosmology, a mass and redshift range,
@@ -27,6 +26,13 @@ class ClusterAbundance(Updatable):
         """The cosmology used to predict the cluster number count."""
         return self._cosmo
 
+    @cosmo.setter
+    def cosmo(self, cosmo: Cosmology) -> None:
+        """Update the cluster abundance calculation with a new cosmology."""
+        self._cosmo = cosmo
+        self._hmf_cache = {}
+
+# 
     def __init__(
         self,
         mass_interval: tuple[float, float],
@@ -34,7 +40,6 @@ class ClusterAbundance(Updatable):
         halo_mass_function: pyccl.halos.MassFunc,
     ) -> None:
         super().__init__()
-        self.kernels: UpdatableCollection = UpdatableCollection()
         self.halo_mass_function = halo_mass_function
         self.min_mass = mass_interval[0]
         self.max_mass = mass_interval[1]
@@ -43,10 +48,10 @@ class ClusterAbundance(Updatable):
         self._hmf_cache: dict[tuple[float, float], float] = {}
         self._cosmo: Cosmology | None = None
 
-    def update_ingredients(self, cosmo: Cosmology) -> None:
-        """Update the cluster abundance calculation with a new cosmology."""
-        self._cosmo = cosmo
-        self._hmf_cache = {}
+    #def update_ingredients(self, cosmo: Cosmology) -> None:
+    #    """Update the cluster abundance calculation with a new cosmology."""
+    #    self._cosmo = cosmo
+    #    self._hmf_cache = {}
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0

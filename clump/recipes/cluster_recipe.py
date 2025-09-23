@@ -18,12 +18,3 @@ class ClusterRecipe(Updatable, ABC):
         super().__init__(parameter_prefix)
         self.my_updatables: UpdatableCollection = UpdatableCollection()
 
-    @abstractmethod
-    def evaluate_theory_prediction(
-        self,
-        cluster_theory,
-        this_bin: SaccBin,
-        sky_area: float,
-        average_on: None | ClusterProperty = None,
-    ) -> float:
-        """Evaluate the theory prediction for this cluster recipe."""
