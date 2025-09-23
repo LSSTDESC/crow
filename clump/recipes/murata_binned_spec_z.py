@@ -129,7 +129,7 @@ class MurataBinnedSpecZRecipe:
         ]
         self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction(self.cluster_theory, average_on)
+        theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)

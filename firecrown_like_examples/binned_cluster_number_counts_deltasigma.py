@@ -70,14 +70,11 @@ class BinnedClusterDeltaSigma(BinnedCluster):
             if not include_prop:
                 continue
             if cl_property == ClusterProperty.DELTASIGMA:
-                theory_vector_list += self.get_binned_cluster_property(
-                    tools, cl_property
-                )
+                theory_vector_list += self.get_binned_cluster_property(cl_property)
         return TheoryVector.from_list(theory_vector_list)
 
     def get_binned_cluster_property(
         self,
-        tools: ModelingTools,
         cluster_properties: ClusterProperty,
     ) -> list[float]:
         """Computes the mean deltasigma of clusters in each bin.
@@ -95,12 +92,10 @@ class BinnedClusterDeltaSigma(BinnedCluster):
                 mass_edges = this_bin.mass_proxy_edges
                 z_edges = this_bin.z_edges
                 counts = self.cluster_recipe.evaluate_theory_prediction_counts(
-                    tools.cluster_deltasigma,
                     this_bin,
                     self.sky_area,
                 )
             total_observable = self.cluster_recipe.evaluate_theory_prediction(
-                tools.cluster_deltasigma,
                 this_bin,
                 self.sky_area,
                 cluster_properties,

@@ -136,7 +136,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.integrator.extra_args = np.array(
             [*this_bin.mass_proxy_edges, sky_area, radius_center]
         )
-        theory_prediction = self.get_theory_prediction(self.cluster_theory, average_on)
+        theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
         deltasigma = self.integrator.integrate(prediction_wrapper)
         return deltasigma
@@ -219,7 +219,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         ]
         self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction_counts(self.cluster_theory)
+        theory_prediction = self.get_theory_prediction_counts()
         prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
