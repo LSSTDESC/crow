@@ -117,6 +117,7 @@ class MurataBinned(MassRichnessGaussian):
         self.pivot_redshift = pivot_redshift
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
+        self.purity == None
 
         self.mu_p0 = MURATA_DEFAULT_MU_P0
         self.mu_p1 = MURATA_DEFAULT_MU_P1
@@ -162,8 +163,16 @@ class MurataBinned(MassRichnessGaussian):
         mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_binned(mass, z, mass_proxy_limits)
+        if self.purity == None:
+            return self._distribution_binned(mass, z, mass_proxy_limits)
+        else:
+            return scipy.integrate.quad(lambda mass_proxy: self._distribution_unbinned(mass, z, mass_proxy) * self.purity.distribution(z,mass_proxy),mass_proxy_limits[0,mass_proxy_limits[1]])
 
+    def set_purity(
+        self,
+        purity: Purity
+    ):
+        self.purity == purity
 
 class MurataUnbinned(MassRichnessGaussian):
     """The mass richness relation defined in Murata 19 for a unbinned data vector."""
@@ -177,6 +186,7 @@ class MurataUnbinned(MassRichnessGaussian):
         self.pivot_redshift = pivot_redshift
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
+        self.purity = None
 
         self.mu_p0 = MURATA_DEFAULT_MU_P0
         self.mu_p1 = MURATA_DEFAULT_MU_P1
@@ -220,4 +230,14 @@ class MurataUnbinned(MassRichnessGaussian):
         mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_unbinned(mass, z, mass_proxy)
+        if self.purity == None:
+            return self._distribution_unbinned(mass, z, mass_proxy)
+        else:
+            return self._distribution_unbinned(mass, z, mass_proxy) * self.purity.distribution(z,mass_proxy)
+
+
+    def set_purity(
+        self,
+        purity: Purity
+    ):
+        self.purity == purity
