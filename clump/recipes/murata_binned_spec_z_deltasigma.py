@@ -14,8 +14,6 @@ from clump.properties import ClusterProperty
 from clump.recipes.cluster_recipe import ClusterRecipe
 from clump.deltasigma import ClusterDeltaSigma
 
-from clump.updatable_wrapper import Updatable
-
 class MurataBinnedSpecZDeltaSigmaRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
@@ -23,7 +21,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self, updatable_parameters=None) -> None:
+    def __init__(self) -> None:
 
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = SpectroscopicRedshift()

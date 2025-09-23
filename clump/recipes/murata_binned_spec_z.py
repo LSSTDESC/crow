@@ -23,7 +23,7 @@ class MurataBinnedSpecZRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self, updatable_parameters=None) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
         self.integrator = NumCosmoIntegrator()

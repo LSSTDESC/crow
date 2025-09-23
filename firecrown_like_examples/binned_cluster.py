@@ -16,6 +16,8 @@ from firecrown.models.cluster.cluster_data import ClusterData
 from firecrown.models.cluster.binning import SaccBin
 from firecrown.models.cluster.properties import ClusterProperty
 
+from clump.updatable_wrapper import UpdatableClusterObjects
+
 
 class BinnedCluster(Statistic):
     """A statistic representing clusters in a z, mass bin."""
@@ -25,6 +27,7 @@ class BinnedCluster(Statistic):
         cluster_properties: ClusterProperty,
         survey_name: str,
         cluster_recipe,
+        updatable_parameters: UpdatableClusterObjects,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.
@@ -43,6 +46,7 @@ class BinnedCluster(Statistic):
         self.data_vector = DataVector.from_list([])
         self.sky_area = 0.0
         self.bins: list[SaccBin] = []
+        self.updatable_parameters = updatable_parameters
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data
