@@ -2,6 +2,7 @@
 
 # pylint: disable=duplicate-code
 from typing import Callable
+import pyccl as ccl
 
 import numpy as np
 import numpy.typing as npt
@@ -224,29 +225,3 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         counts = self.integrator.integrate(prediction_wrapper)
 
         return counts
-
-class MurataBinnedUpdatable(Updatable, MurataBinned):
-    """The mass richness relation defined in Murata 19 for a binned data vector."""
-
-    def __init__(
-        self,
-        pivot_mass: float,
-        pivot_redshift: float,
-    ):
-        Updatable.__init__(self)
-        MurataBinned.__init__(self, pivot_mass, pivot_redshift)
-
-class MurataBinnedSpecZDeltaSigmaRecipe(ClusterRecipe, MurataBinnedSpecZDeltaSigmaNotRecipe):
-    """Cluster recipe with Murata19 mass-richness and spec-zs.
-
-    This recipe uses the Murata 2019 binned mass-richness relation and assumes
-    perfectly measured spec-zs.
-    """
-
-    def __init__(self) -> None:
-        ClusterRecipe.__init__(self)
-        MurataBinnedSpecZDeltaSigmaNotRecipe.__init__(self)
-
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinnedUpdatable(pivot_mass, pivot_redshift)
-        self.my_updatables.append(self.mass_distribution)

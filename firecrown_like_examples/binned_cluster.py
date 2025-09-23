@@ -27,7 +27,6 @@ class BinnedCluster(Statistic):
         cluster_properties: ClusterProperty,
         survey_name: str,
         cluster_recipe,
-        updatable_parameters: UpdatableClusterObjects,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.
@@ -46,7 +45,14 @@ class BinnedCluster(Statistic):
         self.data_vector = DataVector.from_list([])
         self.sky_area = 0.0
         self.bins: list[SaccBin] = []
-        self.updatable_parameters = updatable_parameters
+        self.updatable_parameters = UpdatableClusterObjects(
+            ["mass_distribution", "cluster_theory"],
+            [
+                ["mu_p0",  "mu_p1", "mu_p2", "sigma_p0", "sigma_p1", "sigma_p2"],
+                ["cosmo"],
+            ],
+        )
+        self.updatable_parameters.import_parameters(self.cluster_recipe)
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data

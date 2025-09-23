@@ -18,7 +18,7 @@ from firecrown.likelihood.statistic import (
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster.deltasigma_data import DeltaSigmaData
 from firecrown.models.cluster.properties import ClusterProperty
-from firecrown.likelihood.binned_cluster import BinnedCluster
+from .binned_cluster import BinnedCluster
 from firecrown.models.cluster.recipes.murata_binned_spec_z_deltasigma import (
     MurataBinnedSpecZDeltaSigmaRecipe,
 )
@@ -62,9 +62,8 @@ class BinnedClusterDeltaSigma(BinnedCluster):
 
     def _compute_theory_vector(self, tools: ModelingTools) -> TheoryVector:
         """Compute a statistic from sources, concrete implementation."""
-        assert tools.cluster_abundance is not None
-        assert tools.cluster_deltasigma is not None
         theory_vector_list: list[float] = []
+        self.updatable_parameters.export_parameters(self.cluster_recipe)
 
         for cl_property in ClusterProperty:
             include_prop = cl_property & self.cluster_properties
@@ -87,7 +86,6 @@ class BinnedClusterDeltaSigma(BinnedCluster):
         a single point of the parameter space, and returns the predicted
         mean deltasigma of the clusters in each bin.
         """
-        assert tools.cluster_abundance is not None
         mean_values = []
         mass_edges = None
         z_edges = None

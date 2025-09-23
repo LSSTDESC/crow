@@ -2,6 +2,7 @@
 
 # pylint: disable=duplicate-code
 from typing import Callable
+import pyccl as ccl
 
 import numpy as np
 import numpy.typing as npt
@@ -24,7 +25,6 @@ class MurataBinnedSpecZRecipe:
     """
 
     def __init__(self) -> None:
-        super().__init__()
 
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = SpectroscopicRedshift()
@@ -36,7 +36,6 @@ class MurataBinnedSpecZRecipe:
         min_z, max_z = 0.2, 0.8
 
         self.cluster_theory = ClusterAbundance((min_mass, max_mass), (min_z, max_z), hmf)
-
     def get_theory_prediction(
         self,
         average_on: None | ClusterProperty = None,

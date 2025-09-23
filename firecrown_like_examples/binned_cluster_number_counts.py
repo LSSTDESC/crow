@@ -8,7 +8,7 @@ from firecrown.data_types import TheoryVector
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster.abundance_data import AbundanceData
 from firecrown.models.cluster.properties import ClusterProperty
-from firecrown.likelihood.binned_cluster import BinnedCluster
+from .binned_cluster import BinnedCluster
 
 
 class BinnedClusterNumberCounts(BinnedCluster):
@@ -33,7 +33,7 @@ class BinnedClusterNumberCounts(BinnedCluster):
         :param tools: The modeling tools used to compute the statistic.
         :return: The computed statistic.
         """
-        assert tools.cluster_abundance is not None
+        self.updatable_parameters.export_parameters(self.cluster_recipe)
 
         theory_vector_list: list[float] = []
         cluster_counts = []
@@ -70,7 +70,6 @@ class BinnedClusterNumberCounts(BinnedCluster):
         :param cluster_counts: The number of clusters in each bin.
         :param cluster_properties: The cluster observables to use.
         """
-        assert tools.cluster_abundance is not None
 
         mean_values = []
         for this_bin, counts in zip(self.bins, cluster_counts):
@@ -92,7 +91,6 @@ class BinnedClusterNumberCounts(BinnedCluster):
         :param tools: The modeling tools used to compute the statistic.
         :return: The number of clusters in each bin.
         """
-        assert tools.cluster_abundance is not None
 
         cluster_counts = []
         for this_bin in self.bins:
