@@ -8,7 +8,7 @@ import numpy.typing as npt
 
 from clump.binning import NDimensionalBin
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
-from clump.kernel import SpectroscopicRedshift
+from clump.kernel import SpectroscopicRedshift, Completeness, Purity
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
 from clump.recipes.cluster_recipe import ClusterRecipe

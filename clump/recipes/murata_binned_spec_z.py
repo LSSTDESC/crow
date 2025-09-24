@@ -23,20 +23,24 @@ class MurataBinnedSpecZRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, hmf, redshift_distribution, mass_distribution, min_mass=13.0, max_mass=16.0,min_z=0.2, max_z=0.8) -> None:
         super().__init__()
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
 
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
+        self.hmf = hmf
+        self.min_mass = min_mass
+        self.max_mass = max_mass
+        self.min_z = min_z
+        self.max_z = max_z
 
         self.cluster_theory = ClusterAbundance((min_mass, max_mass), (min_z, max_z), hmf)
 
+
+
+    
     def get_theory_prediction(
         self,
         average_on: None | ClusterProperty = None,
@@ -61,9 +65,8 @@ class MurataBinnedSpecZRecipe:
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
+                * self.mass_distribution.distribution(mass=mass, z=z, mass_proxy_limits=mass_proxy_limits)
             )
-
             if average_on is None:
                 return prediction
 
@@ -75,7 +78,6 @@ class MurataBinnedSpecZRecipe:
                     prediction *= mass
                 if cluster_prop == ClusterProperty.REDSHIFT:
                     prediction *= z
-
             return prediction
 
         return theory_prediction
@@ -107,14 +109,15 @@ class MurataBinnedSpecZRecipe:
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
-
+            
             return prediction(mass, z, (mass_proxy_low, mass_proxy_high), sky_area)
 
         return function_mapper
 
     def evaluate_theory_prediction(
         self,
-        this_bin: NDimensionalBin,
+        z_edges: tuple[float,float],
+        mass_proxy_edges:tuple[float,float],
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -126,11 +129,11 @@ class MurataBinnedSpecZRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            this_bin.z_edges,
+            z_edges
         ]
-        self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
+        self.integrator.extra_args = np.array([mass_proxy_edges[0], mass_proxy_edges[1], sky_area])
 
-        theory_prediction = self.get_theory_prediction(self.cluster_theory, average_on)
+        theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
