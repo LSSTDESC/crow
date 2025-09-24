@@ -32,7 +32,6 @@ class ClusterAbundance:
         self._cosmo = cosmo
         self._hmf_cache = {}
 
-# 
     def __init__(
         self,
         mass_interval: tuple[float, float],

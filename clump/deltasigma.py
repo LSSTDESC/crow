@@ -30,12 +30,10 @@ class ClusterDeltaSigma(ClusterAbundance):
         mass_interval: tuple[float, float],
         z_interval: tuple[float, float],
         halo_mass_function: pyccl.halos.MassFunc,
-        conc_parameter: bool = False,
+        cluster_concentration: float | None = None,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
-        self.conc_parameter = conc_parameter
-        if conc_parameter:
-            self.cluster_conc = 4.0
+        self.cluster_concentration = cluster_concentration
 
     def delta_sigma(
         self,
@@ -44,7 +42,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         radius_center: np.float64,
         two_halo_term: bool = False,
         miscentering_frac: np.float64 = None,
-        boost_factor: bool = False
+        boost_factor: bool = False,
     ) -> npt.NDArray[np.float64]:
         """Delta sigma for cprint(new_pred)lusters."""
         cosmo_clmm = clmm.Cosmology()
@@ -63,8 +61,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
-            conc_val = self._get_concentration(log_m, redshift)
-            moo.set_concentration(conc_val)
+            moo.set_concentration(self._get_concentration(log_m, redshift))
             moo.set_mass(10**log_m)
             val = self._one_halo_contribution(moo, radius_center, redshift, miscentering_frac)
             if two_halo_term:
@@ -113,8 +110,8 @@ class ClusterDeltaSigma(ClusterAbundance):
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
         """Determine the concentration for a halo."""
-        if self.conc_parameter and self.cluster_conc is not None:
-            return float(self.cluster_conc)
+        if self.cluster_concentration is not None:
+            return self.cluster_concentration
 
         conc_model = pyccl.halos.concentration.ConcentrationBhattacharya13(
             mass_def=self.halo_mass_function.mass_def

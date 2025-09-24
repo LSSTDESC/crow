@@ -16,8 +16,6 @@ from firecrown.models.cluster.cluster_data import ClusterData
 from firecrown.models.cluster.binning import SaccBin
 from firecrown.models.cluster.properties import ClusterProperty
 
-from clump.updatable_wrapper import UpdatableClusterObjects
-
 
 class BinnedCluster(Statistic):
     """A statistic representing clusters in a z, mass bin."""
@@ -45,27 +43,11 @@ class BinnedCluster(Statistic):
         self.data_vector = DataVector.from_list([])
         self.sky_area = 0.0
         self.bins: list[SaccBin] = []
-        self.updatable_parameters = UpdatableClusterObjects(
-            (
-                {
-                    "attribute_name": "mass_distribution",
-                    "parameters": [
-                        "mu_p0",
-                        "mu_p1",
-                        "mu_p2",
-                        "sigma_p0",
-                        "sigma_p1",
-                        "sigma_p2",
-                    ],
-                },
-                {
-                    "attribute_name": "cluster_theory",
-                    "parameters": [],
-                    "has_cosmo": True,
-                },
-            )
-        )
+        self._create_updatable_parameters()
         self.updatable_parameters.init_all_parameters(self.cluster_recipe)
+
+    def _create_updatable_parameters(self):
+        raise NotImplementedError("method _create_updatable_parameters missing!")
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data
