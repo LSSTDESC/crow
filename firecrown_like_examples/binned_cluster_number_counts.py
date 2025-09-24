@@ -8,9 +8,8 @@ from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster.abundance_data import AbundanceData
 from firecrown.models.cluster.properties import ClusterProperty
 
-from clump.updatable_wrapper import UpdatableClusterObjects
-
 from .binned_cluster import BinnedCluster
+from .updatable_wrapper import UpdatableClusterObjects
 
 
 class BinnedClusterNumberCounts(BinnedCluster):
