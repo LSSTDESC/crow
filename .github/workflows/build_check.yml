@@ -31,8 +31,12 @@ jobs:
     - name: Analysing the code formatting with black
       run: |
         pip install black black-configparser
-        black --check --diff
+        black --check --diff clump
+        black --check --diff firecrown_like_examples
+        black --check --diff firecrown_tutorial
     - name: Analysing the code import order with isort
       run: |
         pip install isort
-        isort --check --diff
+        isort --check --diff clump
+        isort --check --diff firecrown_like_examples
+        isort --check --diff firecrown_tutorial
