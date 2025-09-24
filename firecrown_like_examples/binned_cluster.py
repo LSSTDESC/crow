@@ -49,7 +49,8 @@ class BinnedCluster(Statistic):
             ["mass_distribution", "cluster_theory"],
             [
                 ["mu_p0",  "mu_p1", "mu_p2", "sigma_p0", "sigma_p1", "sigma_p2"],
-                ["cosmo"],
+                [],
+                #["cosmo"],
             ],
         )
         self.updatable_parameters.import_parameters(self.cluster_recipe)

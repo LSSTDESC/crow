@@ -1,4 +1,4 @@
-from firecrown.updatable import Updatable
+from firecrown.updatable import Updatable, UpdatableCollection
 from firecrown import parameters
 
 
@@ -39,7 +39,7 @@ class UpdatableParameters(Updatable):
             )
 
 
-class UpdatableClusterObjects:
+class UpdatableClusterObjects(Updatable):
     """
     Class that contains all cluster objects to integrate the firecrown
     Updatable functionality.
@@ -54,21 +54,25 @@ class UpdatableClusterObjects:
     """
 
     def __init__(self, cluster_objects_names, cluster_objects_updatable_parameters):
+        super().__init__()
         self.cluster_objects_names = cluster_objects_names
+        self.my_updatables = UpdatableCollection()
         for name, par_names in zip(cluster_objects_names, cluster_objects_updatable_parameters):
             setattr(
                 self,
                 name,
                 UpdatableParameters(par_names),
             )
+            self.my_updatables.append(getattr(self, name))
 
     def import_parameters(self, cluster_recipe):
         for name in self.cluster_objects_names:
             getattr(self, name).import_parameters(getattr(cluster_recipe, name))
 
-    def export_parameters(self, cluster_recipe):
+    def export_parameters(self, cluster_recipe, cosmo):
         for name in self.cluster_objects_names:
             getattr(self, name).export_parameters(getattr(cluster_recipe, name))
+        cluster_recipe.cluster_theory.cosmo = cosmo
 
 
 # EXAMPLES

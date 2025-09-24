@@ -48,11 +48,6 @@ class ClusterAbundance:
         self._hmf_cache: dict[tuple[float, float], float] = {}
         self._cosmo: Cosmology | None = None
 
-    #def update_ingredients(self, cosmo: Cosmology) -> None:
-    #    """Update the cluster abundance calculation with a new cosmology."""
-    #    self._cosmo = cosmo
-    #    self._hmf_cache = {}
-
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0
     ) -> npt.NDArray[np.float64]:

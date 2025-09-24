@@ -33,7 +33,7 @@ class BinnedClusterNumberCounts(BinnedCluster):
         :param tools: The modeling tools used to compute the statistic.
         :return: The computed statistic.
         """
-        self.updatable_parameters.export_parameters(self.cluster_recipe)
+        self.updatable_parameters.export_parameters(self.cluster_recipe, tools.get_ccl_cosmology())
 
         theory_vector_list: list[float] = []
         cluster_counts = []
