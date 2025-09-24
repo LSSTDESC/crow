@@ -1,5 +1,5 @@
-from firecrown.updatable import Updatable, UpdatableCollection
 from firecrown import parameters
+from firecrown.updatable import Updatable, UpdatableCollection
 
 
 class UpdatableParameters(Updatable):

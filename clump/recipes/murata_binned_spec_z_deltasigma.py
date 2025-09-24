@@ -2,17 +2,17 @@
 
 # pylint: disable=duplicate-code
 from typing import Callable
-import pyccl as ccl
 
 import numpy as np
 import numpy.typing as npt
+import pyccl as ccl
 
 from clump.binning import NDimensionalBin
+from clump.deltasigma import ClusterDeltaSigma
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
-from clump.deltasigma import ClusterDeltaSigma
 
 
 class MurataBinnedSpecZDeltaSigmaRecipe:

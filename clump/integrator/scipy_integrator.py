@@ -3,7 +3,7 @@
 This module holds the scipy implementation of the integrator classes
 """
 
-from typing import Callable, Any
+from typing import Any, Callable
 
 import numpy as np
 import numpy.typing as npt

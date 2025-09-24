@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import sacc
-
 from firecrown.data_types import TheoryVector
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster.abundance_data import AbundanceData
 from firecrown.models.cluster.properties import ClusterProperty
-from .binned_cluster import BinnedCluster
-
 
 from clump.updatable_wrapper import UpdatableClusterObjects
+
+from .binned_cluster import BinnedCluster
 
 
 class BinnedClusterNumberCounts(BinnedCluster):

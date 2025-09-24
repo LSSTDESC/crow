@@ -2,10 +2,10 @@
 
 # pylint: disable=duplicate-code
 from typing import Callable
-import pyccl as ccl
 
 import numpy as np
 import numpy.typing as npt
+import pyccl as ccl
 
 from clump.abundance import ClusterAbundance
 from clump.binning import NDimensionalBin

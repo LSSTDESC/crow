@@ -1,30 +1,24 @@
 """Likelihood factory function for cluster number counts."""
 
 import os
+import sys
 
 import pyccl as ccl
 import sacc
-
 from firecrown.likelihood.gaussian import ConstGaussian
-
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
 from firecrown.modeling_tools import ModelingTools
 
-import sys
-
 sys.path.append("/global/homes/a/aguena/git_codes/clump/")
-from firecrown_like_examples.binned_cluster_number_counts_deltasigma import (
-    BinnedClusterDeltaSigma,
-)
-from firecrown_like_examples.binned_cluster_number_counts import (
-    BinnedClusterNumberCounts,
-)
-
 from firecrown.models.cluster.properties import ClusterProperty
-from clump.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
+
 from clump.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from clump.recipes.murata_binned_spec_z_deltasigma import \
+    MurataBinnedSpecZDeltaSigmaRecipe
+from firecrown_like_examples.binned_cluster_number_counts import \
+    BinnedClusterNumberCounts
+from firecrown_like_examples.binned_cluster_number_counts_deltasigma import \
+    BinnedClusterDeltaSigma
 
 
 def build_likelihood(
