@@ -1,0 +1,38 @@
+name: Build and Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-gcc-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+#    - name: Install prereq and NumCosmo using conda
+#      run: |
+#        echo "$CONDA/bin" >> $GITHUB_PATH
+#        conda install -c conda-forge gobject-introspection pygobject 'numcosmo<=0.22.0' cmake swig setuptools_scm sphinx sphinx_rtd_theme nbconvert pandoc ipython
+#    - name: Install prereq using pip
+#      run: |
+#        pip install -r requirements.txt
+#    - name: Install the package
+#      run: |
+#        pip install .
+#    - name: Install CCL from source
+#      run: |
+#        git clone https://github.com/LSSTDESC/CCL
+#        cd CCL
+#        pip install .
+    - name: Analysing the code formatting with black
+      run: |
+        pip install black black-configparser
+        black --check --diff
+    - name: Analysing the code import order with isort
+      run: |
+        pip install isort
+        isort --check --diff
