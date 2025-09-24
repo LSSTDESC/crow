@@ -12,8 +12,8 @@ from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
-from clump.recipes.cluster_recipe import ClusterRecipe
 from clump.deltasigma import ClusterDeltaSigma
+
 
 class MurataBinnedSpecZDeltaSigmaRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
@@ -33,7 +33,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         min_mass, max_mass = 13.0, 16.0
         min_z, max_z = 0.2, 0.8
 
-        self.cluster_theory = ClusterDeltaSigma((min_mass, max_mass), (min_z, max_z), hmf)
+        self.cluster_theory = ClusterDeltaSigma(
+            (min_mass, max_mass), (min_z, max_z), hmf
+        )
 
     def get_theory_prediction(
         self,
@@ -76,7 +78,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(mass, z, radius_center, True, 0.3)
+                    prediction *= self.cluster_theory.delta_sigma(
+                        mass, z, radius_center, True, None
+                    )
             return prediction
 
         return theory_prediction

@@ -127,7 +127,9 @@ class UpdatableClusterObjects(Updatable):
             Recipe containing all cluster objects (as attributes) to get the defalt parameters from.
         """
         for conf in self.cluster_objects_configs:
-            getattr(self, conf["attribute_name"]).init_parameters(getattr(cluster_recipe, conf["attribute_name"]))
+            getattr(self, conf["attribute_name"]).init_parameters(
+                getattr(cluster_recipe, conf["attribute_name"])
+            )
 
     def export_all_parameters(self, cluster_recipe, cosmo):
         """

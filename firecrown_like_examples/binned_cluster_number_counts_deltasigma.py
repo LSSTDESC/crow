@@ -26,6 +26,7 @@ from firecrown.models.cluster.recipes.murata_binned_spec_z_deltasigma import (
 
 from clump.updatable_wrapper import UpdatableClusterObjects
 
+
 class BinnedClusterDeltaSigma(BinnedCluster):
     """The Binned Cluster Delta Sigma statistic.
 

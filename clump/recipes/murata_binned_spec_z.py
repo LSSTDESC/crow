@@ -13,8 +13,6 @@ from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
-from clump.recipes.cluster_recipe import ClusterRecipe
-
 
 
 class MurataBinnedSpecZRecipe:
@@ -35,7 +33,10 @@ class MurataBinnedSpecZRecipe:
         min_mass, max_mass = 13.0, 16.0
         min_z, max_z = 0.2, 0.8
 
-        self.cluster_theory = ClusterAbundance((min_mass, max_mass), (min_z, max_z), hmf)
+        self.cluster_theory = ClusterAbundance(
+            (min_mass, max_mass), (min_z, max_z), hmf
+        )
+
     def get_theory_prediction(
         self,
         average_on: None | ClusterProperty = None,

@@ -13,6 +13,7 @@ from .binned_cluster import BinnedCluster
 
 from clump.updatable_wrapper import UpdatableClusterObjects
 
+
 class BinnedClusterNumberCounts(BinnedCluster):
     """A statistic representing the number of clusters in a z, mass bin."""
 
