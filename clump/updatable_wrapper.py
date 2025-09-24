@@ -4,23 +4,33 @@ from firecrown import parameters
 
 class UpdatableParameters(Updatable):
     """
-    Class that contains all cluster objects to integrate the firecrown
-    Updatable functionality.
+    Class to store and pass updatable parameters to cluster objects.
 
-    Parameters
+    Attributes
     ----------
-    cluster_objects_list: list
-        List of all cluster objects.
-    cluster_objects_updatable_parameters: list
-        List of list of the names of updatables in each cluster object.
-        Same order as cluster_objects_list.
+    updatable_parameters: list
+        Name of updatable parameters.
     """
 
     def __init__(self, updatable_parameters):
+        """
+        Parameters
+        ----------
+        updatable_parameters: list
+            Name of updatable parameters.
+        """
         super().__init__()
         self.updatable_parameters = updatable_parameters
 
-    def import_parameters(self, cluster_object):
+    def init_parameters(self, cluster_object):
+        """
+        Instanciate all parameters (uses parameters.register_new_updatable_parameter)
+
+        Parameters
+        ----------
+        cluster_object: object
+            cluster object to get the defalt parameters from.
+        """
         for par_name in self.updatable_parameters:
             setattr(
                 self,
@@ -31,6 +41,14 @@ class UpdatableParameters(Updatable):
             )
 
     def export_parameters(self, cluster_object):
+        """
+        Passes internal parameters to cluster object.
+
+        Parameters
+        ----------
+        cluster_object: list
+            cluster object to export internal parameters to.
+        """
         for par_name in self.updatable_parameters:
             setattr(
                 cluster_object,
@@ -41,62 +59,87 @@ class UpdatableParameters(Updatable):
 
 class UpdatableClusterObjects(Updatable):
     """
-    Class that contains all cluster objects to integrate the firecrown
-    Updatable functionality.
+    Class to store and pass updatable parameters of all to cluster objects
+    in a cluster recipe.
 
-    Parameters
+    Attributes
     ----------
-    cluster_objects_list: list
-        List of all cluster objects.
-    cluster_objects_updatable_parameters: list
-        List of list of the names of updatables in each cluster object.
-        Same order as cluster_objects_list.
+    cluster_objects_configs: tuple
+        List of dictionaries containing configuration on which parameters
+        of each cluster objects in the recipe that will be updated.
+
+
+    Examples
+    --------
+
+    cluster_objects_configs = (
+        {
+            "attribute_name": "mass_distribution",
+            "parameters": ["mu_p0", "mu_p1", "mu_p2", "sigma_p0", "sigma_p1", "sigma_p2"],
+        },
+        {
+            "attribute_name": "cluster_theory",
+            "parameters": [],
+            "has_cosmo": True,
+        },
+        {
+            "attribute_name": "completeness",
+            "parameters": ["ac_nc", "bc_nc", "ac_rc", "bc_rc"],
+        },
+        {
+            "attribute_name": "purity",
+            "parameters": ["ap_nc", "bp_nc", "ap_rc", "bp_rc"],
+        },
+    )
     """
 
-    def __init__(self, cluster_objects_names, cluster_objects_updatable_parameters):
+    def __init__(self, cluster_objects_configs):
+        """
+        Parameters
+        ----------
+        cluster_objects_configs: tuple
+            List of dictionaries containing configuration on which parameters
+            of each cluster objects in the recipe that will be updated. Each
+            dictionary should contain the keys:
+
+            - attribute_name: name of the attribute in the recipe.
+            - parameters: list name of parameters that should be updatable.
+            - has_cosmo (optional, defalut=False): if this attribute has an internal cosmology.
+        """
         super().__init__()
-        self.cluster_objects_names = cluster_objects_names
+        self.cluster_objects_configs = cluster_objects_configs
         self.my_updatables = UpdatableCollection()
-        for name, par_names in zip(cluster_objects_names, cluster_objects_updatable_parameters):
+        for conf in self.cluster_objects_configs:
             setattr(
                 self,
-                name,
-                UpdatableParameters(par_names),
+                conf["attribute_name"],
+                UpdatableParameters(conf["parameters"]),
             )
-            self.my_updatables.append(getattr(self, name))
+            self.my_updatables.append(getattr(self, conf["attribute_name"]))
 
-    def import_parameters(self, cluster_recipe):
-        for name in self.cluster_objects_names:
-            getattr(self, name).import_parameters(getattr(cluster_recipe, name))
+    def init_all_parameters(self, cluster_recipe):
+        """
+        Instanciate all parameters (uses parameters.register_new_updatable_parameter)
 
-    def export_parameters(self, cluster_recipe, cosmo):
-        for name in self.cluster_objects_names:
-            getattr(self, name).export_parameters(getattr(cluster_recipe, name))
-        cluster_recipe.cluster_theory.cosmo = cosmo
+        Parameters
+        ----------
+        cluster_recipe: recipe object
+            Recipe containing all cluster objects (as attributes) to get the defalt parameters from.
+        """
+        for conf in self.cluster_objects_configs:
+            getattr(self, conf["attribute_name"]).init_parameters(getattr(cluster_recipe, conf["attribute_name"]))
 
+    def export_all_parameters(self, cluster_recipe, cosmo):
+        """
+        Passes internal parameters to cluster object.
 
-# EXAMPLES
-#
-#  MurataBinned:
-#      updatable_parameters_name_list:
-#         mu_p0,  mu_p1, mu_p2, sigma_p0, sigma_p1, sigma_p2
-#
-#  MurataUnbinned:
-#      updatable_parameters_name_list:
-#         mu_p0,  mu_p1, mu_p2, sigma_p0, sigma_p1, sigma_p2
-#
-#  Completeness:
-#      updatable_parameters_name_list:
-#         ac_nc, bc_nc, ac_rc, bc_rc 
-#
-#  Purity:
-#      updatable_parameters_name_list:
-#         ap_nc, bp_nc, ap_rc, bp_rc 
-#
-#  ClusterAbundance:
-#      updatable_parameters_name_list:
-#          cosmo
-#
-#  ClusterDeltaSigma:
-#      updatable_parameters_name_list:
-#         cosmo, cluster_conc
+        Parameters
+        ----------
+        cluster_object: list
+            Recipe containing all cluster objects (as attributes) to export internal parameters to.
+        """
+        for conf in self.cluster_objects_configs:
+            _recipe_attribute = getattr(cluster_recipe, conf["attribute_name"])
+            getattr(self, conf["attribute_name"]).export_parameters(_recipe_attribute)
+            if conf.get("has_cosmo", False):
+                _recipe_attribute.cosmo = cosmo

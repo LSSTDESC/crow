@@ -46,14 +46,26 @@ class BinnedCluster(Statistic):
         self.sky_area = 0.0
         self.bins: list[SaccBin] = []
         self.updatable_parameters = UpdatableClusterObjects(
-            ["mass_distribution", "cluster_theory"],
-            [
-                ["mu_p0",  "mu_p1", "mu_p2", "sigma_p0", "sigma_p1", "sigma_p2"],
-                [],
-                #["cosmo"],
-            ],
+            (
+                {
+                    "attribute_name": "mass_distribution",
+                    "parameters": [
+                        "mu_p0",
+                        "mu_p1",
+                        "mu_p2",
+                        "sigma_p0",
+                        "sigma_p1",
+                        "sigma_p2",
+                    ],
+                },
+                {
+                    "attribute_name": "cluster_theory",
+                    "parameters": [],
+                    "has_cosmo": True,
+                },
+            )
         )
-        self.updatable_parameters.import_parameters(self.cluster_recipe)
+        self.updatable_parameters.init_all_parameters(self.cluster_recipe)
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data

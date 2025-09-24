@@ -63,7 +63,9 @@ class BinnedClusterDeltaSigma(BinnedCluster):
     def _compute_theory_vector(self, tools: ModelingTools) -> TheoryVector:
         """Compute a statistic from sources, concrete implementation."""
         theory_vector_list: list[float] = []
-        self.updatable_parameters.export_parameters(self.cluster_recipe, tools.get_ccl_cosmology())
+        self.updatable_parameters.export_all_parameters(
+            self.cluster_recipe, tools.get_ccl_cosmology()
+        )
 
         for cl_property in ClusterProperty:
             include_prop = cl_property & self.cluster_properties
