@@ -13,12 +13,15 @@ sys.path.append("/global/homes/a/aguena/git_codes/clump/")
 from firecrown.models.cluster.properties import ClusterProperty
 
 from clump.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from clump.recipes.murata_binned_spec_z_deltasigma import \
-    MurataBinnedSpecZDeltaSigmaRecipe
-from firecrown_like_examples.binned_cluster_number_counts import \
-    BinnedClusterNumberCounts
-from firecrown_like_examples.binned_cluster_number_counts_deltasigma import \
-    BinnedClusterDeltaSigma
+from clump.recipes.murata_binned_spec_z_deltasigma import (
+    MurataBinnedSpecZDeltaSigmaRecipe,
+)
+from firecrown_like_examples.binned_cluster_number_counts import (
+    BinnedClusterNumberCounts,
+)
+from firecrown_like_examples.binned_cluster_number_counts_deltasigma import (
+    BinnedClusterDeltaSigma,
+)
 
 
 def build_likelihood(
