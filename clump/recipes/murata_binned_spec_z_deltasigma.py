@@ -7,7 +7,6 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from clump.binning import NDimensionalBin
 from clump.deltasigma import ClusterDeltaSigma
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
@@ -122,7 +121,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction(
         self,
-        this_bin: NDimensionalBin,
+        z_edges,
+        mass_proxy_edges,
+        radius_center,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -134,11 +135,11 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            this_bin.z_edges,
+            z_edges,
         ]
-        radius_center = this_bin.radius_center
+        radius_center = radius_center
         self.integrator.extra_args = np.array(
-            [*this_bin.mass_proxy_edges, sky_area, radius_center]
+            [*mass_proxy_edges, sky_area, radius_center]
         )
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
@@ -208,7 +209,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction_counts(
         self,
-        this_bin: NDimensionalBin,
+        z_edges,
+        mass_proxy_edges,
         sky_area: float,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
@@ -219,9 +221,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            this_bin.z_edges,
+            z_edges,
         ]
-        self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
+        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
         theory_prediction = self.get_theory_prediction_counts()
         prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)

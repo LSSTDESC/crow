@@ -8,7 +8,6 @@ import numpy.typing as npt
 import pyccl as ccl
 
 from clump.abundance import ClusterAbundance
-from clump.binning import NDimensionalBin
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
 from clump.mass_proxy import MurataBinned
@@ -114,7 +113,8 @@ class MurataBinnedSpecZRecipe:
 
     def evaluate_theory_prediction(
         self,
-        this_bin: NDimensionalBin,
+        z_edges,
+        mass_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -126,9 +126,9 @@ class MurataBinnedSpecZRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            this_bin.z_edges,
+            z_edges,
         ]
-        self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
+        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)

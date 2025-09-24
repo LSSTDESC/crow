@@ -115,11 +115,14 @@ class BinnedClusterDeltaSigma(BinnedCluster):
                 mass_edges = this_bin.mass_proxy_edges
                 z_edges = this_bin.z_edges
                 counts = self.cluster_recipe.evaluate_theory_prediction_counts(
-                    this_bin,
+                    this_bin.z_edges,
+                    this_bin.mass_proxy_edges,
                     self.sky_area,
                 )
             total_observable = self.cluster_recipe.evaluate_theory_prediction(
-                this_bin,
+                this_bin.z_edges,
+                this_bin.mass_proxy_edges,
+                this_bin.radius_center,
                 self.sky_area,
                 cluster_properties,
             )
