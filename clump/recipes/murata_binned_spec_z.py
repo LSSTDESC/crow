@@ -36,7 +36,7 @@ class MurataBinnedSpecZRecipe:
         self.min_z = min_z
         self.max_z = max_z
 
-        self.cluster_theory = ClusterAbundance((min_mass, max_mass), (min_z, max_z), hmf)
+        self.cluster_theory = ClusterAbundance((self.min_mass, self.max_mass), (self.min_z, self.max_z), self.hmf)
 
 
 
