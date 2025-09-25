@@ -8,14 +8,16 @@ import sacc
 from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
 from firecrown.modeling_tools import ModelingTools
-
-sys.path.append("/global/homes/a/aguena/git_codes/clump/")
 from firecrown.models.cluster.properties import ClusterProperty
 
+# remove this line after clump becomes installable
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from clump.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 from clump.recipes.murata_binned_spec_z_deltasigma import (
     MurataBinnedSpecZDeltaSigmaRecipe,
 )
+
+# to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
     BinnedClusterNumberCounts,
 )
