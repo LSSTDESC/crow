@@ -13,7 +13,6 @@ import numpy.typing as npt
 from scipy import special
 from clump.kernel import  Purity
 
-
 class MassRichnessGaussian:
     """The representation of mass richness relations that are of a gaussian form."""
 

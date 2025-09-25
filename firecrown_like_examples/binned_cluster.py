@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import numpy as np
-
 # firecrown is needed for backward compatibility; remove support for deprecated
 # directory structure is removed.
 import firecrown  # pylint: disable=unused-import # noqa: F401
+import numpy as np
+from firecrown.data_types import DataVector, TheoryVector
 from firecrown.likelihood.source import SourceSystematic
-from firecrown.likelihood.statistic import (
-    Statistic,
-)
-from firecrown.data_types import TheoryVector, DataVector
-from firecrown.models.cluster.cluster_data import ClusterData
+from firecrown.likelihood.statistic import Statistic
 from firecrown.models.cluster.binning import SaccBin
+from firecrown.models.cluster.cluster_data import ClusterData
 from firecrown.models.cluster.properties import ClusterProperty
 
 from clump.updatable_wrapper import UpdatableClusterObjects
@@ -46,7 +43,11 @@ class BinnedCluster(Statistic):
         self.data_vector = DataVector.from_list([])
         self.sky_area = 0.0
         self.bins: list[SaccBin] = []
-        self.updatable_parameters = updatable_parameters
+        self._create_updatable_parameters()
+        self.updatable_parameters.init_all_parameters(self.cluster_recipe)
+
+    def _create_updatable_parameters(self):
+        raise NotImplementedError("method _create_updatable_parameters missing!")
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data

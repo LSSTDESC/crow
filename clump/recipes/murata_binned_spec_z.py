@@ -5,16 +5,13 @@ from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
+import pyccl as ccl
 
 from clump.abundance import ClusterAbundance
-from clump.binning import NDimensionalBin
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
-from clump.recipes.cluster_recipe import ClusterRecipe
-
-
 
 class MurataBinnedSpecZRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
@@ -22,13 +19,17 @@ class MurataBinnedSpecZRecipe:
     This recipe uses the Murata 2019 binned mass-richness relation and assumes
     perfectly measured spec-zs.
     """
-
-    def __init__(self, hmf, redshift_distribution, mass_distribution, min_mass=13.0, max_mass=16.0,min_z=0.2, max_z=0.8) -> None:
+    def __init__(self, hmf, redshift_distribution, mass_distribution, pivot_mass = 14.625862906, pivot_redshift = 0.6,  min_mass=13.0, max_mass=16.0,min_z=0.2, max_z=0.8) -> None:
         super().__init__()
 
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
+        
+        self.redshift_distribution = SpectroscopicRedshift()
+        self.pivot_mass = pivot_mass
+        self.pivot_redshift = pivot_redshift
+        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
 
         self.hmf = hmf
         self.min_mass = min_mass

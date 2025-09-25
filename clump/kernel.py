@@ -4,10 +4,11 @@ This module holds the classes that define the kernels that can be included
 in the cluster abundance integrand.
 """
 
-from typing import Optional
 from enum import Enum
-import numpy.typing as npt
+from typing import Optional
+
 import numpy as np
+import numpy.typing as npt
 
 REDMAPPER_DEFAULT_AC_NC = 0.38
 REDMAPPER_DEFAULT_BC_NC = 1.2634
