@@ -13,7 +13,7 @@ from firecrown.models.cluster.binning import SaccBin
 from firecrown.models.cluster.cluster_data import ClusterData
 from firecrown.models.cluster.properties import ClusterProperty
 
-from clump.updatable_wrapper import UpdatableClusterObjects
+from .updatable_wrapper import UpdatableClusterObjects
 
 
 class BinnedCluster(Statistic):
