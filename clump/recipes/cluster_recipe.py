@@ -16,4 +16,3 @@ class ClusterRecipe(Updatable, ABC):
     def __init__(self, parameter_prefix: None | str = None) -> None:
         super().__init__(parameter_prefix)
         self.my_updatables: UpdatableCollection = UpdatableCollection()
-

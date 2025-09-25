@@ -13,6 +13,7 @@ from clump.properties import ClusterProperty
 from clump.recipes.cluster_recipe import ClusterRecipe
 from clump.deltasigma import ClusterDeltaSigma
 
+
 class MurataBinnedSpecZDeltaSigmaRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
@@ -20,15 +21,26 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self, hmf, redshift_distribution, mass_distribution, min_mass=13.0, max_mass=16.0,min_z=0.2, max_z=0.8) -> None:
+    def __init__(
+        self,
+        hmf,
+        redshift_distribution,
+        mass_distribution,
+        min_mass=13.0,
+        max_mass=16.0,
+        min_z=0.2,
+        max_z=0.8,
+    ) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        
+
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
         self.hmf = hmf
 
-        self.cluster_theory = ClusterDeltaSigma((min_mass, max_mass), (min_z, max_z), hmf, True)
+        self.cluster_theory = ClusterDeltaSigma(
+            (min_mass, max_mass), (min_z, max_z), hmf, True
+        )
 
     def get_theory_prediction(
         self,
@@ -71,7 +83,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(log_mass=mass, z=z, radius_center=radius_center)
+                    prediction *= self.cluster_theory.delta_sigma(
+                        log_mass=mass, z=z, radius_center=radius_center
+                    )
             return prediction
 
         return theory_prediction
@@ -100,7 +114,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         ) -> npt.NDArray[np.float64]:
             mass = int_args[:, 0]
             z = int_args[:, 1]
-            
+
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
@@ -113,8 +127,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction(
         self,
-        z_edges: tuple[float,float],
-        mass_proxy_edges:tuple[float,float],
+        z_edges: tuple[float, float],
+        mass_proxy_edges: tuple[float, float],
         sky_area: float,
         radius_center: float,
         average_on: None | ClusterProperty = None,
@@ -161,7 +175,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(mass=mass, z=z, mass_proxy_limits=mass_proxy_limits)
+                * self.mass_distribution.distribution(
+                    mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
+                )
             )
             if average_on is None:
                 return prediction
@@ -205,15 +221,15 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
-            
+
             return prediction(mass, z, (mass_proxy_low, mass_proxy_high), sky_area)
 
         return function_mapper
 
     def evaluate_theory_prediction_counts(
         self,
-        z_edges: tuple[float,float],
-        mass_proxy_edges:tuple[float,float],
+        z_edges: tuple[float, float],
+        mass_proxy_edges: tuple[float, float],
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -225,10 +241,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            z_edges
+            z_edges,
         ]
-        
-        self.integrator.extra_args = np.array([mass_proxy_edges[0], mass_proxy_edges[1], sky_area])
+
+        self.integrator.extra_args = np.array(
+            [mass_proxy_edges[0], mass_proxy_edges[1], sky_area]
+        )
 
         theory_prediction = self.get_theory_prediction_counts(average_on)
         prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
