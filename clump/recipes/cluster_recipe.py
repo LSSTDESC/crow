@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 
-from clump.binning import SaccBin
 from clump.properties import ClusterProperty
 from firecrown.updatable import Updatable, UpdatableCollection
 

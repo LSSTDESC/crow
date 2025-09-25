@@ -5,13 +5,13 @@ from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
-import pyccl as ccl
 
-from clump.deltasigma import ClusterDeltaSigma
 from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
-from clump.kernel import SpectroscopicRedshift
+from clump.kernel import SpectroscopicRedshift, Completeness, Purity
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
+from clump.recipes.cluster_recipe import ClusterRecipe
+from clump.deltasigma import ClusterDeltaSigma
 
 class MurataBinnedSpecZDeltaSigmaRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
@@ -20,16 +20,13 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, hmf, redshift_distribution, mass_distribution, min_mass=13.0, max_mass=16.0,min_z=0.2, max_z=0.8) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
-
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
+        
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
+        self.hmf = hmf
 
         self.cluster_theory = ClusterDeltaSigma((min_mass, max_mass), (min_z, max_z), hmf)
 
@@ -74,7 +71,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(mass, z, radius_center, True, 0.3)
+                    prediction *= self.cluster_theory.delta_sigma(mass, z, radius_center, True)
             return prediction
 
         return theory_prediction
@@ -116,10 +113,10 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction(
         self,
-        z_edges,
-        mass_proxy_edges,
-        radius_center,
+        z_edges: tuple[float,float],
+        mass_proxy_edges:tuple[float,float],
         sky_area: float,
+        radius_center: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
@@ -132,9 +129,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
             z_edges,
         ]
-        radius_center = radius_center
         self.integrator.extra_args = np.array(
-            [*mass_proxy_edges, sky_area, radius_center]
+            [mass_proxy_edges[0], mass_proxy_edges[1], sky_area, radius_center]
         )
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
@@ -143,6 +139,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def get_theory_prediction_counts(
         self,
+        average_on: None | ClusterProperty = None,
     ) -> Callable[
         [npt.NDArray[np.float64], npt.NDArray[np.float64], tuple[float, float], float],
         npt.NDArray[np.float64],
@@ -164,8 +161,19 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
+                * self.mass_distribution.distribution(mass=mass, z=z, mass_proxy_limits=mass_proxy_limits)
             )
+            if average_on is None:
+                return prediction
+
+            for cluster_prop in ClusterProperty:
+                include_prop = cluster_prop & average_on
+                if not include_prop:
+                    continue
+                if cluster_prop == ClusterProperty.MASS:
+                    prediction *= mass
+                if cluster_prop == ClusterProperty.REDSHIFT:
+                    prediction *= z
             return prediction
 
         return theory_prediction
@@ -197,16 +205,17 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
-
+            
             return prediction(mass, z, (mass_proxy_low, mass_proxy_high), sky_area)
 
         return function_mapper
 
     def evaluate_theory_prediction_counts(
         self,
-        z_edges,
-        mass_proxy_edges,
+        z_edges: tuple[float,float],
+        mass_proxy_edges:tuple[float,float],
         sky_area: float,
+        average_on: None | ClusterProperty = None,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
 
@@ -216,39 +225,14 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         """
         self.integrator.integral_bounds = [
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
-            z_edges,
+            z_edges
         ]
-        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
+        
+        self.integrator.extra_args = np.array([mass_proxy_edges[0], mass_proxy_edges[1], sky_area])
 
-        theory_prediction = self.get_theory_prediction_counts()
-        prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
+        theory_prediction = self.get_theory_prediction(average_on)
+        prediction_wrapper = self.get_function_to_integrate(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
 
         return counts
-
-class MurataBinnedUpdatable(Updatable, MurataBinned):
-    """The mass richness relation defined in Murata 19 for a binned data vector."""
-
-    def __init__(
-        self,
-        pivot_mass: float,
-        pivot_redshift: float,
-    ):
-        Updatable.__init__(self)
-        MurataBinned.__init__(self, pivot_mass, pivot_redshift)
-
-class MurataBinnedSpecZDeltaSigmaRecipe(ClusterRecipe, MurataBinnedSpecZDeltaSigmaNotRecipe):
-    """Cluster recipe with Murata19 mass-richness and spec-zs.
-
-    This recipe uses the Murata 2019 binned mass-richness relation and assumes
-    perfectly measured spec-zs.
-    """
-
-    def __init__(self) -> None:
-        ClusterRecipe.__init__(self)
-        MurataBinnedSpecZDeltaSigmaNotRecipe.__init__(self)
-
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinnedUpdatable(pivot_mass, pivot_redshift)
-        self.my_updatables.append(self.mass_distribution)

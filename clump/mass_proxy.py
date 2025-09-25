@@ -7,11 +7,12 @@ implementations of Kernels.
 import sys
 sys.path.append("/global/homes/l/lettieri/clump/")
 from abc import abstractmethod
-
+import scipy
 import numpy as np
 import numpy.typing as npt
 from scipy import special
 from clump.kernel import  Purity
+
 
 class MassRichnessGaussian:
     """The representation of mass richness relations that are of a gaussian form."""
@@ -165,13 +166,11 @@ class MurataBinned(MassRichnessGaussian):
         if self.purity == None:
             return self._distribution_binned(mass, z, mass_proxy_limits)
         else:
-            return scipy.integrate.quad(lambda mass_proxy: self._distribution_unbinned(mass, z, mass_proxy) * self.purity.distribution(z,mass_proxy),mass_proxy_limits[0,mass_proxy_limits[1]])
+            integrator = NumCosmoIntegrator()
+            integrator.integral_bounds = [mass_proxy_limits[0],mass_proxy_limits[1]]
 
-    def set_purity(
-        self,
-        purity: Purity
-    ):
-        self.purity == purity
+            
+            return scipy.integrate.quad(lambda mass_proxy: self._distribution_unbinned(mass, z, mass_proxy) * 1/self.purity.distribution(z,mass_proxy),mass_proxy_limits[0],mass_proxy_limits[1])
 
 class MurataUnbinned(MassRichnessGaussian):
     """The mass richness relation defined in Murata 19 for a unbinned data vector."""
@@ -232,11 +231,4 @@ class MurataUnbinned(MassRichnessGaussian):
         if self.purity == None:
             return self._distribution_unbinned(mass, z, mass_proxy)
         else:
-            return self._distribution_unbinned(mass, z, mass_proxy) * self.purity.distribution(z,mass_proxy)
-
-
-    def set_purity(
-        self,
-        purity: Purity
-    ):
-        self.purity == purity
+            return self._distribution_unbinned(mass, z, mass_proxy) * 1/self.purity.distribution(z,mass_proxy)
