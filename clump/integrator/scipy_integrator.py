@@ -3,13 +3,13 @@
 This module holds the scipy implementation of the integrator classes
 """
 
-from typing import Callable, Any
+from typing import Any, Callable
 
 import numpy as np
 import numpy.typing as npt
 from scipy.integrate import nquad
 
-from firecrown.models.cluster.integrator.integrator import Integrator
+from clump.integrator.integrator import Integrator
 
 
 class ScipyIntegrator(Integrator):

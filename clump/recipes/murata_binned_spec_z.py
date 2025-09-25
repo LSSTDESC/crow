@@ -5,17 +5,16 @@ from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
+import pyccl as ccl
 
-from firecrown.models.cluster.abundance import ClusterAbundance
-from firecrown.models.cluster.binning import NDimensionalBin
-from firecrown.models.cluster.integrator.numcosmo_integrator import NumCosmoIntegrator
-from firecrown.models.cluster.kernel import SpectroscopicRedshift
-from firecrown.models.cluster.mass_proxy import MurataBinned
-from firecrown.models.cluster.properties import ClusterProperty
-from firecrown.models.cluster.recipes.cluster_recipe import ClusterRecipe
+from clump.abundance import ClusterAbundance
+from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
+from clump.kernel import SpectroscopicRedshift
+from clump.mass_proxy import MurataBinned
+from clump.properties import ClusterProperty
 
 
-class MurataBinnedSpecZRecipe(ClusterRecipe):
+class MurataBinnedSpecZRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
     This recipe uses the Murata 2019 binned mass-richness relation and assumes
@@ -23,17 +22,22 @@ class MurataBinnedSpecZRecipe(ClusterRecipe):
     """
 
     def __init__(self) -> None:
-        super().__init__()
 
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = SpectroscopicRedshift()
         pivot_mass, pivot_redshift = 14.625862906, 0.6
         self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
-        self.my_updatables.append(self.mass_distribution)
+
+        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
+        min_mass, max_mass = 13.0, 16.0
+        min_z, max_z = 0.2, 0.8
+
+        self.cluster_theory = ClusterAbundance(
+            (min_mass, max_mass), (min_z, max_z), hmf
+        )
 
     def get_theory_prediction(
         self,
-        cluster_theory: ClusterAbundance,
         average_on: None | ClusterProperty = None,
     ) -> Callable[
         [npt.NDArray[np.float64], npt.NDArray[np.float64], tuple[float, float], float],
@@ -53,8 +57,8 @@ class MurataBinnedSpecZRecipe(ClusterRecipe):
             sky_area: float,
         ):
             prediction = (
-                cluster_theory.comoving_volume(z, sky_area)
-                * cluster_theory.mass_function(mass, z)
+                self.cluster_theory.comoving_volume(z, sky_area)
+                * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
@@ -109,8 +113,8 @@ class MurataBinnedSpecZRecipe(ClusterRecipe):
 
     def evaluate_theory_prediction(
         self,
-        cluster_theory: ClusterAbundance,
-        this_bin: NDimensionalBin,
+        z_edges,
+        mass_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -121,12 +125,12 @@ class MurataBinnedSpecZRecipe(ClusterRecipe):
         measured redshifts.
         """
         self.integrator.integral_bounds = [
-            (cluster_theory.min_mass, cluster_theory.max_mass),
-            this_bin.z_edges,
+            (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
+            z_edges,
         ]
-        self.integrator.extra_args = np.array([*this_bin.mass_proxy_edges, sky_area])
+        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction(cluster_theory, average_on)
+        theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)

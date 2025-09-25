@@ -4,13 +4,11 @@ This module holds the classes that define the kernels that can be included
 in the cluster abundance integrand.
 """
 
-from typing import Optional
 from enum import Enum
-import numpy.typing as npt
-import numpy as np
+from typing import Optional
 
-from firecrown import parameters
-from firecrown.updatable import Updatable
+import numpy as np
+import numpy.typing as npt
 
 REDMAPPER_DEFAULT_AC_NC = 0.38
 REDMAPPER_DEFAULT_BC_NC = 1.2634
@@ -29,7 +27,7 @@ class KernelType(Enum):
     PURITY = 6
 
 
-class Completeness(Updatable):
+class Completeness:
     """The completeness kernel for the numcosmo simulated survey.
 
     This kernel will affect the integrand by accounting for the incompleteness
@@ -39,20 +37,10 @@ class Completeness(Updatable):
     def __init__(
         self,
     ):
-        super().__init__()
-        # Updatable parameters
-        self.ac_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AC_NC
-        )
-        self.bc_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BC_NC
-        )
-        self.ac_mc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AC_MC
-        )
-        self.bc_mc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BC_MC
-        )
+        self.ac_nc = REDMAPPER_DEFAULT_AC_NC
+        self.bc_nc = REDMAPPER_DEFAULT_BC_NC
+        self.ac_mc = REDMAPPER_DEFAULT_AC_MC
+        self.bc_mc = REDMAPPER_DEFAULT_BC_MC
 
     def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ac_mc = self.ac_mc
@@ -88,7 +76,7 @@ REDMAPPER_DEFAULT_AP_RC = 1.1839
 REDMAPPER_DEFAULT_BP_RC = -0.4077
 
 
-class Purity(Updatable):
+class Purity:
     """The purity kernel for the numcosmo simulated survey.
 
     This kernel will affect the integrand by accounting for the purity
@@ -97,18 +85,10 @@ class Purity(Updatable):
 
     def __init__(self):
         super().__init__()
-        self.ap_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AP_NC
-        )
-        self.bp_nc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BP_NC
-        )
-        self.ap_rc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_AP_RC
-        )
-        self.bp_rc = parameters.register_new_updatable_parameter(
-            default_value=REDMAPPER_DEFAULT_BP_RC
-        )
+        self.ap_nc = REDMAPPER_DEFAULT_AP_NC
+        self.bp_nc = REDMAPPER_DEFAULT_BP_NC
+        self.ap_rc = REDMAPPER_DEFAULT_AP_RC
+        self.bp_rc = REDMAPPER_DEFAULT_BP_RC
 
     def _rc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ap_rc = self.ap_rc
