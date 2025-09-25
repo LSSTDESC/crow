@@ -24,7 +24,6 @@ class BinnedCluster(Statistic):
         cluster_properties: ClusterProperty,
         survey_name: str,
         cluster_recipe,
-        updatable_parameters: UpdatableClusterObjects,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.

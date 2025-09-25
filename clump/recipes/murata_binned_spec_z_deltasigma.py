@@ -28,7 +28,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.mass_distribution = mass_distribution
         self.hmf = hmf
 
-        self.cluster_theory = ClusterDeltaSigma((min_mass, max_mass), (min_z, max_z), hmf)
+        self.cluster_theory = ClusterDeltaSigma((min_mass, max_mass), (min_z, max_z), hmf, True)
 
     def get_theory_prediction(
         self,
@@ -71,7 +71,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(mass, z, radius_center, True)
+                    prediction *= self.cluster_theory.delta_sigma(log_mass=mass, z=z, radius_center=radius_center)
             return prediction
 
         return theory_prediction
@@ -100,7 +100,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         ) -> npt.NDArray[np.float64]:
             mass = int_args[:, 0]
             z = int_args[:, 1]
-
+            
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
@@ -230,8 +230,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         
         self.integrator.extra_args = np.array([mass_proxy_edges[0], mass_proxy_edges[1], sky_area])
 
-        theory_prediction = self.get_theory_prediction(average_on)
-        prediction_wrapper = self.get_function_to_integrate(theory_prediction)
+        theory_prediction = self.get_theory_prediction_counts(average_on)
+        prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
 

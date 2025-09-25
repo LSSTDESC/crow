@@ -31,14 +31,12 @@ class ClusterDeltaSigma(ClusterAbundance):
         mass_interval: tuple[float, float],
         z_interval: tuple[float, float],
         halo_mass_function: pyccl.halos.MassFunc,
-        conc_parameter: bool = False,
         is_delta_sigma: bool = False,
+        cluster_concentration: float | None = None,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
-        self.conc_parameter = conc_parameter
         self.is_delta_sigma = is_delta_sigma
-        if conc_parameter:
-            self.cluster_conc = 4.0
+        self.cluster_concentration = cluster_concentration
 
     def delta_sigma(
         self,
@@ -127,14 +125,16 @@ class ClusterDeltaSigma(ClusterAbundance):
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
         """Determine the concentration for a halo."""
-        if self.conc_parameter and self.cluster_conc is not None:
-            return float(self.cluster_conc)
+        if self.cluster_concentration is not None:
+            return self.cluster_concentration
 
         conc_model = pyccl.halos.concentration.ConcentrationBhattacharya13(
             mass_def=self.halo_mass_function.mass_def
         )
         a = 1.0 / (1.0 + redshift)
-        return conc_model._concentration(self._cosmo, 10.0**log_m, a)  # pylint: disable=protected-access
+        return conc_model._concentration(
+            self._cosmo, 10.0**log_m, a
+        )  # pylint: disable=protected-access
     
     def _correct_with_boost_nfw(self, profiles: npt.NDArray[np.float64], radius_list: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Determine the nfw boost factor and correct the shear profiles."""
