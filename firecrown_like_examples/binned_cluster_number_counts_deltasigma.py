@@ -94,7 +94,6 @@ class BinnedClusterDeltaSigma(BinnedCluster):
                 continue
             if cl_property == ClusterProperty.DELTASIGMA:
                 theory_vector_list += self.get_binned_cluster_property(cl_property)
-        print(theory_vector_list, self.data_vector, (np.array(theory_vector_list)- np.array(self.data_vector))/(np.array(self.data_vector)))
         return TheoryVector.from_list(theory_vector_list)
 
     def get_binned_cluster_property(
