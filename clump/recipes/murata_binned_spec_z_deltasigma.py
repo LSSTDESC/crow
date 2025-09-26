@@ -10,7 +10,6 @@ from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 from clump.kernel import SpectroscopicRedshift, Completeness, Purity
 from clump.mass_proxy import MurataBinned
 from clump.properties import ClusterProperty
-from clump.recipes.cluster_recipe import ClusterRecipe
 from clump.deltasigma import ClusterDeltaSigma
 
 
