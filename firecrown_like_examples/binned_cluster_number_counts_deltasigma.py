@@ -122,8 +122,8 @@ class BinnedClusterDeltaSigma(BinnedCluster):
             total_observable = self.cluster_recipe.evaluate_theory_prediction(
                 this_bin.z_edges,
                 this_bin.mass_proxy_edges,
-                self.sky_area,
                 this_bin.radius_center,
+                self.sky_area,
                 cluster_properties,
             )
             mean_observable = total_observable / counts

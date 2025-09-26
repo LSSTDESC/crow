@@ -145,8 +145,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self,
         z_edges: tuple[float, float],
         mass_proxy_edges: tuple[float, float],
-        sky_area: float,
         radius_center: float,
+        sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
