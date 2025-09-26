@@ -29,6 +29,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         max_mass=16.0,
         min_z=0.2,
         max_z=0.8,
+        is_delta_sigma=False,
+        cluster_concentration=None,
+        two_halo_term=False,
+        miscentering_frac=None,
+        boost_factor=False,
+        
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
@@ -36,9 +42,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
         self.hmf = hmf
+        self.two_halo_term = two_halo_term
+        self.miscentering_frac = miscentering_frac
+        self.boost_factor = boost_factor
 
         self.cluster_theory = ClusterDeltaSigma(
-            (min_mass, max_mass), (min_z, max_z), hmf, True
+            mass_interval=(min_mass, max_mass), z_interval=(min_z, max_z), halo_mass_function=self.hmf, is_delta_sigma=is_delta_sigma, cluster_concentration=cluster_concentration
         )
 
     def get_theory_prediction(
@@ -83,7 +92,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
                     prediction *= self.cluster_theory.delta_sigma(
-                        log_mass=mass, z=z, radius_center=radius_center
+                        log_mass=mass, z=z, radius_center=radius_center, two_halo_term=self.two_halo_term, miscentering_frac=self.miscentering_frac, boost_factor=self.boost_factor 
                     )
             return prediction
 
