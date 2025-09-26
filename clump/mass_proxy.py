@@ -168,16 +168,7 @@ class MurataBinned(MassRichnessGaussian):
         if self.purity == None:
             return self._distribution_binned(mass, z, mass_proxy_limits)
         else:
-            integrator = NumCosmoIntegrator()
-            integrator.integral_bounds = [mass_proxy_limits[0], mass_proxy_limits[1]]
-
-            return scipy.integrate.quad(
-                lambda mass_proxy: self._distribution_unbinned(mass, z, mass_proxy)
-                * 1
-                / self.purity.distribution(z, mass_proxy),
-                mass_proxy_limits[0],
-                mass_proxy_limits[1],
-            )
+            raise Exception("Purity option is not supported yet.")
 
 
 class MurataUnbinned(MassRichnessGaussian):
@@ -239,8 +230,4 @@ class MurataUnbinned(MassRichnessGaussian):
         if self.purity == None:
             return self._distribution_unbinned(mass, z, mass_proxy)
         else:
-            return (
-                self._distribution_unbinned(mass, z, mass_proxy)
-                * 1
-                / self.purity.distribution(z, mass_proxy)
-            )
+            raise Exception("Purity option is not supported yet.")

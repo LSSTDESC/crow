@@ -98,20 +98,20 @@ class ClusterDeltaSigma(ClusterAbundance):
         else:
             beta_s_mean = compute_beta_s_mean_from_distribution(
                 z_cl=redshift,
-                z_inf=1000,
+                z_inf=10,
                 cosmo=clmm_model.cosmo,
-                zmax=10.0,
+                zmax=5.0,
                 delta_z_cut=0.1,
-                zmin=None,
+                zmin=redshift,
                 z_distrib_func=None,
             )
             beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
                 z_cl=redshift,
-                z_inf=1000,
+                z_inf=10,
                 cosmo=clmm_model.cosmo,
-                zmax=10.0,
+                zmax=5.0,
                 delta_z_cut=0.1,
-                zmin=None,
+                zmin=redshift,
                 z_distrib_func=None,
             )
             first_halo_right_centered = clmm_model.eval_tangential_shear(
@@ -146,18 +146,18 @@ class ClusterDeltaSigma(ClusterAbundance):
                 else:
                     beta_s_mean = compute_beta_s_mean_from_distribution(
                         z_cl=redshift,
-                        z_inf=1000,
+                        z_inf=10,
                         cosmo=clmm_model.cosmo,
-                        zmax=10.0,
+                        zmax=5.0,
                         delta_z_cut=0.1,
                         zmin=None,
                         z_distrib_func=None,
                     )
                     beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
                         z_cl=redshift,
-                        z_inf=1000,
+                        z_inf=10,
                         cosmo=clmm_model.cosmo,
-                        zmax=10.0,
+                        zmax=5.0,
                         delta_z_cut=0.1,
                         zmin=None,
                         z_distrib_func=None,
@@ -199,9 +199,14 @@ class ClusterDeltaSigma(ClusterAbundance):
     ) -> npt.NDArray[np.float64]:
         """Calculate the second halo contribution to the delta sigma."""
         # pylint: disable=protected-access
+        if self.is_delta_sigma ==False:
+            raise Exception("Two halo contribution for gt is not suported yet.")  
+
         second_halo_right_centered = clmm_model.eval_excess_surface_density_2h(
             np.array([radius_center]), redshift
         )
+        
+        
         return second_halo_right_centered[0]
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
