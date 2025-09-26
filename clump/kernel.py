@@ -67,7 +67,6 @@ class Completeness:
         nc = self._nc(z)
         completeness = (mass / mc) ** nc / ((mass / mc) ** nc + 1.0)
         assert isinstance(completeness, np.ndarray)
-        print(completeness)
         return completeness
 
 
