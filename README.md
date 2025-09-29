@@ -1,2 +1,2 @@
-# clump
-CLUster Module Prediction  (clump).
+# CROW
+**C**luster **R**econstruction of **O**bservables **W**orkbench: **CROW**
