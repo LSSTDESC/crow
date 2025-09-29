@@ -10,10 +10,10 @@ from firecrown.likelihood.likelihood import Likelihood, NamedParameters
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster.properties import ClusterProperty
 
-# remove this line after clump becomes installable
+# remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from clump.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from clump.recipes.murata_binned_spec_z_deltasigma import (
+from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from crow.recipes.murata_binned_spec_z_deltasigma import (
     MurataBinnedSpecZDeltaSigmaRecipe,
 )
 

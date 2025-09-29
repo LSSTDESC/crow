@@ -10,7 +10,7 @@ import numpy as np
 import numpy.typing as npt
 from numcosmo_py import Ncm
 
-from clump.integrator.integrator import Integrator
+from crow.integrator.integrator import Integrator
 
 
 class NumCosmoIntegralMethod(Enum):

@@ -14,8 +14,8 @@ import pyccl
 from scipy.integrate import simpson
 from scipy.stats import gamma
 
-from clump.abundance import ClusterAbundance
-from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
+from crow.abundance import ClusterAbundance
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 
 class ClusterDeltaSigma(ClusterAbundance):
