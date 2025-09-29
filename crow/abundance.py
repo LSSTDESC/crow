@@ -10,7 +10,7 @@ import numpy.typing as npt
 import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
-from clump.kernel import Completeness
+from crow.kernel import Completeness
 
 
 class ClusterAbundance:

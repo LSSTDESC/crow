@@ -7,13 +7,13 @@ implementations of Kernels.
 
 import sys
 
-sys.path.append("/global/homes/l/lettieri/clump/")
+sys.path.append("/global/homes/l/lettieri/crow/")
 from abc import abstractmethod
 import scipy
 import numpy as np
 import numpy.typing as npt
 from scipy import special
-from clump.kernel import Purity
+from crow.kernel import Purity
 
 
 class MassRichnessGaussian:

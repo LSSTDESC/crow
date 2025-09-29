@@ -6,11 +6,11 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 
-from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
-from clump.kernel import SpectroscopicRedshift, Completeness, Purity
-from clump.mass_proxy import MurataBinned
-from clump.properties import ClusterProperty
-from clump.deltasigma import ClusterDeltaSigma
+from crow.deltasigma import ClusterDeltaSigma
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
+from crow.kernel import SpectroscopicRedshift, Completeness, Purity
+from crow.mass_proxy import MurataBinned
+from crow.properties import ClusterProperty
 
 
 class MurataBinnedSpecZDeltaSigmaRecipe:

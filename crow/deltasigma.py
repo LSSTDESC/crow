@@ -10,14 +10,16 @@ import numpy.typing as npt
 import pyccl
 from scipy.stats import gamma
 from scipy.integrate import simpson
-from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
 import time
+
 import clmm  # pylint: disable=import-error
 from clmm.utils.beta_lens import (
     compute_beta_s_mean_from_distribution,
     compute_beta_s_square_mean_from_distribution,
 )
-from clump.abundance import ClusterAbundance
+
+from crow.abundance import ClusterAbundance
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 
 class ClusterDeltaSigma(ClusterAbundance):

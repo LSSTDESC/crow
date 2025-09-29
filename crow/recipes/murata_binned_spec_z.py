@@ -6,11 +6,11 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 
-from clump.abundance import ClusterAbundance
-from clump.integrator.numcosmo_integrator import NumCosmoIntegrator
-from clump.kernel import SpectroscopicRedshift
-from clump.mass_proxy import MurataBinned
-from clump.properties import ClusterProperty
+from crow.abundance import ClusterAbundance
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
+from crow.kernel import SpectroscopicRedshift
+from crow.mass_proxy import MurataBinned
+from crow.properties import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
