@@ -41,17 +41,10 @@ def build_likelihood(
     if build_parameters.get_bool("use_mean_deltasigma", True):
         average_on |= ClusterProperty.DELTASIGMA
     
-    hmf = ccl.halos.MassFuncDespali16()
+    hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
     redshift_distribution = SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
-    
-    mass_distribution.mu_p0 = 3.19
-    mass_distribution.mu_p1 = 2.0
-    mass_distribution.mu_p2 = 0.04
-    mass_distribution.sigma_p0 =  0.5
-    mass_distribution.sigma_p1 = 0.03
-    mass_distribution.sigma_p2 = 0.01
     
     survey_name = "numcosmo_simulated_redshift_richness_deltasigma"
     likelihood = ConstGaussian(
