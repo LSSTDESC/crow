@@ -10,6 +10,7 @@ import numpy.typing as npt
 import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
+from clump.kernel import Completeness
 
 
 class ClusterAbundance:
@@ -48,7 +49,6 @@ class ClusterAbundance:
         self.max_z = z_interval[1]
         self._hmf_cache: dict[tuple[float, float], float] = {}
         self._cosmo: Cosmology | None = None
-        self.completenss = None
 
     # def update_ingredients(self, cosmo: Cosmology) -> None:
     #    """Update the cluster abundance calculation with a new cosmology."""
@@ -95,5 +95,7 @@ class ClusterAbundance:
                 self._hmf_cache[(m, a)] = val
 
             return_vals.append(val)
+
+            
 
         return np.asarray(return_vals, dtype=np.float64)

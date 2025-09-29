@@ -53,7 +53,7 @@ def build_likelihood(
                 average_on, survey_name, MurataBinnedSpecZRecipe(hmf, redshift_distribution, mass_distribution)
             ),
             BinnedClusterDeltaSigma(
-                average_on, survey_name, MurataBinnedSpecZDeltaSigmaRecipe(hmf, redshift_distribution, mass_distribution)
+                average_on, survey_name, MurataBinnedSpecZDeltaSigmaRecipe(hmf=hmf, redshift_distribution=redshift_distribution, mass_distribution=mass_distribution, is_delta_sigma=True)
             ),
         ]
     )
