@@ -25,6 +25,7 @@ class MurataBinnedSpecZRecipe:
         hmf,
         redshift_distribution,
         mass_distribution,
+        completeness=None,
         min_mass=13.0,
         max_mass=16.0,
         min_z=0.2,
@@ -35,7 +36,7 @@ class MurataBinnedSpecZRecipe:
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
-
+        
         self.hmf = hmf
 
         self.cluster_theory = ClusterAbundance(
@@ -43,6 +44,8 @@ class MurataBinnedSpecZRecipe:
             z_interval=(min_z, max_z),
             halo_mass_function=self.hmf,
         )
+
+        self.completeness = completeness
 
     def get_theory_prediction(
         self,
@@ -64,14 +67,27 @@ class MurataBinnedSpecZRecipe:
             mass_proxy_limits: tuple[float, float],
             sky_area: float,
         ):
-            prediction = (
-                self.cluster_theory.comoving_volume(z, sky_area)
-                * self.cluster_theory.mass_function(mass, z)
-                * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(
-                    mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
+            if self.completeness==None:
+                prediction = (
+                    self.cluster_theory.comoving_volume(z, sky_area)
+                    * self.cluster_theory.mass_function(mass, z)
+                    * self.redshift_distribution.distribution()
+                    * self.mass_distribution.distribution(
+                        mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
+                    )
                 )
-            )
+
+            else:
+                prediction = (
+                    self.cluster_theory.comoving_volume(z, sky_area)
+                    * self.cluster_theory.mass_function(mass, z)
+                    * self.redshift_distribution.distribution()
+                    * self.mass_distribution.distribution(
+                        mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
+                    )
+                    * self.completeness.distribution(log_mass=mass, z=z)
+                )
+            
             if average_on is None:
                 return prediction
 
@@ -110,7 +126,7 @@ class MurataBinnedSpecZRecipe:
         ) -> npt.NDArray[np.float64]:
             mass = int_args[:, 0]
             z = int_args[:, 1]
-
+            
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
