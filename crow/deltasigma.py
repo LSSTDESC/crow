@@ -1,7 +1,7 @@
 """Module to compute the cluster excess surface mass density (delta sigma).
 
 The galaxy cluster delta sigma integral is a combination of both theoretical
-and phenomenological predictions.This module contains the classes and
+and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
