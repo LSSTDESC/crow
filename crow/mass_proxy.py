@@ -14,7 +14,6 @@ import numpy as np
 import numpy.typing as npt
 from scipy import special
 from crow.kernel import Purity
-from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 
 class MassRichnessGaussian:
@@ -91,16 +90,11 @@ class MassRichnessGaussian:
         proxy_mean = self.get_proxy_mean(mass, z)
         proxy_sigma = self.get_proxy_sigma(mass, z)
 
-        print(mass_proxy)
-        print(proxy_mean)
-        print(proxy_sigma)
-        
-        
         normalization = 1 / np.sqrt(2 * np.pi * proxy_sigma**2)
         result = normalization * np.exp(
             -0.5 * ((mass_proxy * np.log(10) - proxy_mean) / proxy_sigma) ** 2
         )
-        
+
         assert isinstance(result, np.ndarray)
         return result
 
@@ -175,20 +169,6 @@ class MurataBinned(MassRichnessGaussian):
             return self._distribution_binned(mass, z, mass_proxy_limits)
         else:
             raise Exception("Purity option is not supported yet.")
-            integrator = NumCosmoIntegrator(relative_tolerance=1e-2,absolute_tolerance=1e-6,)
-            def integration_func(int_args, extra_args):
-                #mass  = extra_args[0]
-                #z     = extra_args[1]
-                mass_proxy = int_args[:, 0]
-                #print(mass)
-                #print(z)
-                #print(mass_proxy)
-                return self._distribution_unbinned(mass, z, mass_proxy) / self.purity.distribution(z, mass_proxy)
-
-            integrator.integral_bounds = [(mass_proxy_limits[0], mass_proxy_limits[1])]
-            integrator.extra_args = np.array([mass, z])  
-            
-            return integrator.integrate(integration_func)
 
 
 class MurataUnbinned(MassRichnessGaussian):
@@ -250,4 +230,4 @@ class MurataUnbinned(MassRichnessGaussian):
         if self.purity == None:
             return self._distribution_unbinned(mass, z, mass_proxy)
         else:
-            return self._distribution_unbinned(mass, z, mass_proxy) / self.purity.distribution(z, mass_proxy)
+            raise Exception("Purity option is not supported yet.")

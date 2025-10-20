@@ -29,7 +29,6 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         max_mass=16.0,
         min_z=0.2,
         max_z=0.8,
-        completeness=None,
         is_delta_sigma=False,
         cluster_concentration=None,
         two_halo_term=False,
@@ -54,8 +53,6 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             cluster_concentration=cluster_concentration,
         )
 
-        self.completeness = completeness
-        
     def get_theory_prediction(
         self,
         average_on: None | ClusterProperty = None,  # pylint: disable=unused-argument
@@ -83,24 +80,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             sky_area: float,
             radius_center: float,
         ):
-            if self.completeness==None:
-                prediction = (
-                    self.cluster_theory.comoving_volume(z, sky_area)
-                    * self.cluster_theory.mass_function(mass, z)
-                    * self.redshift_distribution.distribution()
-                    * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
-                )
-            else:
-                prediction = (
-                    self.cluster_theory.comoving_volume(z, sky_area)
-                    * self.cluster_theory.mass_function(mass, z)
-                    * self.redshift_distribution.distribution()
-                    * self.mass_distribution.distribution(
-                        mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
-                    )
-                    * self.completeness.distribution(log_mass=mass, z=z)
-                )
-                
+            prediction = (
+                self.cluster_theory.comoving_volume(z, sky_area)
+                * self.cluster_theory.mass_function(mass, z)
+                * self.redshift_distribution.distribution()
+                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
+            )
             if average_on is None:
                 # pylint: disable=no-member
                 raise ValueError(
@@ -145,12 +130,11 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         ) -> npt.NDArray[np.float64]:
             mass = int_args[:, 0]
             z = int_args[:, 1]
-            
+
             mass_proxy_low = extra_args[0]
             mass_proxy_high = extra_args[1]
             sky_area = extra_args[2]
             radius_center = extra_args[3]
-            
             return prediction(
                 mass, z, (mass_proxy_low, mass_proxy_high), sky_area, radius_center
             )
@@ -203,25 +187,14 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             mass_proxy_limits: tuple[float, float],
             sky_area: float,
         ):
-            if self.completeness==None: 
-                prediction = (
-                    self.cluster_theory.comoving_volume(z, sky_area)
-                    * self.cluster_theory.mass_function(mass, z)
-                    * self.redshift_distribution.distribution()
-                    * self.mass_distribution.distribution(
-                        mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
-                    )
+            prediction = (
+                self.cluster_theory.comoving_volume(z, sky_area)
+                * self.cluster_theory.mass_function(mass, z)
+                * self.redshift_distribution.distribution()
+                * self.mass_distribution.distribution(
+                    mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
                 )
-            else:
-                prediction = (
-                    self.cluster_theory.comoving_volume(z, sky_area)
-                    * self.cluster_theory.mass_function(mass, z)
-                    * self.redshift_distribution.distribution()
-                    * self.mass_distribution.distribution(
-                        mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
-                    )
-                    * self.completeness(log_mass=mass, z=z)
-                )
+            )
             if average_on is None:
                 return prediction
 

@@ -119,8 +119,7 @@ class Purity:
             mean_mass = (mass_proxy_limits[0] + mass_proxy_limits[1]) / 2
             r = np.array([np.power(10.0, mean_mass)], dtype=np.float64)
         else:
-            #r = np.array([np.power(10.0, mass_proxy)], dtype=np.float64)
-            r = np.power(10.0, mass_proxy)
+            r = np.array([np.power(10.0, mass_proxy)], dtype=np.float64)
 
         r_over_rc = r / self._rc(z)
 
