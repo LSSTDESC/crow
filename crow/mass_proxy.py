@@ -5,11 +5,15 @@ that can be included in the cluster abundance integrand.  These are
 implementations of Kernels.
 """
 
-from abc import abstractmethod
+import sys
 
+sys.path.append("/global/homes/l/lettieri/crow/")
+from abc import abstractmethod
+import scipy
 import numpy as np
 import numpy.typing as npt
 from scipy import special
+from crow.kernel import Purity
 
 
 class MassRichnessGaussian:
@@ -56,14 +60,12 @@ class MassRichnessGaussian:
     ) -> npt.NDArray[np.float64]:
         proxy_mean = self.get_proxy_mean(mass, z)
         proxy_sigma = self.get_proxy_sigma(mass, z)
-
         x_min = (proxy_mean - mass_proxy_limits[0] * np.log(10.0)) / (
             np.sqrt(2.0) * proxy_sigma
         )
         x_max = (proxy_mean - mass_proxy_limits[1] * np.log(10.0)) / (
             np.sqrt(2.0) * proxy_sigma
         )
-
         return_vals = np.empty_like(x_min)
         mask1 = (x_max > 3.0) | (x_min < -3.0)
         mask2 = ~mask1
@@ -117,6 +119,7 @@ class MurataBinned(MassRichnessGaussian):
         self.pivot_redshift = pivot_redshift
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
+        self.purity = None
 
         self.mu_p0 = MURATA_DEFAULT_MU_P0
         self.mu_p1 = MURATA_DEFAULT_MU_P1
@@ -162,7 +165,10 @@ class MurataBinned(MassRichnessGaussian):
         mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_binned(mass, z, mass_proxy_limits)
+        if self.purity == None:
+            return self._distribution_binned(mass, z, mass_proxy_limits)
+        else:
+            raise Exception("Purity option is not supported yet.")
 
 
 class MurataUnbinned(MassRichnessGaussian):
@@ -177,6 +183,7 @@ class MurataUnbinned(MassRichnessGaussian):
         self.pivot_redshift = pivot_redshift
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
+        self.purity = None
 
         self.mu_p0 = MURATA_DEFAULT_MU_P0
         self.mu_p1 = MURATA_DEFAULT_MU_P1
@@ -220,4 +227,7 @@ class MurataUnbinned(MassRichnessGaussian):
         mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_unbinned(mass, z, mass_proxy)
+        if self.purity == None:
+            return self._distribution_unbinned(mass, z, mass_proxy)
+        else:
+            raise Exception("Purity option is not supported yet.")

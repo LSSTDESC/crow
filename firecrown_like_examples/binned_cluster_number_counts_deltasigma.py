@@ -18,7 +18,7 @@ from firecrown.models.cluster.properties import ClusterProperty
 from firecrown.models.cluster.recipes.murata_binned_spec_z_deltasigma import (
     MurataBinnedSpecZDeltaSigmaRecipe,
 )
-
+import numpy as np
 from .binned_cluster import BinnedCluster
 from .updatable_wrapper import UpdatableClusterObjects
 

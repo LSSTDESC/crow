@@ -13,6 +13,8 @@ from firecrown.models.cluster.binning import SaccBin
 from firecrown.models.cluster.cluster_data import ClusterData
 from firecrown.models.cluster.properties import ClusterProperty
 
+from .updatable_wrapper import UpdatableClusterObjects
+
 
 class BinnedCluster(Statistic):
     """A statistic representing clusters in a z, mass bin."""

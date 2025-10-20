@@ -5,11 +5,10 @@ from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
-import pyccl as ccl
 
 from crow.deltasigma import ClusterDeltaSigma
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import SpectroscopicRedshift
+from crow.kernel import SpectroscopicRedshift, Completeness, Purity
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 
@@ -21,19 +20,37 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        hmf,
+        redshift_distribution,
+        mass_distribution,
+        min_mass=13.0,
+        max_mass=16.0,
+        min_z=0.2,
+        max_z=0.8,
+        is_delta_sigma=False,
+        cluster_concentration=None,
+        two_halo_term=False,
+        miscentering_frac=None,
+        boost_factor=False,
+    ) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
 
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
+        self.hmf = hmf
+        self.two_halo_term = two_halo_term
+        self.miscentering_frac = miscentering_frac
+        self.boost_factor = boost_factor
 
         self.cluster_theory = ClusterDeltaSigma(
-            (min_mass, max_mass), (min_z, max_z), hmf
+            mass_interval=(min_mass, max_mass),
+            z_interval=(min_z, max_z),
+            halo_mass_function=self.hmf,
+            is_delta_sigma=is_delta_sigma,
+            cluster_concentration=cluster_concentration,
         )
 
     def get_theory_prediction(
@@ -78,7 +95,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
                     prediction *= self.cluster_theory.delta_sigma(
-                        mass, z, radius_center, True, None
+                        log_mass=mass,
+                        z=z,
+                        radius_center=radius_center,
+                        two_halo_term=self.two_halo_term,
+                        miscentering_frac=self.miscentering_frac,
+                        boost_factor=self.boost_factor,
                     )
             return prediction
 
@@ -121,9 +143,9 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction(
         self,
-        z_edges,
-        mass_proxy_edges,
-        radius_center,
+        z_edges: tuple[float, float],
+        mass_proxy_edges: tuple[float, float],
+        radius_center: float,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -137,9 +159,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
             z_edges,
         ]
-        radius_center = radius_center
         self.integrator.extra_args = np.array(
-            [*mass_proxy_edges, sky_area, radius_center]
+            [mass_proxy_edges[0], mass_proxy_edges[1], sky_area, radius_center]
         )
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
@@ -148,6 +169,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def get_theory_prediction_counts(
         self,
+        average_on: None | ClusterProperty = None,
     ) -> Callable[
         [npt.NDArray[np.float64], npt.NDArray[np.float64], tuple[float, float], float],
         npt.NDArray[np.float64],
@@ -169,8 +191,21 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
+                * self.mass_distribution.distribution(
+                    mass=mass, z=z, mass_proxy_limits=mass_proxy_limits
+                )
             )
+            if average_on is None:
+                return prediction
+
+            for cluster_prop in ClusterProperty:
+                include_prop = cluster_prop & average_on
+                if not include_prop:
+                    continue
+                if cluster_prop == ClusterProperty.MASS:
+                    prediction *= mass
+                if cluster_prop == ClusterProperty.REDSHIFT:
+                    prediction *= z
             return prediction
 
         return theory_prediction
@@ -209,9 +244,10 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
 
     def evaluate_theory_prediction_counts(
         self,
-        z_edges,
-        mass_proxy_edges,
+        z_edges: tuple[float, float],
+        mass_proxy_edges: tuple[float, float],
         sky_area: float,
+        average_on: None | ClusterProperty = None,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
 
@@ -223,9 +259,12 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
             z_edges,
         ]
-        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction_counts()
+        self.integrator.extra_args = np.array(
+            [mass_proxy_edges[0], mass_proxy_edges[1], sky_area]
+        )
+
+        theory_prediction = self.get_theory_prediction_counts(average_on)
         prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)

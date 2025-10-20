@@ -10,6 +10,7 @@ import numpy.typing as npt
 import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
+from crow.kernel import Completeness
 
 
 class ClusterAbundance:
@@ -32,6 +33,7 @@ class ClusterAbundance:
         self._cosmo = cosmo
         self._hmf_cache = {}
 
+    #
     def __init__(
         self,
         mass_interval: tuple[float, float],
@@ -41,11 +43,17 @@ class ClusterAbundance:
         super().__init__()
         self.halo_mass_function = halo_mass_function
         self.min_mass = mass_interval[0]
+
         self.max_mass = mass_interval[1]
         self.min_z = z_interval[0]
         self.max_z = z_interval[1]
         self._hmf_cache: dict[tuple[float, float], float] = {}
         self._cosmo: Cosmology | None = None
+
+    # def update_ingredients(self, cosmo: Cosmology) -> None:
+    #    """Update the cluster abundance calculation with a new cosmology."""
+    #    self._cosmo = cosmo
+    #    self._hmf_cache = {}
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0
@@ -85,6 +93,9 @@ class ClusterAbundance:
             if val is None:
                 val = self.halo_mass_function(self.cosmo, 10**m, a)
                 self._hmf_cache[(m, a)] = val
+
             return_vals.append(val)
+
+            
 
         return np.asarray(return_vals, dtype=np.float64)

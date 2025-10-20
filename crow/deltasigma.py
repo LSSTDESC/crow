@@ -5,14 +5,18 @@ and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
-import time
-
-import clmm  # pylint: disable=import-error
 import numpy as np
 import numpy.typing as npt
 import pyccl
-from scipy.integrate import simpson
 from scipy.stats import gamma
+from scipy.integrate import simpson
+import time
+
+import clmm  # pylint: disable=import-error
+from clmm.utils.beta_lens import (
+    compute_beta_s_mean_from_distribution,
+    compute_beta_s_square_mean_from_distribution,
+)
 
 from crow.abundance import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
@@ -32,9 +36,11 @@ class ClusterDeltaSigma(ClusterAbundance):
         mass_interval: tuple[float, float],
         z_interval: tuple[float, float],
         halo_mass_function: pyccl.halos.MassFunc,
+        is_delta_sigma: bool = False,
         cluster_concentration: float | None = None,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
+        self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 
     def delta_sigma(
@@ -63,7 +69,8 @@ class ClusterDeltaSigma(ClusterAbundance):
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
-            moo.set_concentration(self._get_concentration(log_m, redshift))
+            conc_val = self._get_concentration(log_m, redshift)
+            moo.set_concentration(conc_val)
             moo.set_mass(10**log_m)
             val = self._one_halo_contribution(
                 moo, radius_center, redshift, miscentering_frac
@@ -86,9 +93,36 @@ class ClusterDeltaSigma(ClusterAbundance):
         """Calculate the second halo contribution to the delta sigma."""
         # pylint: disable=protected-access
         # t1 = time.time()
-        first_halo_right_centered = clmm_model.eval_excess_surface_density(
-            radius_center, redshift
-        )
+        if self.is_delta_sigma:
+            first_halo_right_centered = clmm_model.eval_excess_surface_density(
+                radius_center, redshift
+            )
+        else:
+            beta_s_mean = compute_beta_s_mean_from_distribution(
+                z_cl=redshift,
+                z_inf=10,
+                cosmo=clmm_model.cosmo,
+                zmax=5.0,
+                delta_z_cut=0.1,
+                zmin=redshift,
+                z_distrib_func=None,
+            )
+            beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
+                z_cl=redshift,
+                z_inf=10,
+                cosmo=clmm_model.cosmo,
+                zmax=5.0,
+                delta_z_cut=0.1,
+                zmin=redshift,
+                z_distrib_func=None,
+            )
+            first_halo_right_centered = clmm_model.eval_tangential_shear(
+                radius_center,
+                redshift,
+                (beta_s_mean, beta_s_square_mean),
+                z_src_info="beta",
+            )
+
         # t2 = time.time()
         # print(f'1halo term took {t2-t1}')
         if miscentering_frac is not None:
@@ -101,14 +135,48 @@ class ClusterDeltaSigma(ClusterAbundance):
                 sigma = extra_args[0]
                 r_mis_list = int_args[:, 0]
                 # t3 = time.time()
-                esd_vals = np.array(
-                    [
-                        clmm_model.eval_excess_surface_density(
-                            np.array([radius_center]), redshift, r_mis=r_mis
-                        )[0]
-                        for r_mis in r_mis_list
-                    ]
-                )
+                if self.is_delta_sigma:
+                    esd_vals = np.array(
+                        [
+                            clmm_model.eval_excess_surface_density(
+                                np.array([radius_center]), redshift, r_mis=r_mis
+                            )[0]
+                            for r_mis in r_mis_list
+                        ]
+                    )
+
+                else:
+                    beta_s_mean = compute_beta_s_mean_from_distribution(
+                        z_cl=redshift,
+                        z_inf=10,
+                        cosmo=clmm_model.cosmo,
+                        zmax=5.0,
+                        delta_z_cut=0.1,
+                        zmin=None,
+                        z_distrib_func=None,
+                    )
+                    beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
+                        z_cl=redshift,
+                        z_inf=10,
+                        cosmo=clmm_model.cosmo,
+                        zmax=5.0,
+                        delta_z_cut=0.1,
+                        zmin=None,
+                        z_distrib_func=None,
+                    )
+                    esd_vals = np.array(
+                        [
+                            clmm_model.eval_tangential_shear(
+                                np.array([radius_center]),
+                                redshift,
+                                r_mis,
+                                (beta_s_mean, beta_s_square_mean),
+                                "beta",
+                            )[0]
+                            for r_mis in r_mis_list
+                        ]
+                    )
+
                 # t4 = time.time()
                 # print(f'for {len(r_mis_list)} radiuses, misc it took {(t4 - t3) / len(r_mis_list)} per radius')
                 gamma_vals = gamma.pdf(r_mis_list, a=2.0, scale=sigma)
@@ -133,9 +201,14 @@ class ClusterDeltaSigma(ClusterAbundance):
     ) -> npt.NDArray[np.float64]:
         """Calculate the second halo contribution to the delta sigma."""
         # pylint: disable=protected-access
+        if self.is_delta_sigma ==False:
+            raise Exception("Two halo contribution for gt is not suported yet.")  
+
         second_halo_right_centered = clmm_model.eval_excess_surface_density_2h(
             np.array([radius_center]), redshift
         )
+        
+        
         return second_halo_right_centered[0]
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
