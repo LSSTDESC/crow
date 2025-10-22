@@ -6,7 +6,8 @@ functions that produce those predictions.
 """
 
 import time
-from typing import Callable
+from typing import Optional, Tuple, Callable
+from scipy.interpolate import interp1d
 
 import clmm  # pylint: disable=import-error
 from clmm.utils.beta_lens import (
@@ -40,11 +41,14 @@ class ClusterDeltaSigma(ClusterAbundance):
         halo_mass_function: pyccl.halos.MassFunc,
         is_delta_sigma: bool = False,
         cluster_concentration: float | None = None,
+        beta_zbin_cl_edges: Optional[Tuple[float, float]] = None,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
-
+        self.beta_zbin_cl_edges = beta_zbin_cl_edges
+        self.beta_interp = None
+        
     def delta_sigma(
         self,
         log_mass: npt.NDArray[np.float64],
@@ -53,7 +57,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         two_halo_term: bool = False,
         miscentering_frac: np.float64 = None,
         boost_factor: bool = False,
-        beta_lens_interp: tuple[Callable[[float | np.ndarray], float], Callable[[float | np.ndarray], float]] | None = None,
+        use_beta_interp: bool = False,
     ) -> npt.NDArray[np.float64]:
         """Delta sigma for cprint(new_pred)lusters."""
         cosmo_clmm = clmm.Cosmology()
@@ -75,7 +79,7 @@ class ClusterDeltaSigma(ClusterAbundance):
             moo.set_concentration(self._get_concentration(log_m, redshift))
             moo.set_mass(10**log_m)
             val = self._one_halo_contribution(
-                moo, radius_center, redshift, miscentering_frac, beta_lens_interp=beta_lens_interp
+                moo, radius_center, redshift, miscentering_frac, use_beta_interp=use_beta_interp
             )
             if two_halo_term:
                 val += self._two_halo_contribution(moo, radius_center, redshift)
@@ -91,7 +95,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         redshift,
         miscentering_frac=None,
         sigma_offset=0.12,
-        beta_lens_interp: tuple[Callable[[float | np.ndarray], float], Callable[[float | np.ndarray], float]] | None = None,
+        use_beta_interp: bool = False,
         **kwargs,
     ) -> npt.NDArray[np.float64]:
         """Calculate the second halo contribution to the delta sigma."""
@@ -104,7 +108,7 @@ class ClusterDeltaSigma(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean, beta_s_square_mean = self._get_beta_lens_efficiency(clmm_model, redshift, beta_lens_interp, **kwargs) 
+            beta_s_mean, beta_s_square_mean = self._get_beta_lens_efficiency(clmm_model, redshift, use_beta_interp, **kwargs) 
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,
@@ -157,7 +161,6 @@ class ClusterDeltaSigma(ClusterAbundance):
                 (1.0 - miscentering_frac) * first_halo_right_centered
                 + miscentering_frac * miscentering_integral
             )
-        print("values", first_halo_right_centered)
         return first_halo_right_centered
 
     def _two_halo_contribution(
@@ -199,11 +202,11 @@ class ClusterDeltaSigma(ClusterAbundance):
         )
         return corrected_profiles
         
-    def _get_beta_lens_efficiency(self, clmm_model: clmm.Modeling, redshift, beta_lens_interp, **kwargs):
+    def _get_beta_lens_efficiency(self, clmm_model: clmm.Modeling, redshift, use_beta_interp, **kwargs):
         beta_s_mean = None
         beta_s_square_mean = None
         zmax = kwargs.pop('zmax', 5.0)
-        if beta_lens_interp == None:
+        if use_beta_interp == False:
             beta_s_mean = compute_beta_s_mean_from_distribution(
                    z_cl=redshift,
                    z_inf=10,
@@ -219,6 +222,39 @@ class ClusterDeltaSigma(ClusterAbundance):
                    **kwargs
             )
         else:
-            beta_s_mean = beta_lens_interp[0](redshift)
-            beta_s_square_mean = beta_lens_interp[1](redshift)
+            if self.beta_interp == None:
+                self.beta_interp = self._compute_beta_interp(clmm_model)
+            beta_s_mean_interp = self.beta_interp[0]
+            beta_s_square_mean_interp = self.beta_interp[1]
+            beta_s_mean = beta_s_mean_interp(redshift)
+            beta_s_square_mean = beta_s_square_mean_interp(redshift)
         return float(beta_s_mean), float(beta_s_square_mean)
+        
+    def _compute_beta_interp(self, clmm_model):
+        clmm_cosmo = clmm_model.cosmo
+        betaz_min = None
+        betaz_max = None
+        if self.beta_zbin_cl_edges == None:
+            print(f"Warning, no redshift bin for beta estimation, using integration values ({self.min_z}, {self.max_z}) instead")
+            betaz_min = self.min_z
+            betaz_max = self.max_z
+        else:
+            betaz_min = self.beta_zbin_cl_edges[0]
+            betaz_max = self.beta_zbin_cl_edges[-1]
+        redshift_points = np.linspace(betaz_min, betaz_max, 3)
+        beta_list = [clmm.utils.compute_beta_s_mean_from_distribution(z_cl, 10.0, clmm_cosmo, zmax=5.0) for z_cl in redshift_points]
+        beta_sq_list = [clmm.utils.compute_beta_s_square_mean_from_distribution(z_cl, 10.0, clmm_cosmo, zmax=5.0) for z_cl in redshift_points]
+        beta_mean_interp = interp1d(
+            redshift_points,
+            beta_list,
+            kind='quadratic',
+            fill_value='extrapolate'
+        )
+        beta_sq_mean_interp = interp1d(
+            redshift_points,
+            beta_sq_list,
+            kind='quadratic',
+            fill_value='extrapolate'
+        )
+        
+        return (beta_mean_interp, beta_sq_mean_interp)
