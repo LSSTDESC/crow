@@ -21,20 +21,40 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        hmf,
+        redshift_distribution,
+        mass_distribution,
+        min_mass=13.0,
+        max_mass=16.0,
+        min_z=0.2,
+        max_z=0.8,
+        is_delta_sigma=False,
+        cluster_concentration=None,
+        two_halo_term=False,
+        miscentering_frac=None,
+        boost_factor=False,
+        use_interp = False,
+    ) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
 
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
-
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
+        self.hmf = hmf
+        self.two_halo_term = two_halo_term
+        self.miscentering_frac = miscentering_frac
+        self.boost_factor = boost_factor
+        self.is_delta_sigma = is_delta_sigma
         self.cluster_theory = ClusterDeltaSigma(
-            (min_mass, max_mass), (min_z, max_z), hmf
+            mass_interval=(min_mass, max_mass),
+            z_interval=(min_z, max_z),
+            halo_mass_function=self.hmf,
+            is_delta_sigma=is_delta_sigma,
+            cluster_concentration=cluster_concentration,
         )
+        self.use_interp = use_interp
 
     def get_theory_prediction(
         self,
