@@ -35,7 +35,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         two_halo_term=False,
         miscentering_frac=None,
         boost_factor=False,
-        use_interp = False,
+        use_beta_interp = False,
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
@@ -54,7 +54,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             is_delta_sigma=is_delta_sigma,
             cluster_concentration=cluster_concentration,
         )
-        self.use_interp = use_interp
+        self.use_beta_interp= use_beta_interp
 
     def get_theory_prediction(
         self,
@@ -98,7 +98,13 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             for cluster_prop in ClusterProperty:
                 if cluster_prop == ClusterProperty.DELTASIGMA:
                     prediction *= self.cluster_theory.delta_sigma(
-                        mass, z, radius_center, True, None
+                        log_mass=mass,
+                        z=z,
+                        radius_center=radius_center,
+                        two_halo_term=self.two_halo_term,
+                        miscentering_frac=self.miscentering_frac,
+                        boost_factor=self.boost_factor,
+                        use_beta_interp=self.use_beta_interp,
                     )
             return prediction
 
@@ -161,6 +167,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.integrator.extra_args = np.array(
             [*mass_proxy_edges, sky_area, radius_center]
         )
+        self.cluster_theory.beta_interp = None
+        self.cluster_theory.beta_zbin_cl_edges = z_edges
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
         deltasigma = self.integrator.integrate(prediction_wrapper)
