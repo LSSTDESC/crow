@@ -11,7 +11,7 @@ from crow.deltasigma import ClusterDeltaSigma
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from crow.properties import ClusterProperty
+from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZDeltaSigmaRecipe:
@@ -92,12 +92,11 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             if average_on is None:
                 # pylint: disable=no-member
                 raise ValueError(
-                    f"The property should be" f" {ClusterProperty.DELTASIGMA}."
+                    f"The property should be" f" {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR}."
                 )
 
-            for cluster_prop in ClusterProperty:
-                if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(
+            if average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR):
+                prediction *= self.cluster_theory.delta_sigma(
                         log_mass=mass,
                         z=z,
                         radius_center=radius_center,
@@ -105,7 +104,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
                         miscentering_frac=self.miscentering_frac,
                         boost_factor=self.boost_factor,
                         use_beta_interp=self.use_beta_interp,
-                    )
+                )
             return prediction
 
         return theory_prediction
