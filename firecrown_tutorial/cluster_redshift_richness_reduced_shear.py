@@ -45,7 +45,7 @@ def build_likelihood(
     redshift_distribution = SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
-    survey_name = "numcosmo_simulated_redshift_richness_deltasigma"
+    survey_name = "numcosmo_simulated_redshift_richness_gt"
     
     likelihood = ConstGaussian(
         [
@@ -53,13 +53,13 @@ def build_likelihood(
                 average_on, survey_name, MurataBinnedSpecZRecipe(hmf, redshift_distribution, mass_distribution)
             ),
             BinnedClusterDeltaSigma(
-                average_on, survey_name, MurataBinnedSpecZDeltaSigmaRecipe(hmf=hmf, redshift_distribution=redshift_distribution, mass_distribution=mass_distribution, is_delta_sigma=True)
+                average_on, survey_name, MurataBinnedSpecZDeltaSigmaRecipe(hmf=hmf, redshift_distribution=redshift_distribution, mass_distribution=mass_distribution, is_delta_sigma=False, use_beta_interp=True)
             ),
         ]
     )
 
     # Read in sacc data
-    sacc_file_nm = "cluster_redshift_richness_deltasigma_sacc_data.fits"
+    sacc_file_nm = "cluster_redshift_richness_gt_sacc_data.fits"
     sacc_data = sacc.Sacc.load_fits(sacc_file_nm)
     likelihood.read(sacc_data)
 

@@ -11,7 +11,7 @@ from crow.deltasigma import ClusterDeltaSigma
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from crow.properties import ClusterProperty
+from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZDeltaSigmaRecipe:
@@ -21,20 +21,40 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        hmf,
+        redshift_distribution,
+        mass_distribution,
+        min_mass=13.0,
+        max_mass=16.0,
+        min_z=0.2,
+        max_z=0.8,
+        is_delta_sigma=False,
+        cluster_concentration=None,
+        two_halo_term=False,
+        miscentering_frac=None,
+        boost_factor=False,
+        use_beta_interp = False,
+    ) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
 
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
-
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
+        self.hmf = hmf
+        self.two_halo_term = two_halo_term
+        self.miscentering_frac = miscentering_frac
+        self.boost_factor = boost_factor
+        self.is_delta_sigma = is_delta_sigma
         self.cluster_theory = ClusterDeltaSigma(
-            (min_mass, max_mass), (min_z, max_z), hmf
+            mass_interval=(min_mass, max_mass),
+            z_interval=(min_z, max_z),
+            halo_mass_function=self.hmf,
+            is_delta_sigma=is_delta_sigma,
+            cluster_concentration=cluster_concentration,
         )
+        self.use_beta_interp= use_beta_interp
 
     def get_theory_prediction(
         self,
@@ -72,14 +92,19 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             if average_on is None:
                 # pylint: disable=no-member
                 raise ValueError(
-                    f"The property should be" f" {ClusterProperty.DELTASIGMA}."
+                    f"The property should be" f" {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR}."
                 )
 
-            for cluster_prop in ClusterProperty:
-                if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(
-                        mass, z, radius_center, True, None
-                    )
+            if average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR):
+                prediction *= self.cluster_theory.delta_sigma(
+                        log_mass=mass,
+                        z=z,
+                        radius_center=radius_center,
+                        two_halo_term=self.two_halo_term,
+                        miscentering_frac=self.miscentering_frac,
+                        boost_factor=self.boost_factor,
+                        use_beta_interp=self.use_beta_interp,
+                )
             return prediction
 
         return theory_prediction
@@ -141,6 +166,8 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.integrator.extra_args = np.array(
             [*mass_proxy_edges, sky_area, radius_center]
         )
+        self.cluster_theory.beta_interp = None
+        self.cluster_theory.beta_zbin_cl_edges = z_edges
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
         deltasigma = self.integrator.integrate(prediction_wrapper)
