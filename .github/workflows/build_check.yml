@@ -1,4 +1,4 @@
-name: Build and Check
+name: firecrown-ci-minimal
 
 on:
   push:
@@ -6,40 +6,48 @@ on:
       - main
   pull_request:
 
+env:
+  CONDA_ENV: myrepo-env
+
 jobs:
-  test-conda-env:
-    name: Build, Lint, and Test (Conda)
+  quick-validation:
+    name: Quick validation (Lint + Tests)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # 1. Checkout repository
+      - uses: actions/checkout@v4
 
+      # 2. Set up Miniconda
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
-          activate-environment: myrepo-env   # or whatever name you used in environment.yml
+          activate-environment: ${{ env.CONDA_ENV }}
           python-version: 3.12
           auto-activate-base: false
-          use-mamba: true  # much faster dependency solving
+          use-mamba: true
 
+      # 3. Verify environment
       - name: Verify conda environment
         run: |
           conda info
           conda list
 
+      # 4. Linting with black
       - name: Check code formatting with black
         run: |
-          pip install black
-          black --check --diff crow tests
+          conda run -n ${{ env.CONDA_ENV }} pip install black
+          conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
 
+      # 5. Import sorting with isort
       - name: Check import order with isort
         run: |
-          pip install isort
-          isort --check --diff crow tests
+          conda run -n ${{ env.CONDA_ENV }} pip install isort
+          conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
 
+      # 6. Run tests with pytest
       - name: Run tests with pytest
         run: |
-          pip install pytest
-          pytest -v --maxfail=1 --disable-warnings
+          conda run -n ${{ env.CONDA_ENV }} pip install pytest
+          conda run -n ${{ env.CONDA_ENV }} pytest -v --maxfail=1 --disable-warnings
