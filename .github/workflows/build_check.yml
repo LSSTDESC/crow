@@ -1,4 +1,4 @@
-name: firecrown-ci-minimal
+name: crow-ci
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  CONDA_ENV: myrepo-env
+  CONDA_ENV: crow-env
 
 jobs:
   quick-validation:
@@ -37,17 +37,14 @@ jobs:
       # 4. Linting with black
       - name: Check code formatting with black
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install black
           conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
 
       # 5. Import sorting with isort
       - name: Check import order with isort
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install isort
           conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
 
       # 6. Run tests with pytest
       - name: Run tests with pytest
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install pytest
           conda run -n ${{ env.CONDA_ENV }} pytest -v --maxfail=1 --disable-warnings
