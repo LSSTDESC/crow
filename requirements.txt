@@ -1,0 +1,9 @@
+# These can be installed by conda.
+clmm
+hypothesis
+numcosmo>=0.21.1
+numpy>=2.0
+pyccl>=2.8.0
+pytest
+sacc>=2.1
+scipy>=1.12

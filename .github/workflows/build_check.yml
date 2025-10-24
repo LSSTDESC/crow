@@ -7,32 +7,39 @@ on:
   pull_request:
 
 jobs:
-  build-gcc-ubuntu:
+  test-conda-env:
+    name: Build, Lint, and Test (Conda)
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v3
-#    - name: Install prereq and NumCosmo using conda
-#      run: |
-#        echo "$CONDA/bin" >> $GITHUB_PATH
-#        conda install -c conda-forge gobject-introspection pygobject 'numcosmo<=0.22.0' cmake swig setuptools_scm sphinx sphinx_rtd_theme nbconvert pandoc ipython
-#    - name: Install prereq using pip
-#      run: |
-#        pip install -r requirements.txt
-#    - name: Install the package
-#      run: |
-#        pip install .
-#    - name: Install CCL from source
-#      run: |
-#        git clone https://github.com/LSSTDESC/CCL
-#        cd CCL
-#        pip install .
-    - name: Analysing the code formatting with black
-      run: |
-        pip install black black-configparser
-        black --check --diff crow
-    - name: Analysing the code import order with isort
-      run: |
-        pip install isort
-        isort --check --diff crow
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: environment.yml
+          activate-environment: myrepo-env   # or whatever name you used in environment.yml
+          python-version: 3.12
+          auto-activate-base: false
+          use-mamba: true  # much faster dependency solving
+
+      - name: Verify conda environment
+        run: |
+          conda info
+          conda list
+
+      - name: Check code formatting with black
+        run: |
+          pip install black
+          black --check --diff crow tests
+
+      - name: Check import order with isort
+        run: |
+          pip install isort
+          isort --check --diff crow tests
+
+      - name: Run tests with pytest
+        run: |
+          pip install pytest
+          pytest -v --maxfail=1 --disable-warnings
