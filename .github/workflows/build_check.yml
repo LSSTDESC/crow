@@ -90,13 +90,15 @@ jobs:
       - name: Update environment
         if: steps.cache.outputs.cache-hit != 'true'
         run: conda env update -n ${{ env.CONDA_ENV }} -f environment.yml
+      - name: Install test dependencies
+        run: |
+          conda run -n ${{ env.CONDA_ENV }} pip install pytest-xdist pytest-cov
       - name: Check code formatting with black
         run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
       - name: Check import order with isort
         run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
       - name: Run tests
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install pytest-xdist
           if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --cov crow --cov-report xml --cov-branch -n auto
           else
@@ -111,4 +113,3 @@ jobs:
       #     verbose: true
       #   env:
       #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
