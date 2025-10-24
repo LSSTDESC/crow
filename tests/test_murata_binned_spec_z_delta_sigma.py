@@ -15,9 +15,8 @@ from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
+from crow.recipes.murata_binned_spec_z_deltasigma import \
+    MurataBinnedSpecZDeltaSigmaRecipe
 
 
 @pytest.fixture(name="murata_binned_spec_z")

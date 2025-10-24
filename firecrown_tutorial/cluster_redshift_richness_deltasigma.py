@@ -12,17 +12,13 @@ from firecrown.models.cluster import ClusterProperty
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
-
+from crow.recipes.murata_binned_spec_z_deltasigma import \
+    MurataBinnedSpecZDeltaSigmaRecipe
 # to be moved to firecrown eventually
-from firecrown_like_examples.binned_cluster_number_counts import (
-    BinnedClusterNumberCounts,
-)
-from firecrown_like_examples.binned_cluster_number_counts_deltasigma import (
-    BinnedClusterDeltaSigma,
-)
+from firecrown_like_examples.binned_cluster_number_counts import \
+    BinnedClusterNumberCounts
+from firecrown_like_examples.binned_cluster_number_counts_deltasigma import \
+    BinnedClusterDeltaSigma
 
 
 def build_likelihood(
