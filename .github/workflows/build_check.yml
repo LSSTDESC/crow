@@ -96,6 +96,7 @@ jobs:
         run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
       - name: Run tests
         run: |
+          conda run -n ${{ env.CONDA_ENV }} pip install pytest-xdist
           if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --cov crow --cov-report xml --cov-branch -n auto
           else
