@@ -13,8 +13,11 @@ import sacc
 from firecrown.likelihood.source import SourceSystematic
 from firecrown.likelihood.statistic import TheoryVector
 from firecrown.modeling_tools import ModelingTools
-from firecrown.models.cluster import (ClusterProperty, DeltaSigmaData,
-                                      MurataBinnedSpecZDeltaSigmaRecipe)
+from firecrown.models.cluster import (
+    ClusterProperty,
+    DeltaSigmaData,
+    MurataBinnedSpecZDeltaSigmaRecipe,
+)
 
 from .binned_cluster import BinnedCluster
 from .updatable_wrapper import UpdatableClusterObjects
