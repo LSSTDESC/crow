@@ -2,7 +2,6 @@
 
 import os
 import sys
-from unittest.mock import Mock
 
 import numpy as np
 import pyccl
@@ -11,8 +10,6 @@ import pytest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow.abundance import ClusterAbundance
-from crow.deltasigma import ClusterDeltaSigma
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned

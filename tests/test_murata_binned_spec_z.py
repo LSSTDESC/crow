@@ -2,7 +2,6 @@
 
 import os
 import sys
-from unittest.mock import Mock
 
 import numpy as np
 import pyccl
@@ -13,8 +12,6 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow.abundance import ClusterAbundance
-from crow.deltasigma import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
@@ -158,14 +155,6 @@ def test_get_theory_prediction_throws_with_nonimpl_average(
     assert prediction is not None
     assert callable(prediction)
 
-    # mass = np.linspace(13, 17, 2, dtype=np.float64)
-    # z = np.linspace(0.1, 1, 2, dtype=np.float64)
-    # mass_proxy_limits = (0, 5)
-    # sky_area = 360**2
-
-    # with pytest.raises(NotImplementedError):
-    #    _ = prediction(mass, z, mass_proxy_limits, sky_area)
-
 
 def test_get_function_to_integrate_returns_value(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
@@ -191,16 +180,15 @@ def test_evaluates_theory_prediction_returns_value(
 ):
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
-    mass_proxy_limits = (0.0, 5.0)
     sky_area = 360**2
 
     prediction = murata_binned_spec_z.evaluate_theory_prediction(
-        z_edges, mass_proxy_edges, 360**2
+        z_edges, mass_proxy_edges, sky_area
     )
 
     assert prediction > 0
     prediction = murata_binned_spec_z.evaluate_theory_prediction(
-        z_edges, mass_proxy_edges, 360**2, ClusterProperty.REDSHIFT
+        z_edges, mass_proxy_edges, sky_area, ClusterProperty.REDSHIFT
     )
 
     assert prediction > 0

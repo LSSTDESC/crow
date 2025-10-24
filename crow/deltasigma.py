@@ -5,13 +5,11 @@ and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
-import time
 
 import clmm  # pylint: disable=import-error
 import numpy as np
 import numpy.typing as npt
 import pyccl
-from scipy.integrate import simpson
 from scipy.stats import gamma
 
 from crow.abundance import ClusterAbundance
