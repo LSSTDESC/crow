@@ -43,11 +43,14 @@ jobs:
       - name: Check import order with isort
         run: |
           conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
-
-      # 6. Run tests with pytest
-      - name: Run tests with pytest
+      
+      # 6. Run tests with pytest + coverage
+      - name: Run tests with pytest and coverage
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pytest -v --maxfail=1 --disable-warnings
+          conda run -n ${{ env.CONDA_ENV }} pip install coverage
+          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
+          conda run -n ${{ env.CONDA_ENV }} coverage report -m
+          conda run -n ${{ env.CONDA_ENV }} coverage xml
 
       # 7. Upload coverage to Coveralls
       - name: Coveralls
@@ -55,7 +58,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install coverage coveralls
-          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest
-          conda run -n ${{ env.CONDA_ENV }} coverage report -m
+          conda run -n ${{ env.CONDA_ENV }} pip install coveralls
           conda run -n ${{ env.CONDA_ENV }} coveralls --service=github
+
+      # 8. Upload coverage to Codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
