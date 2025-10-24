@@ -5,7 +5,6 @@ and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
-
 import clmm  # pylint: disable=import-error
 import numpy as np
 import numpy.typing as npt
