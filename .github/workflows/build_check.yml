@@ -89,7 +89,7 @@ jobs:
           key: conda-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}-v${{ env.CACHE_VERSION }}
       - name: Update environment
         if: steps.cache.outputs.cache-hit != 'true'
-        run: mamba env update -n ${{ env.CONDA_ENV }} -f environment.yml
+        run: conda env update -n ${{ env.CONDA_ENV }} -f environment.yml
       - name: Check code formatting with black
         run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
       - name: Check import order with isort
