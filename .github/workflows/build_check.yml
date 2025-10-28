@@ -45,13 +45,6 @@ jobs:
           conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
           conda run -n ${{ env.CONDA_ENV }} coverage report -m
           conda run -n ${{ env.CONDA_ENV }} coverage xml
-      - name: Upload coverage to Coveralls
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install coveralls
-          conda run -n ${{ env.CONDA_ENV }} coveralls --service=github
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
