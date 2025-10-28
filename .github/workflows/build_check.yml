@@ -52,14 +52,15 @@ jobs:
         run: |
           conda run -n ${{ env.CONDA_ENV }} pip install coveralls
           conda run -n ${{ env.CONDA_ENV }} coveralls --service=github
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v5
-      #   with:
-      #     files: ./coverage.xml
-      #     fail_ci_if_error: true
-      #     verbose: true
-      #   env:
-      #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+       - name: Upload coverage to Codecov
+         uses: codecov/codecov-action@v5
+         with:
+           files: ./coverage.xml
+           fail_ci_if_error: true
+           verbose: true
+           use_oidc: false
+         env:
+           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   crow-matrix:
     name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
@@ -104,12 +105,13 @@ jobs:
           else
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
           fi
-      # - name: Upload coverage to Codecov
-      #   if: ${{ matrix.coverage == true }}
-      #   uses: codecov/codecov-action@v5
-      #   with:
-      #     files: ./coverage.xml
-      #     fail_ci_if_error: true
-      #     verbose: true
-      #   env:
-      #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.coverage == true }}
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
