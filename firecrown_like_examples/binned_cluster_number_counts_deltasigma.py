@@ -13,13 +13,15 @@ import sacc
 from firecrown.likelihood.source import SourceSystematic
 from firecrown.likelihood.statistic import TheoryVector
 from firecrown.modeling_tools import ModelingTools
-from firecrown.models.cluster import DeltaSigmaData
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from firecrown.models.cluster import ClusterProperty
 from crow.recipes.murata_binned_spec_z_deltasigma import MurataBinnedSpecZDeltaSigmaRecipe
+from firecrown.models.cluster import (
+    ClusterProperty,
+    DeltaSigmaData,
+)
 
 from .binned_cluster import BinnedCluster
 from .updatable_wrapper import UpdatableClusterObjects

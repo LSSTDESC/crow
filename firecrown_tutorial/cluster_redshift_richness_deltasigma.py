@@ -3,7 +3,6 @@
 import os
 import sys
 
-import pyccl as ccl
 import sacc
 from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
