@@ -44,7 +44,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 
-        self._cosmo_clmm = clmm.Cosmology(self._cosmo)
+        self._cosmo_clmm = clmm.Cosmology(be_cosmo=self._cosmo)
 
         self._beta_parameters = None
         self._beta_mean_interp = None
