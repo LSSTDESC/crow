@@ -9,9 +9,7 @@ import numpy as np
 from firecrown.data_types import DataVector, TheoryVector
 from firecrown.likelihood.source import SourceSystematic
 from firecrown.likelihood.statistic import Statistic
-from firecrown.models.cluster.binning import SaccBin
-from firecrown.models.cluster.cluster_data import ClusterData
-from firecrown.models.cluster.properties import ClusterProperty
+from firecrown.models.cluster import ClusterData, ClusterProperty, SaccBin
 
 from .updatable_wrapper import UpdatableClusterObjects
 
