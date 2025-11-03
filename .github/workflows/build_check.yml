@@ -13,6 +13,10 @@ on:
     paths-ignore:
       - 'docs/**/*.md'
       - '*.md'
+  pull_request_target:
+    types:
+      - ready_for_review
+
 
 env:
   CONDA_ENV: crow-env
@@ -58,6 +62,10 @@ jobs:
   crow-matrix:
     name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
     runs-on: ${{ matrix.os }}-latest
+    needs: quick-validation
+    if: >
+      (github.event_name == 'pull_request' && github.event.action == 'ready_for_review')
+      || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     strategy:
       fail-fast: false
       matrix:
