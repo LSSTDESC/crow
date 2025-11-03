@@ -13,7 +13,6 @@ on:
     paths-ignore:
       - 'docs/**/*.md'
       - '*.md'
-  pull_request_target:
     types:
       - opened
       - synchronize
