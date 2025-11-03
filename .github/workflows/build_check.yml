@@ -15,8 +15,10 @@ on:
       - '*.md'
   pull_request_target:
     types:
+      - opened
+      - synchronize
+      - reopened
       - ready_for_review
-
 
 env:
   CONDA_ENV: crow-env
