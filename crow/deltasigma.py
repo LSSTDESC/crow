@@ -38,14 +38,103 @@ class ClusterDeltaSigma(ClusterAbundance):
         halo_mass_function: pyccl.halos.MassFunc,
         is_delta_sigma: bool = False,
         cluster_concentration: float | None = None,
-        beta_zbin_cl_edges: Optional[Tuple[float, float]] = None,
+        use_beta_interp: bool = False,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
-        self.beta_zbin_cl_edges = beta_zbin_cl_edges
-        self.beta_interp = None
-        
+
+        self._cosmo_clmm = clmm.Cosmology(self._cosmo)
+
+        self._beta_parameters = None
+        self._beta_mean_interp = None
+        self._beta_sq_mean_interp = None
+
+        self.use_beta_interp = use_beta_interp
+
+    @property
+    def use_beta_interp(self):
+        return self.__use_beta_interp
+
+    @use_beta_interp.setter
+    def use_beta_interp(self, value):
+        if not isinstance(value, bool):
+            raise ValueError(f"value (={value}) for use_beta_interp must be boolean.")
+        self.__use_beta_interp = value
+        if value:
+            self.eval_beta_mean = self._beta_mean_interp
+            self.eval_beta_sq_mean = self._beta_sq_mean_interp
+        else:
+            self.eval_beta_mean = self._beta_mean_exact
+            self.eval_beta_sq_mean = self._beta_sq_mean_exact
+
+    def set_beta_parameters(
+        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
+    ):
+        r"""Set parameters to comput mean value of the geometric lensing efficicency
+
+        .. math::
+           \left<\beta_s\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
+           {\int_{z = z_{min}}^{z_{max}}N(z)}
+
+        Parameters
+        ----------
+        z_inf: float
+            Redshift at infinity
+        zmax: float, optional
+            Maximum redshift to be set as the source of the galaxy when performing the sum.
+            Default: 10
+        delta_z_cut: float, optional
+            Redshift interval to be summed with :math:`z_{cl}` to return :math:`z_{min}`.
+            This feature is not used if :math:`z_{min}` is provided by the user. Default: 0.1
+        zmin: float, None, optional
+            Minimum redshift to be set as the source of the galaxy when performing the sum.
+            Default: None
+        z_distrib_func: one-parameter function, optional
+            Redshift distribution function. Default is Chang et al (2013) distribution function.
+
+        Returns
+        -------
+        float
+            Mean value of the geometric lensing efficicency
+        """
+        self._beta_paramesters = {
+            "z_inf": z_inf,
+            "zmax": zmax,
+            "delta_z_cut": delta_z_cut,
+            "zmin": zmin,
+            "z_distrib_func": z_distrib_func,
+        }
+
+    def _beta_mean_exact(self, z_cl):
+        return clmm.utils.compute_beya_s_mean_from_distribution(
+            z_cl, cosmo=self._clmm_cosmo, **self._beta_paramesters
+        )
+
+    def _beta_sq_mean_exact(self, z_cl):
+        return clmm.utils.compute_beta_s_mean_from_distribution(
+            z_cl, cosmo=self._clmm_cosmo, **self._beta_paramesters
+        )
+
+    def set_beta_interp(self, z_min, z_max, n_intep=3):
+
+        # Note: this will set an interpolator with a fixed cosmology
+        # must add check to verify consistency with main cosmology
+
+        redshift_points = np.linspace(z_min, z_max, n_intep)
+        beta_list = [
+            self._beta_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+        ]
+        self._beta_mean_interp = interp1d(
+            redshift_points, beta_list, kind="quadratic", fill_value="extrapolate"
+        )
+        beta_sq_list = [
+            self._beta_sq_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+        ]
+        self._beta_sq_mean_interp = interp1d(
+            redshift_points, beta_sq_list, kind="quadratic", fill_value="extrapolate"
+        )
+
     def delta_sigma(
         self,
         log_mass: npt.NDArray[np.float64],
@@ -54,7 +143,6 @@ class ClusterDeltaSigma(ClusterAbundance):
         two_halo_term: bool = False,
         miscentering_frac: np.float64 = None,
         boost_factor: bool = False,
-        use_beta_interp: bool = False,
     ) -> npt.NDArray[np.float64]:
         """Delta sigma for cprint(new_pred)lusters."""
         cosmo_clmm = clmm.Cosmology()
@@ -76,7 +164,7 @@ class ClusterDeltaSigma(ClusterAbundance):
             moo.set_concentration(self._get_concentration(log_m, redshift))
             moo.set_mass(10**log_m)
             val = self._one_halo_contribution(
-                moo, radius_center, redshift, miscentering_frac, use_beta_interp=use_beta_interp
+                moo, radius_center, redshift, miscentering_frac
             )
             if two_halo_term:
                 val += self._two_halo_contribution(moo, radius_center, redshift)
@@ -92,27 +180,25 @@ class ClusterDeltaSigma(ClusterAbundance):
         redshift,
         miscentering_frac=None,
         sigma_offset=0.12,
-        use_beta_interp: bool = False,
         **kwargs,
     ) -> npt.NDArray[np.float64]:
         """Calculate the second halo contribution to the delta sigma."""
         beta_s_mean = None
         beta_s_square_mean = None
-        first_halo_right_centered = None
-        clmm_model.z_inf = 10.0
         if self.is_delta_sigma:
             first_halo_right_centered = clmm_model.eval_excess_surface_density(
                 radius_center, redshift
             )
         else:
-            beta_s_mean, beta_s_square_mean = self._get_beta_lens_efficiency(clmm_model, redshift, use_beta_interp, **kwargs) 
+            beta_s_mean = self.eval_beta_s_mean(redshift)
+            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),
                 z_src_info="beta",
             )
-            
+
         if miscentering_frac is not None:
             integrator = NumCosmoIntegrator(
                 relative_tolerance=1e-2,
@@ -139,7 +225,7 @@ class ClusterDeltaSigma(ClusterAbundance):
                                 np.array([radius_center]),
                                 redshift,
                                 r_mis,
-                                z_src = (beta_s_mean, beta_s_square_mean),
+                                z_src=(beta_s_mean, beta_s_square_mean),
                                 z_src_info="beta",
                             )[0]
                             for r_mis in r_mis_list
@@ -165,14 +251,13 @@ class ClusterDeltaSigma(ClusterAbundance):
     ) -> npt.NDArray[np.float64]:
         """Calculate the second halo contribution to the delta sigma."""
         # pylint: disable=protected-access
-        if self.is_delta_sigma ==False:
-            raise Exception("Two halo contribution for gt is not suported yet.")  
+        if self.is_delta_sigma == False:
+            raise Exception("Two halo contribution for gt is not suported yet.")
 
         second_halo_right_centered = clmm_model.eval_excess_surface_density_2h(
             np.array([radius_center]), redshift
         )
-        
-        
+
         return second_halo_right_centered[0]
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
@@ -198,60 +283,3 @@ class ClusterDeltaSigma(ClusterAbundance):
             profiles, boost_factors
         )
         return corrected_profiles
-        
-    def _get_beta_lens_efficiency(self, clmm_model: clmm.Modeling, redshift, use_beta_interp, **kwargs):
-        beta_s_mean = None
-        beta_s_square_mean = None
-        zmax = kwargs.pop('zmax', 5.0)
-        if use_beta_interp == False:
-            beta_s_mean = compute_beta_s_mean_from_distribution(
-                   z_cl=redshift,
-                   z_inf=10,
-                   cosmo=clmm_model.cosmo,
-                   zmax=zmax,
-                   **kwargs
-            )
-            beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
-                   z_cl=redshift,
-                   z_inf=10,
-                   cosmo=clmm_model.cosmo,
-                   zmax=zmax,
-                   **kwargs
-            )
-        else:
-            if self.beta_interp == None:
-                self.beta_interp = self._compute_beta_interp(clmm_model)
-            beta_s_mean_interp = self.beta_interp[0]
-            beta_s_square_mean_interp = self.beta_interp[1]
-            beta_s_mean = beta_s_mean_interp(redshift)
-            beta_s_square_mean = beta_s_square_mean_interp(redshift)
-        return float(beta_s_mean), float(beta_s_square_mean)
-        
-    def _compute_beta_interp(self, clmm_model):
-        clmm_cosmo = clmm_model.cosmo
-        betaz_min = None
-        betaz_max = None
-        if self.beta_zbin_cl_edges == None:
-            print(f"Warning, no redshift bin for beta estimation, using integration values ({self.min_z}, {self.max_z}) instead")
-            betaz_min = self.min_z
-            betaz_max = self.max_z
-        else:
-            betaz_min = self.beta_zbin_cl_edges[0]
-            betaz_max = self.beta_zbin_cl_edges[-1]
-        redshift_points = np.linspace(betaz_min, betaz_max, 3)
-        beta_list = [clmm.utils.compute_beta_s_mean_from_distribution(z_cl, 10.0, clmm_cosmo, zmax=5.0) for z_cl in redshift_points]
-        beta_sq_list = [clmm.utils.compute_beta_s_square_mean_from_distribution(z_cl, 10.0, clmm_cosmo, zmax=5.0) for z_cl in redshift_points]
-        beta_mean_interp = interp1d(
-            redshift_points,
-            beta_list,
-            kind='quadratic',
-            fill_value='extrapolate'
-        )
-        beta_sq_mean_interp = interp1d(
-            redshift_points,
-            beta_sq_list,
-            kind='quadratic',
-            fill_value='extrapolate'
-        )
-        
-        return (beta_mean_interp, beta_sq_mean_interp)
