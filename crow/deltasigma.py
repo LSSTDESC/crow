@@ -36,37 +36,37 @@ class ClusterDeltaSigma(ClusterAbundance):
         mass_interval: tuple[float, float],
         z_interval: tuple[float, float],
         halo_mass_function: pyccl.halos.MassFunc,
-        is_delta_sigma: bool = False,
         cluster_concentration: float | None = None,
-        use_beta_interp: bool = False,
+        is_delta_sigma: bool = False,
+        use_beta_s_interp: bool = False,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 
-        self._cosmo_clmm = clmm.Cosmology(be_cosmo=self._cosmo)
+        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo)
 
         self._beta_parameters = None
-        self._beta_mean_interp = None
-        self._beta_sq_mean_interp = None
+        self._beta_s_mean_interp = None
+        self._beta_s_square_mean_interp = None
 
-        self.use_beta_interp = use_beta_interp
+        self.use_beta_s_interp = use_beta_s_interp
 
     @property
-    def use_beta_interp(self):
-        return self.__use_beta_interp
+    def use_beta_s_interp(self):
+        return self.__use_beta_s_interp
 
-    @use_beta_interp.setter
-    def use_beta_interp(self, value):
+    @use_beta_s_interp.setter
+    def use_beta_s_interp(self, value):
         if not isinstance(value, bool):
-            raise ValueError(f"value (={value}) for use_beta_interp must be boolean.")
-        self.__use_beta_interp = value
+            raise ValueError(f"value (={value}) for use_beta_s_interp must be boolean.")
+        self.__use_beta_s_interp = value
         if value:
-            self.eval_beta_mean = self._beta_mean_interp
-            self.eval_beta_sq_mean = self._beta_sq_mean_interp
+            self.eval_beta_s_mean = self._beta_s_mean_interp
+            self.eval_beta_s_square_mean = self._beta_s_square_mean_interp
         else:
-            self.eval_beta_mean = self._beta_mean_exact
-            self.eval_beta_sq_mean = self._beta_sq_mean_exact
+            self.eval_beta_s_mean = self._beta_s_mean_exact
+            self.eval_beta_s_square_mean = self._beta_s_square_mean_exact
 
     def set_beta_parameters(
         self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
@@ -98,7 +98,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         float
             Mean value of the geometric lensing efficicency
         """
-        self._beta_paramesters = {
+        self._beta_parameters = {
             "z_inf": z_inf,
             "zmax": zmax,
             "delta_z_cut": delta_z_cut,
@@ -106,33 +106,33 @@ class ClusterDeltaSigma(ClusterAbundance):
             "z_distrib_func": z_distrib_func,
         }
 
-    def _beta_mean_exact(self, z_cl):
-        return clmm.utils.compute_beya_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_paramesters
-        )
-
-    def _beta_sq_mean_exact(self, z_cl):
+    def _beta_s_mean_exact(self, z_cl):
         return clmm.utils.compute_beta_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_paramesters
+            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
         )
 
-    def set_beta_interp(self, z_min, z_max, n_intep=3):
+    def _beta_s_square_mean_exact(self, z_cl):
+        return clmm.utils.compute_beta_s_mean_from_distribution(
+            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+        )
+
+    def set_beta_s_interp(self, z_min, z_max, n_intep=3):
 
         # Note: this will set an interpolator with a fixed cosmology
         # must add check to verify consistency with main cosmology
 
         redshift_points = np.linspace(z_min, z_max, n_intep)
-        beta_list = [
-            self._beta_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+        beta_s_list = [
+            self._beta_s_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
         ]
-        self._beta_mean_interp = interp1d(
-            redshift_points, beta_list, kind="quadratic", fill_value="extrapolate"
+        self._beta_s_mean_interp = interp1d(
+            redshift_points, beta_s_list, kind="quadratic", fill_value="extrapolate"
         )
-        beta_sq_list = [
-            self._beta_sq_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+        beta_s_square_list = [
+            self._beta_s_square_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
         ]
-        self._beta_sq_mean_interp = interp1d(
-            redshift_points, beta_sq_list, kind="quadratic", fill_value="extrapolate"
+        self._beta_s_square_mean_interp = interp1d(
+            redshift_points, beta_s_square_list, kind="quadratic", fill_value="extrapolate"
         )
 
     def delta_sigma(
