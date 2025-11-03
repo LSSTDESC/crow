@@ -17,6 +17,7 @@ def fixture_cluster_deltasigma():
     """Test fixture that represents an assembled cluster deltasigma class."""
     hmf = pyccl.halos.MassFuncBocquet16()
     ca = ClusterDeltaSigma((13, 17), (0, 2), hmf, 4.0)
+    ca.set_beta_parameters(5.0)
     return ca
 
 
