@@ -91,4 +91,6 @@ class CountsIntegralND(Ncm.IntegralND):
     ) -> None:
         """Called by NumCosmo to evaluate the integrand."""
         x_array = np.array(x.dup_array()).reshape(npoints, dim)
+        #print(x_array)
+        #print(list(self.fun(x_array, self.extra_args)))
         fval.set_array(list(self.fun(x_array, self.extra_args)))

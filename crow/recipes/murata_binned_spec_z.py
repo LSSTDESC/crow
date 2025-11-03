@@ -98,7 +98,8 @@ class MurataBinnedSpecZRecipe:
                 if cluster_prop == ClusterProperty.MASS:
                     prediction *= mass
                 if cluster_prop == ClusterProperty.REDSHIFT:
-                    prediction *= z
+                    prediction *=z
+
             return prediction
 
         return theory_prediction
@@ -159,7 +160,5 @@ class MurataBinnedSpecZRecipe:
 
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
-
         counts = self.integrator.integrate(prediction_wrapper)
-
         return counts
