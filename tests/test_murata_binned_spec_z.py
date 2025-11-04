@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from crow.properties import ClusterProperty
+from firecrown.models.cluster import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 
 
@@ -59,7 +59,9 @@ def test_murata_binned_spec_z_init():
 def test_get_theory_prediction_returns_value(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(ClusterProperty.COUNTS)
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+        ClusterProperty.COUNTS
+    )
 
     assert prediction is not None
     assert callable(prediction)
@@ -94,7 +96,9 @@ def test_cluster_prediction_positivity_property(
     sky_area: float,
 ):
     """Test that cluster predictions are always positive using hypothesis."""
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(ClusterProperty.COUNTS)
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+        ClusterProperty.COUNTS
+    )
 
     mass_array = np.array([mass])
     z_array = np.array([z])
@@ -170,7 +174,9 @@ def test_get_function_to_integrate_returns_value(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
 ):
     prediction = murata_binned_spec_z.get_theory_prediction_counts()
-    function_to_integrate = murata_binned_spec_z.get_function_to_integrate_counts(prediction)
+    function_to_integrate = murata_binned_spec_z.get_function_to_integrate_counts(
+        prediction
+    )
 
     assert function_to_integrate is not None
     assert callable(function_to_integrate)

@@ -11,7 +11,7 @@ from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from crow.properties import ClusterProperty
+from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
@@ -269,7 +269,8 @@ class MurataBinnedSpecZRecipe:
         )
         self.cluster_theory.set_beta_s_interp(*z_edges)
         theory_prediction = self.get_theory_prediction_shear_profile(average_on)
-        prediction_wrapper = self.get_function_to_integrate_shear_profile(theory_prediction)
+        prediction_wrapper = self.get_function_to_integrate_shear_profile(
+            theory_prediction
+        )
         deltasigma = self.integrator.integrate(prediction_wrapper)
         return deltasigma
-
