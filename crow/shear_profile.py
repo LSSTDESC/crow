@@ -194,6 +194,7 @@ class ClusterShearProfile(ClusterAbundance):
             kind="quadratic",
             fill_value="extrapolate",
         )
+        self.use_beta_s_interp = self.use_beta_s_interp
 
     def set_miscentering_parameters(
         self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
@@ -288,8 +289,8 @@ class ClusterShearProfile(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = self.eval_beta_s_mean(redshift)
-            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
+            beta_s_mean = float(self.eval_beta_s_mean(redshift))
+            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,
