@@ -69,7 +69,7 @@ jobs:
       || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     strategy:
       fail-fast: false
-      gatrix:
+      matrix:
         os: ["ubuntu", "macos"]
         python-version: ["3.11", "3.12", "3.13"]
         include:
