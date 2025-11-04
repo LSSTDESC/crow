@@ -59,6 +59,7 @@ class MurataBinnedSpecZRecipe:
 
     def get_theory_prediction_counts(
         self,
+        average_on: None | ClusterProperty = None,
     ) -> Callable[
         [npt.NDArray[np.float64], npt.NDArray[np.float64], tuple[float, float], float],
         npt.NDArray[np.float64],
@@ -82,6 +83,18 @@ class MurataBinnedSpecZRecipe:
                 * self.redshift_distribution.distribution()
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
+
+            if average_on is None:
+                return prediction
+
+            for cluster_prop in ClusterProperty:
+                include_prop = cluster_prop & average_on
+                if not include_prop:
+                    continue
+                if cluster_prop == ClusterProperty.MASS:
+                    prediction *= mass
+                if cluster_prop == ClusterProperty.REDSHIFT:
+                    prediction *= z
             return prediction
 
         return theory_prediction
@@ -123,6 +136,7 @@ class MurataBinnedSpecZRecipe:
         z_edges,
         mass_proxy_edges,
         sky_area: float,
+        average_on: None | ClusterProperty = None,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
 
@@ -136,7 +150,7 @@ class MurataBinnedSpecZRecipe:
         ]
         self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction_counts()
+        theory_prediction = self.get_theory_prediction_counts(average_on)
         prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
