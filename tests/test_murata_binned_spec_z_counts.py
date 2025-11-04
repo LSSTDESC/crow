@@ -12,12 +12,12 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+from crow.abundance import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.shear_profile import ClusterShearProfile
 
 # from firecrown.models.cluster import ClusterProperty
 
@@ -25,16 +25,12 @@ from crow.shear_profile import ClusterShearProfile
 @pytest.fixture(name="murata_binned_spec_z")
 def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
-    cluster_theory = ClusterShearProfile(
-        z_interval=(0, 2),
-        mass_interval=(13, 17),
-        halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
-        cluster_concentration=4.0,
-        is_delta_sigma=True,
-    )
-    cluster_theory.set_beta_parameters(10.0)
     cluster_recipe = MurataBinnedSpecZRecipe(
-        cluster_theory=cluster_theory,
+        cluster_theory=ClusterAbundance(
+            z_interval=(0, 2),
+            mass_interval=(13, 17),
+            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        ),
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
     )
@@ -51,16 +47,12 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
 
 def test_murata_binned_spec_z_init():
     pivot_mass, pivot_redshift = 14.625862906, 0.6
-    cluster_theory = ClusterShearProfile(
-        z_interval=(0, 2),
-        mass_interval=(13, 17),
-        halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
-        cluster_concentration=4.0,
-        is_delta_sigma=True,
-    )
-    cluster_theory.set_beta_parameters(10.0)
     recipe = MurataBinnedSpecZRecipe(
-        cluster_theory=cluster_theory,
+        cluster_theory=ClusterAbundance(
+            z_interval=(0, 2),
+            mass_interval=(13, 17),
+            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        ),
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
     )
