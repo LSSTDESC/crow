@@ -122,18 +122,20 @@ class ClusterDeltaSigma(ClusterAbundance):
         # must add check to verify consistency with main cosmology
 
         redshift_points = np.linspace(z_min, z_max, n_intep)
-        beta_s_list = [
-            self._beta_s_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
-        ]
+        beta_s_list = [self._beta_s_mean_exact(z_cl) for z_cl in redshift_points]
         self._beta_s_mean_interp = interp1d(
             redshift_points, beta_s_list, kind="quadratic", fill_value="extrapolate"
         )
         beta_s_square_list = [
-            self._beta_s_square_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+            self._beta_s_square_mean_exact(z_cl) for z_cl in redshift_points
         ]
         self._beta_s_square_mean_interp = interp1d(
-            redshift_points, beta_s_square_list, kind="quadratic", fill_value="extrapolate"
+            redshift_points,
+            beta_s_square_list,
+            kind="quadratic",
+            fill_value="extrapolate",
         )
+        self.use_beta_s_interp = self.use_beta_s_interp
 
     def delta_sigma(
         self,
@@ -190,8 +192,8 @@ class ClusterDeltaSigma(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = self.eval_beta_s_mean(redshift)
-            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
+            beta_s_mean = float(self.eval_beta_s_mean(redshift))
+            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,

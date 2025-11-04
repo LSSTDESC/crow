@@ -11,7 +11,7 @@ from crow.abundance import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from firecrown.models.cluster import ClusterProperty
+from crow.properties import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
@@ -34,8 +34,6 @@ class MurataBinnedSpecZRecipe:
         self.integrator = NumCosmoIntegrator()
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
-
-        self.hmf = hmf
 
         self.cluster_theory = ClusterAbundance(
             mass_interval=(min_mass, max_mass),

@@ -11,7 +11,7 @@ from crow.deltasigma import ClusterDeltaSigma
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from firecrown.models.cluster import ClusterProperty
+from crow.properties import ClusterProperty
 
 
 class MurataBinnedSpecZDeltaSigmaRecipe:
@@ -35,26 +35,27 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         two_halo_term=False,
         miscentering_frac=None,
         boost_factor=False,
-        use_beta_interp = False,
+        use_beta_interp=False,
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
 
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
-        self.hmf = hmf
         self.two_halo_term = two_halo_term
         self.miscentering_frac = miscentering_frac
         self.boost_factor = boost_factor
-        self.is_delta_sigma = is_delta_sigma
         self.cluster_theory = ClusterDeltaSigma(
             mass_interval=(min_mass, max_mass),
             z_interval=(min_z, max_z),
-            halo_mass_function=self.hmf,
+            halo_mass_function=hmf,
             is_delta_sigma=is_delta_sigma,
             cluster_concentration=cluster_concentration,
+            use_beta_s_interp=True,
         )
-        self.use_beta_interp= use_beta_interp
+        self.cluster_theory.set_beta_parameters(
+            z_inf=5.0, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
+        )
 
     def get_theory_prediction(
         self,
@@ -92,18 +93,18 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             if average_on is None:
                 # pylint: disable=no-member
                 raise ValueError(
-                    f"The property should be" f" {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR}."
+                    f"The property should be"
+                    f" {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR}."
                 )
 
             if average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR):
                 prediction *= self.cluster_theory.delta_sigma(
-                        log_mass=mass,
-                        z=z,
-                        radius_center=radius_center,
-                        two_halo_term=self.two_halo_term,
-                        miscentering_frac=self.miscentering_frac,
-                        boost_factor=self.boost_factor,
-                        use_beta_interp=self.use_beta_interp,
+                    log_mass=mass,
+                    z=z,
+                    radius_center=radius_center,
+                    two_halo_term=self.two_halo_term,
+                    miscentering_frac=self.miscentering_frac,
+                    boost_factor=self.boost_factor,
                 )
             return prediction
 
@@ -166,8 +167,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.integrator.extra_args = np.array(
             [*mass_proxy_edges, sky_area, radius_center]
         )
-        self.cluster_theory.beta_interp = None
-        self.cluster_theory.beta_zbin_cl_edges = z_edges
+        self.cluster_theory.set_beta_s_interp(*z_edges)
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
         deltasigma = self.integrator.integrate(prediction_wrapper)
