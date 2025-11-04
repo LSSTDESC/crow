@@ -2,6 +2,7 @@
 
 import os
 import sys
+
 import numpy as np
 import pyccl
 import pytest
@@ -36,11 +37,14 @@ def fixture_cluster_reduced_interp_profile():
     hmf = pyccl.halos.MassFuncBocquet16()
     ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, False, True)
     ca.set_beta_parameters(10.0)
-    ca.set_beta_s_interp(0,2)
+    ca.set_beta_s_interp(0, 2)
     return ca
 
 
-def test_cluster_update_ingredients(cluster_deltasigma_profile: ClusterShearProfile, cluster_reduced_profile: ClusterShearProfile):
+def test_cluster_update_ingredients(
+    cluster_deltasigma_profile: ClusterShearProfile,
+    cluster_reduced_profile: ClusterShearProfile,
+):
     cosmo = pyccl.CosmologyVanillaLCDM()
     cluster_deltasigma_profile.cosmo = cosmo
     cluster_reduced_profile.cosmo = cosmo
@@ -55,8 +59,12 @@ def test_cluster_shear_profile_init(cluster_deltasigma_profile: ClusterShearProf
     assert cluster_deltasigma_profile is not None
     assert cluster_deltasigma_profile.cluster_concentration is not None
     assert cluster_deltasigma_profile.cosmo is None  # pylint: disable=protected-access
-    assert cluster_deltasigma_profile._hmf_cache == {}  # pylint: disable=protected-access
-    assert isinstance(cluster_deltasigma_profile.halo_mass_function, pyccl.halos.MassFuncBocquet16)
+    assert (
+        cluster_deltasigma_profile._hmf_cache == {}
+    )  # pylint: disable=protected-access
+    assert isinstance(
+        cluster_deltasigma_profile.halo_mass_function, pyccl.halos.MassFuncBocquet16
+    )
     assert cluster_deltasigma_profile.min_mass == 13.0
     assert cluster_deltasigma_profile.max_mass == 17.0
     assert cluster_deltasigma_profile.min_z == 0.0
@@ -71,7 +79,9 @@ def _check_delta_sigma_output(result):
     assert np.all(result > 0)
 
 
-def _check_miscentering_behavior(cluster, log_mass, redshifts, radius, miscentering_frac, pdf=None):
+def _check_miscentering_behavior(
+    cluster, log_mass, redshifts, radius, miscentering_frac, pdf=None
+):
     """Shared logic for testing miscentering behavior."""
     baseline = cluster.delta_sigma(log_mass, redshifts, radius)
     cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
@@ -85,7 +95,10 @@ def _check_miscentering_behavior(cluster, log_mass, redshifts, radius, miscenter
     assert np.all(result_mis >= 0)
 
 
-def test_shear_profile_returns_value(cluster_deltasigma_profile: ClusterShearProfile, cluster_reduced_profile: ClusterShearProfile):
+def test_shear_profile_returns_value(
+    cluster_deltasigma_profile: ClusterShearProfile,
+    cluster_reduced_profile: ClusterShearProfile,
+):
     cosmo = pyccl.CosmologyVanillaLCDM()
     log_mass = np.linspace(13, 17, 5, dtype=np.float64)
     redshifts = np.linspace(0.1, 1, 5, dtype=np.float64)
@@ -97,7 +110,10 @@ def test_shear_profile_returns_value(cluster_deltasigma_profile: ClusterShearPro
         _check_delta_sigma_output(result)
 
 
-def test_shear_profile_returns_value_interp(cluster_reduced_interp_profile: ClusterShearProfile, cluster_reduced_profile: ClusterShearProfile):
+def test_shear_profile_returns_value_interp(
+    cluster_reduced_interp_profile: ClusterShearProfile,
+    cluster_reduced_profile: ClusterShearProfile,
+):
     cosmo = pyccl.CosmologyVanillaLCDM()
     log_mass = np.linspace(13, 17, 5, dtype=np.float64)
     redshifts = np.linspace(0.1, 1, 5, dtype=np.float64)
@@ -114,7 +130,11 @@ def test_shear_profile_returns_value_interp(cluster_reduced_interp_profile: Clus
     )
     np.testing.assert_allclose(result, result_exact, rtol=1e-12)
 
-def test_shear_profile_returns_value_twoh_boost(cluster_deltasigma_profile: ClusterShearProfile, cluster_reduced_profile: ClusterShearProfile):
+
+def test_shear_profile_returns_value_twoh_boost(
+    cluster_deltasigma_profile: ClusterShearProfile,
+    cluster_reduced_profile: ClusterShearProfile,
+):
     cosmo = pyccl.CosmologyVanillaLCDM()
     log_mass = np.linspace(13, 17, 5, dtype=np.float64)
     redshifts = np.linspace(0.1, 1, 5, dtype=np.float64)
@@ -132,8 +152,11 @@ def test_shear_profile_returns_value_twoh_boost(cluster_deltasigma_profile: Clus
     )
     _check_delta_sigma_output(result)
 
+
 @pytest.mark.slow
-def test_shear_profile_miscentering(cluster_deltasigma_profile, cluster_reduced_profile):
+def test_shear_profile_miscentering(
+    cluster_deltasigma_profile, cluster_reduced_profile
+):
     cosmo = pyccl.CosmologyVanillaLCDM()
     log_mass = np.linspace(13, 17, 5)
     redshifts = np.linspace(0.1, 1, 5)
@@ -142,13 +165,19 @@ def test_shear_profile_miscentering(cluster_deltasigma_profile, cluster_reduced_
 
     for cluster in [cluster_deltasigma_profile, cluster_reduced_profile]:
         cluster.cosmo = cosmo
-        _check_miscentering_behavior(cluster, log_mass, redshifts, radius, miscentering_frac)
+        _check_miscentering_behavior(
+            cluster, log_mass, redshifts, radius, miscentering_frac
+        )
 
     # Gaussian miscentering case (only for reduced profile)
     def gaussian_pdf(r_mis_list, mean=0.0, sigma=0.1):
         return norm.pdf(r_mis_list, loc=mean, scale=sigma)
 
     _check_miscentering_behavior(
-        cluster_reduced_profile, log_mass, redshifts, radius, miscentering_frac, pdf=gaussian_pdf
+        cluster_reduced_profile,
+        log_mass,
+        redshifts,
+        radius,
+        miscentering_frac,
+        pdf=gaussian_pdf,
     )
-

@@ -12,12 +12,12 @@ from firecrown.models.cluster import ClusterProperty
 
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from crow.kernel import SpectroscopicRedshift
+from crow.mass_proxy import MurataBinned
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 from crow.recipes.murata_binned_spec_z_deltasigma import (
     MurataBinnedSpecZDeltaSigmaRecipe,
 )
-from crow.mass_proxy import MurataBinned
-from crow.kernel import SpectroscopicRedshift
 
 # to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
