@@ -97,6 +97,7 @@ class ClusterDeltaSigma(ClusterAbundance):
         self._beta_s_square_mean_interp = None
 
         self.use_beta_s_interp = use_beta_s_interp
+        self.miscentering_parameters = None
 
     @property
     def use_beta_s_interp(self):
@@ -113,6 +114,9 @@ class ClusterDeltaSigma(ClusterAbundance):
         else:
             self.eval_beta_s_mean = self._beta_s_mean_exact
             self.eval_beta_s_square_mean = self._beta_s_square_mean_exact
+            
+
+
 
     def set_beta_parameters(
         self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
@@ -168,20 +172,56 @@ class ClusterDeltaSigma(ClusterAbundance):
         # must add check to verify consistency with main cosmology
 
         redshift_points = np.linspace(z_min, z_max, n_intep)
-        beta_s_list = [self._beta_s_mean_exact(z_cl) for z_cl in redshift_points]
+        beta_s_list = [
+            self._beta_s_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+        ]
         self._beta_s_mean_interp = interp1d(
             redshift_points, beta_s_list, kind="quadratic", fill_value="extrapolate"
         )
         beta_s_square_list = [
-            self._beta_s_square_mean_exact(z_cl) for z_cl in redshift_points
+            self._beta_s_square_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
         ]
         self._beta_s_square_mean_interp = interp1d(
-            redshift_points,
-            beta_s_square_list,
-            kind="quadratic",
-            fill_value="extrapolate",
+            redshift_points, beta_s_square_list, kind="quadratic", fill_value="extrapolate"
         )
-        self.use_beta_s_interp = self.use_beta_s_interp
+
+    def set_miscentering_parameters(
+        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
+    ):
+        r"""Set parameters to comput mean value of the geometric lensing efficicency
+
+        .. math::
+           \left<\beta_s\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
+           {\int_{z = z_{min}}^{z_{max}}N(z)}
+
+        Parameters
+        ----------
+        z_inf: float
+            Redshift at infinity
+        zmax: float, optional
+            Maximum redshift to be set as the source of the galaxy when performing the sum.
+            Default: 10
+        delta_z_cut: float, optional
+            Redshift interval to be summed with :math:`z_{cl}` to return :math:`z_{min}`.
+            This feature is not used if :math:`z_{min}` is provided by the user. Default: 0.1
+        zmin: float, None, optional
+            Minimum redshift to be set as the source of the galaxy when performing the sum.
+            Default: None
+        z_distrib_func: one-parameter function, optional
+            Redshift distribution function. Default is Chang et al (2013) distribution function.
+
+        Returns
+        -------
+        float
+            Mean value of the geometric lensing efficicency
+        """
+        self._beta_parameters = {
+            "z_inf": z_inf,
+            "zmax": zmax,
+            "delta_z_cut": delta_z_cut,
+            "zmin": zmin,
+            "z_distrib_func": z_distrib_func,
+        }
 
     def delta_sigma(
         self,
@@ -206,6 +246,7 @@ class ClusterDeltaSigma(ClusterAbundance):
             halo_profile_model="nfw",
         )
         moo.set_cosmo(cosmo_clmm)
+        moo.z_inf = 10.0
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
@@ -238,8 +279,8 @@ class ClusterDeltaSigma(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = float(self.eval_beta_s_mean(redshift))
-            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
+            beta_s_mean = self.eval_beta_s_mean(redshift)
+            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,
@@ -247,47 +288,8 @@ class ClusterDeltaSigma(ClusterAbundance):
                 z_src_info="beta",
             )
 
-        if miscentering_frac is not None:
-            integrator = NumCosmoIntegrator(
-                relative_tolerance=1e-2,
-                absolute_tolerance=1e-6,
-            )
-
-            def integration_func(int_args, extra_args):
-                sigma = extra_args[0]
-                r_mis_list = int_args[:, 0]
-                if self.is_delta_sigma:
-                    esd_vals = np.array(
-                        [
-                            clmm_model.eval_excess_surface_density(
-                                np.array([radius_center]), redshift, r_mis=r_mis
-                            )[0]
-                            for r_mis in r_mis_list
-                        ]
-                    )
-
-                else:
-                    esd_vals = np.array(
-                        [
-                            clmm_model.eval_tangential_shear(
-                                np.array([radius_center]),
-                                redshift,
-                                r_mis,
-                                z_src=(beta_s_mean, beta_s_square_mean),
-                                z_src_info="beta",
-                            )[0]
-                            for r_mis in r_mis_list
-                        ]
-                    )
-
-                gamma_vals = gamma.pdf(r_mis_list, a=2.0, scale=sigma)
-                return esd_vals * gamma_vals
-
-            integrator.integral_bounds = [(0.0, 25.0 * sigma_offset)]
-            integrator.extra_args = np.array(
-                [sigma_offset]
-            )  ## From https://arxiv.org/pdf/2502.08444, we are using 0.12
-            miscentering_integral = integrator.integrate(integration_func)
+        if self.miscentering_parameters is not None:
+            miscentering_integral, miscentering_frac = self.compute_miscentering(clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean)
             return (
                 (1.0 - miscentering_frac) * first_halo_right_centered
                 + miscentering_frac * miscentering_integral
@@ -326,8 +328,76 @@ class ClusterDeltaSigma(ClusterAbundance):
     ) -> npt.NDArray[np.float64]:
         """Determine the nfw boost factor and correct the shear profiles."""
         boost_factors = clmm.utils.compute_powerlaw_boost(radius_list, 1.0)
-        # print(boost_factors, radius_list, profiles)
         corrected_profiles = clmm.utils.correct_with_boost_values(
             profiles, boost_factors
         )
         return corrected_profiles
+
+    def set_miscentering(
+        self,
+        miscentering_fraction: float,
+        sigma: float = 0.12,
+        miscentering_distribution_function: callable = None,
+        integration_max: float = None,
+    ) -> None:
+        """Set the miscentering model parameters.
+    
+        Parameters
+        ----------
+        miscentering_fraction : float
+            Fraction of miscentered clusters (required).
+        sigma : float, optional
+            Width of the miscentering distribution. Default is 0.12.
+        miscentering_distribution_function : callable, optional
+            Function describing the miscentering distribution (single-parameter). Default is None.
+        integration_max : float, optional
+            Maximum radius for integration in units of sigma. Default is 25 * sigma.
+        """
+        if integration_max is None:
+            integration_max = 25.0 * sigma
+    
+        self.miscentering_parameters = {
+            "miscentering_fraction": miscentering_fraction,
+            "sigma": sigma,
+            "miscentering_distribution_function": miscentering_distribution_function,
+            "integration_max": integration_max,
+        }
+        
+    def compute_miscentering(self, clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean):
+        params = self.miscentering_parameters
+        miscentering_frac = params["miscentering_fraction"]
+        sigma = params["sigma"]
+        miscentering_distribution_function = params["miscentering_distribution_function"]
+        integration_max = params["integration_max"]
+
+    
+        integrator = NumCosmoIntegrator(
+            relative_tolerance=1e-4,
+            absolute_tolerance=1e-6,
+        )
+    
+        def integration_func(int_args, extra_args):
+            sigma_local = extra_args[0]
+            r_mis_list = int_args[:, 0]
+    
+            esd_vals = np.array([
+                    clmm_model.eval_excess_surface_density(
+                        np.array([radius_center]), redshift, r_mis=r_mis
+                    )[0]
+                    for r_mis in r_mis_list
+                ])
+            if self.is_delta_sigma == False:
+                sigma_c = clmm_model.cosmo.eval_sigma_crit(redshift, z_src=clmm_model.z_inf)
+                esd_vals = beta_s_mean * esd_vals / sigma_c 
+            if miscentering_distribution_function is not None:
+                pdf_vals = miscentering_distribution_function(r_mis_list)
+            else:
+                pdf_vals = gamma.pdf(r_mis_list, a=2.0, scale=sigma_local)
+    
+            return esd_vals * pdf_vals
+    
+        integrator.integral_bounds = [(0.0, integration_max)]
+        integrator.extra_args = np.array([sigma])
+        miscentering_integral = integrator.integrate(integration_func)
+    
+        return miscentering_integral, miscentering_frac
