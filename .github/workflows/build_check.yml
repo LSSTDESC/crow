@@ -69,7 +69,7 @@ jobs:
       || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     strategy:
       fail-fast: false
-      matrix:
+      gatrix:
         os: ["ubuntu", "macos"]
         python-version: ["3.11", "3.12", "3.13"]
         include:
@@ -103,7 +103,7 @@ jobs:
       - name: Run tests
         run: |
           if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
-            conda run -n ${{ env.CONDA_ENV }} pytest -vv --cov crow --cov-report xml --cov-branch -n auto
+            conda run -n ${{ env.CONDA_ENV }} pytest -vv ---runslow-cov crow --cov-report xml --cov-branch -n auto
           else
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
           fi
