@@ -14,7 +14,7 @@ from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 
 # To run with firecrown, use this import instead
-# from firecrown.models.cluster import ClusterProperty
+#from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
@@ -244,7 +244,8 @@ class MurataBinnedSpecZRecipe:
         self.integrator.extra_args = np.array(
             [*mass_proxy_edges, sky_area, radius_center]
         )
-        self.cluster_theory.set_beta_s_interp(*z_edges)
+        if self.cluster_theory._beta_parameters is not None:
+            self.cluster_theory.set_beta_s_interp(*z_edges)
         theory_prediction = self.get_theory_prediction_shear_profile(average_on)
         prediction_wrapper = self.get_function_to_integrate_shear_profile(
             theory_prediction

@@ -21,9 +21,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow.recipes.murata_binned_spec_z import (
     MurataBinnedSpecZRecipe,
 )
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
 
 from firecrown.models.cluster import (
     ClusterProperty,
