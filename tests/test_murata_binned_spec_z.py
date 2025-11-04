@@ -12,12 +12,14 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from firecrown.models.cluster import ClusterProperty
-
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
+from crow.property import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+
+# from firecrown.models.cluster import ClusterProperty
+
 
 
 @pytest.fixture(name="murata_binned_spec_z")
