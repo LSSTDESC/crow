@@ -22,7 +22,11 @@ from crow.recipes.murata_binned_spec_z_deltasigma import (
 
 @pytest.fixture(name="murata_binned_spec_z")
 def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
-    cluster_recipe = MurataBinnedSpecZRecipe()
+    cluster_recipe = MurataBinnedSpecZRecipe(
+        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        redshift_distribution=SpectroscopicRedshift(),
+        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+    )
     cluster_recipe.mass_distribution.mu_p0 = 3.0
     cluster_recipe.mass_distribution.mu_p1 = 0.86
     cluster_recipe.mass_distribution.mu_p2 = 0.0
@@ -36,7 +40,12 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
 
 @pytest.fixture(name="murata_binned_spec_z_deltasigma")
 def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZDeltaSigmaRecipe:
-    cluster_recipe = MurataBinnedSpecZDeltaSigmaRecipe()
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    cluster_recipe = MurataBinnedSpecZDeltaSigmaRecipe(
+        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        redshift_distribution=SpectroscopicRedshift(),
+        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+    )
     cluster_recipe.mass_distribution.mu_p0 = 3.0
     cluster_recipe.mass_distribution.mu_p1 = 0.86
     cluster_recipe.mass_distribution.mu_p2 = 0.0
@@ -49,7 +58,12 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZDeltaSigmaReci
 
 
 def test_murata_binned_spec_z_deltasigma_init():
-    recipe = MurataBinnedSpecZDeltaSigmaRecipe()
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    recipe = MurataBinnedSpecZDeltaSigmaRecipe(
+        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        redshift_distribution=SpectroscopicRedshift(),
+        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+    )
 
     assert recipe is not None
     assert isinstance(recipe, MurataBinnedSpecZDeltaSigmaRecipe)
@@ -82,6 +96,7 @@ def test_get_theory_prediction_returns_value(
     mass_proxy_limits = (0.0, 5.0)
     sky_area = 360**2
     radius_center = 1.5
+    murata_binned_spec_z_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
     with pytest.raises(
         ValueError,
         match=f"The property should be" f" {ClusterProperty.DELTASIGMA}.",
@@ -116,6 +131,7 @@ def test_get_function_to_integrate_returns_value(
 
     int_args = np.array([[13.0, 0.1], [17.0, 1.0]])
     extra_args = np.array([0, 5, 360**2, 1.5])
+    murata_binned_spec_z_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
 
     result = function_to_integrate(int_args, extra_args)
     assert isinstance(result, np.ndarray)

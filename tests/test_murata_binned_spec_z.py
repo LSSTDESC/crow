@@ -21,7 +21,12 @@ from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 
 @pytest.fixture(name="murata_binned_spec_z")
 def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
-    cluster_recipe = MurataBinnedSpecZRecipe()
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    cluster_recipe = MurataBinnedSpecZRecipe(
+        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        redshift_distribution=SpectroscopicRedshift(),
+        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+    )
     cluster_recipe.mass_distribution.mu_p0 = 3.0
     cluster_recipe.mass_distribution.mu_p1 = 0.86
     cluster_recipe.mass_distribution.mu_p2 = 0.0
@@ -34,7 +39,12 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
 
 
 def test_murata_binned_spec_z_init():
-    recipe = MurataBinnedSpecZRecipe()
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    recipe = MurataBinnedSpecZRecipe(
+        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        redshift_distribution=SpectroscopicRedshift(),
+        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+    )
 
     assert recipe is not None
     assert isinstance(recipe, MurataBinnedSpecZRecipe)
