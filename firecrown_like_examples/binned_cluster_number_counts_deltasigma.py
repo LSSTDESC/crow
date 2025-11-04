@@ -21,6 +21,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow.recipes.murata_binned_spec_z import (
     MurataBinnedSpecZRecipe,
 )
+
 from firecrown.models.cluster import (
     ClusterProperty,
     DeltaSigmaData,
@@ -126,12 +127,14 @@ class BinnedClusterShearProfile(BinnedCluster):
                     this_bin.mass_proxy_edges,
                     self.sky_area,
                 )
-            total_observable = self.cluster_recipe.evaluate_theory_prediction_shear_profile(
-                this_bin.z_edges,
-                this_bin.mass_proxy_edges,
-                this_bin.radius_center,
-                self.sky_area,
-                cluster_properties,
+            total_observable = (
+                self.cluster_recipe.evaluate_theory_prediction_shear_profile(
+                    this_bin.z_edges,
+                    this_bin.mass_proxy_edges,
+                    this_bin.radius_center,
+                    self.sky_area,
+                    cluster_properties,
+                )
             )
             mean_observable = total_observable / counts
             mean_values.append(mean_observable)
