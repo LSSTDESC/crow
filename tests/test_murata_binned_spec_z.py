@@ -59,7 +59,7 @@ def test_murata_binned_spec_z_init():
 def test_get_theory_prediction_returns_value(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction(ClusterProperty.COUNTS)
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     assert prediction is not None
     assert callable(prediction)
@@ -94,7 +94,7 @@ def test_cluster_prediction_positivity_property(
     sky_area: float,
 ):
     """Test that cluster predictions are always positive using hypothesis."""
-    prediction = murata_binned_spec_z.get_theory_prediction(ClusterProperty.COUNTS)
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     mass_array = np.array([mass])
     z_array = np.array([z])
@@ -115,7 +115,7 @@ def test_get_theory_prediction_with_average_returns_value(
     mass_proxy_limits = (0, 5)
     sky_area = 360**2
 
-    prediction = murata_binned_spec_z.get_theory_prediction(
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
         average_on=ClusterProperty.MASS
     )
 
@@ -128,7 +128,7 @@ def test_get_theory_prediction_with_average_returns_value(
     assert len(result) == 2
     assert np.all(result > 0)
 
-    prediction = murata_binned_spec_z.get_theory_prediction(
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
         average_on=ClusterProperty.REDSHIFT
     )
 
@@ -141,7 +141,7 @@ def test_get_theory_prediction_with_average_returns_value(
     assert len(result) == 2
     assert np.all(result > 0)
 
-    prediction = murata_binned_spec_z.get_theory_prediction(
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
         average_on=(ClusterProperty.REDSHIFT | ClusterProperty.MASS)
     )
 
@@ -158,7 +158,7 @@ def test_get_theory_prediction_with_average_returns_value(
 def test_get_theory_prediction_throws_with_nonimpl_average(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction(
+    prediction = murata_binned_spec_z.get_theory_prediction_counts(
         average_on=ClusterProperty.SHEAR
     )
 
@@ -169,8 +169,8 @@ def test_get_theory_prediction_throws_with_nonimpl_average(
 def test_get_function_to_integrate_returns_value(
     murata_binned_spec_z: MurataBinnedSpecZRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction()
-    function_to_integrate = murata_binned_spec_z.get_function_to_integrate(prediction)
+    prediction = murata_binned_spec_z.get_theory_prediction_counts()
+    function_to_integrate = murata_binned_spec_z.get_function_to_integrate_counts(prediction)
 
     assert function_to_integrate is not None
     assert callable(function_to_integrate)
@@ -192,12 +192,12 @@ def test_evaluates_theory_prediction_returns_value(
     z_edges = (0.5, 1)
     sky_area = 360**2
 
-    prediction = murata_binned_spec_z.evaluate_theory_prediction(
+    prediction = murata_binned_spec_z.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
 
     assert prediction > 0
-    prediction = murata_binned_spec_z.evaluate_theory_prediction(
+    prediction = murata_binned_spec_z.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area, ClusterProperty.REDSHIFT
     )
 
