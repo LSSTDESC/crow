@@ -92,10 +92,15 @@ class ClusterShearProfile(ClusterAbundance):
         cluster_concentration: float | None = None,
         is_delta_sigma: bool = False,
         use_beta_s_interp: bool = False,
+        two_halo_term: bool = False,
+        boost_factor: bool = False,
     ) -> None:
         super().__init__(mass_interval, z_interval, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
+
+        self.two_halo_term = two_halo_term
+        self.boost_factor = boost_factor
 
         self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo)
 
@@ -121,9 +126,6 @@ class ClusterShearProfile(ClusterAbundance):
         else:
             self.eval_beta_s_mean = self._beta_s_mean_exact
             self.eval_beta_s_square_mean = self._beta_s_square_mean_exact
-            
-
-
 
     def set_beta_parameters(
         self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
@@ -179,17 +181,18 @@ class ClusterShearProfile(ClusterAbundance):
         # must add check to verify consistency with main cosmology
 
         redshift_points = np.linspace(z_min, z_max, n_intep)
-        beta_s_list = [
-            self._beta_s_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
-        ]
+        beta_s_list = [self._beta_s_mean_exact(z_cl) for z_cl in redshift_points]
         self._beta_s_mean_interp = interp1d(
             redshift_points, beta_s_list, kind="quadratic", fill_value="extrapolate"
         )
         beta_s_square_list = [
-            self._beta_s_square_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+            self._beta_s_square_mean_exact(z_cl) for z_cl in redshift_points
         ]
         self._beta_s_square_mean_interp = interp1d(
-            redshift_points, beta_s_square_list, kind="quadratic", fill_value="extrapolate"
+            redshift_points,
+            beta_s_square_list,
+            kind="quadratic",
+            fill_value="extrapolate",
         )
 
     def set_miscentering_parameters(
@@ -235,9 +238,6 @@ class ClusterShearProfile(ClusterAbundance):
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
         radius_center: np.float64,
-        two_halo_term: bool = False,
-        miscentering_frac: np.float64 = None,
-        boost_factor: bool = False,
     ) -> npt.NDArray[np.float64]:
         """Delta sigma for cprint(new_pred)lusters."""
         cosmo_clmm = clmm.Cosmology()
@@ -260,11 +260,13 @@ class ClusterShearProfile(ClusterAbundance):
             moo.set_concentration(self._get_concentration(log_m, redshift))
             moo.set_mass(10**log_m)
             val = self._one_halo_contribution(
-                moo, radius_center, redshift, miscentering_frac
+                moo,
+                radius_center,
+                redshift,
             )
-            if two_halo_term:
+            if self.two_halo_term:
                 val += self._two_halo_contribution(moo, radius_center, redshift)
-            if boost_factor:
+            if self.boost_factor:
                 val = self._correct_with_boost_nfw(val, radius_center)
             return_vals.append(val)
         return np.asarray(return_vals, dtype=np.float64)
@@ -274,7 +276,6 @@ class ClusterShearProfile(ClusterAbundance):
         clmm_model: clmm.Modeling,
         radius_center,
         redshift,
-        miscentering_frac=None,
         sigma_offset=0.12,
         **kwargs,
     ) -> npt.NDArray[np.float64]:
@@ -296,7 +297,9 @@ class ClusterShearProfile(ClusterAbundance):
             )
 
         if self.miscentering_parameters is not None:
-            miscentering_integral, miscentering_frac = self.compute_miscentering(clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean)
+            miscentering_integral, miscentering_frac = self.compute_miscentering(
+                clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean
+            )
             return (
                 (1.0 - miscentering_frac) * first_halo_right_centered
                 + miscentering_frac * miscentering_integral
@@ -348,7 +351,7 @@ class ClusterShearProfile(ClusterAbundance):
         integration_max: float = None,
     ) -> None:
         """Set the miscentering model parameters.
-    
+
         Parameters
         ----------
         miscentering_fraction : float
@@ -362,49 +365,56 @@ class ClusterShearProfile(ClusterAbundance):
         """
         if integration_max is None:
             integration_max = 25.0 * sigma
-    
+
         self.miscentering_parameters = {
             "miscentering_fraction": miscentering_fraction,
             "sigma": sigma,
             "miscentering_distribution_function": miscentering_distribution_function,
             "integration_max": integration_max,
         }
-        
-    def compute_miscentering(self, clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean):
+
+    def compute_miscentering(
+        self, clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean
+    ):
         params = self.miscentering_parameters
         miscentering_frac = params["miscentering_fraction"]
         sigma = params["sigma"]
-        miscentering_distribution_function = params["miscentering_distribution_function"]
+        miscentering_distribution_function = params[
+            "miscentering_distribution_function"
+        ]
         integration_max = params["integration_max"]
 
-    
         integrator = NumCosmoIntegrator(
             relative_tolerance=1e-4,
             absolute_tolerance=1e-6,
         )
-    
+
         def integration_func(int_args, extra_args):
             sigma_local = extra_args[0]
             r_mis_list = int_args[:, 0]
-    
-            esd_vals = np.array([
+
+            esd_vals = np.array(
+                [
                     clmm_model.eval_excess_surface_density(
                         np.array([radius_center]), redshift, r_mis=r_mis
                     )[0]
                     for r_mis in r_mis_list
-                ])
+                ]
+            )
             if self.is_delta_sigma == False:
-                sigma_c = clmm_model.cosmo.eval_sigma_crit(redshift, z_src=clmm_model.z_inf)
-                esd_vals = beta_s_mean * esd_vals / sigma_c 
+                sigma_c = clmm_model.cosmo.eval_sigma_crit(
+                    redshift, z_src=clmm_model.z_inf
+                )
+                esd_vals = beta_s_mean * esd_vals / sigma_c
             if miscentering_distribution_function is not None:
                 pdf_vals = miscentering_distribution_function(r_mis_list)
             else:
                 pdf_vals = gamma.pdf(r_mis_list, a=2.0, scale=sigma_local)
-    
+
             return esd_vals * pdf_vals
-    
+
         integrator.integral_bounds = [(0.0, integration_max)]
         integrator.extra_args = np.array([sigma])
         miscentering_integral = integrator.integrate(integration_func)
-    
+
         return miscentering_integral, miscentering_frac
