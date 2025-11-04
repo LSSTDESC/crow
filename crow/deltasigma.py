@@ -213,6 +213,11 @@ class ClusterShearProfile(ClusterAbundance):
             halo_profile_model="nfw",
         )
         moo.set_cosmo(cosmo_clmm)
+
+        # NOTE: value set up not to break use in pyccl with firecronw
+        # to be investigated
+        moo.z_inf = 10.0
+
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
