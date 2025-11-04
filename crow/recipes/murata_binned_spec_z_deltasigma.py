@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow.deltasigma import ClusterDeltaSigma
+from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
@@ -45,7 +45,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.two_halo_term = two_halo_term
         self.miscentering_frac = miscentering_frac
         self.boost_factor = boost_factor
-        self.cluster_theory = ClusterDeltaSigma(
+        self.cluster_theory = ClusterShearProfile(
             mass_interval=(min_mass, max_mass),
             z_interval=(min_z, max_z),
             halo_mass_function=hmf,

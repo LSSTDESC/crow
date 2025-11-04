@@ -21,7 +21,10 @@ from scipy.stats import gamma
 from crow.abundance import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-def numcosmo_miscentered_mean_surface_density(r_proj, r_mis, integrand, norm, aux_args, extra_integral):
+
+def numcosmo_miscentered_mean_surface_density(
+    r_proj, r_mis, integrand, norm, aux_args, extra_integral
+):
     """
     NumCosmo replacement for `integrate_azimuthially_miscentered_mean_surface_density`.
 
@@ -48,6 +51,7 @@ def numcosmo_miscentered_mean_surface_density(r_proj, r_mis, integrand, norm, au
                 theta = int_args[:, 1]
                 extra = int_args[:, 2]
                 return integrand(theta, r_local, extra, *extra_args)
+
         else:
             integrator.integral_bounds = [(r_low, r_high), (0.0, np.pi)]
 
@@ -66,9 +70,12 @@ def numcosmo_miscentered_mean_surface_density(r_proj, r_mis, integrand, norm, au
     return mean_surface_density
 
 
-clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = numcosmo_miscentered_mean_surface_density
+clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (
+    numcosmo_miscentered_mean_surface_density
+)
 
-class ClusterDeltaSigma(ClusterAbundance):
+
+class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
 
     The excess density surface mass density is a function of a specific cosmology,
