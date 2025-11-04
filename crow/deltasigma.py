@@ -180,13 +180,13 @@ class ClusterShearProfile(ClusterAbundance):
 
         redshift_points = np.linspace(z_min, z_max, n_intep)
         beta_s_list = [
-            self._beta_s_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+            self._beta_s_mean_exact(z_cl) for z_cl in redshift_points
         ]
         self._beta_s_mean_interp = interp1d(
             redshift_points, beta_s_list, kind="quadratic", fill_value="extrapolate"
         )
         beta_s_square_list = [
-            self._beta_s_square_mean_exact(z_cl, clmm_cosmo) for z_cl in redshift_points
+            self._beta_s_square_mean_exact(z_cl) for z_cl in redshift_points
         ]
         self._beta_s_square_mean_interp = interp1d(
             redshift_points, beta_s_square_list, kind="quadratic", fill_value="extrapolate"
