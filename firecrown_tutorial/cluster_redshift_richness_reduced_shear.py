@@ -12,7 +12,7 @@ from firecrown.models.cluster import ClusterProperty
 
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow.deltasigma import ClusterShearProfile
+from crow.shear_profile import ClusterShearProfile
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
