@@ -127,21 +127,6 @@ def test_shear_profile_returns_value_interp(
         redshifts,
         radius,
     )
-<<<<<<< HEAD
-    assert isinstance(result, np.ndarray)
-    assert np.issubdtype(result.dtype, np.float64)
-    assert len(result) == 5
-    assert np.all(result > 0)
-
-
-def test_deltasigma_profile_miscentering(
-    cluster_deltasigma_profile, cluster_reduced_profile
-):
-    cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_deltasigma_profile.cosmo = cosmo
-    cluster_reduced_profile.cosmo = cosmo
-
-=======
     _check_delta_sigma_output(result)
     cluster_reduced_profile.cosmo = cosmo
     result_exact = cluster_reduced_profile.delta_sigma(
@@ -183,65 +168,21 @@ def test_shear_profile_miscentering(
     cluster_deltasigma_profile, cluster_reduced_profile
 ):
     cosmo = pyccl.CosmologyVanillaLCDM()
->>>>>>> implement_reduced_shear
     log_mass = np.linspace(13, 17, 5)
     redshifts = np.linspace(0.1, 1, 5)
     radius = 5.0
     miscentering_frac = 0.5
 
-<<<<<<< HEAD
-    baseline = cluster_deltasigma_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_deltasigma_profile.set_miscentering(miscentering_frac)
-    result_mis = cluster_deltasigma_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_deltasigma_profile.set_miscentering(0.0)
-    result_right_center = cluster_deltasigma_profile.delta_sigma(
-        log_mass, redshifts, radius
-    )
-    np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
-    assert result_mis.shape == baseline.shape
-    assert np.all(result_mis <= baseline)
-    assert np.all(result_mis >= 0)
-
-    baseline = cluster_reduced_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_reduced_profile.set_miscentering(miscentering_frac)
-    result_mis = cluster_reduced_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_reduced_profile.set_miscentering(0.0)
-    result_right_center = cluster_reduced_profile.delta_sigma(
-        log_mass, redshifts, radius
-    )
-    np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
-    assert result_mis.shape == baseline.shape
-    assert np.all(result_mis <= baseline)
-    assert np.all(result_mis >= 0)
-=======
     for cluster in [cluster_deltasigma_profile, cluster_reduced_profile]:
         cluster.cosmo = cosmo
         _check_miscentering_behavior(
             cluster, log_mass, redshifts, radius, miscentering_frac
         )
->>>>>>> implement_reduced_shear
 
     # Gaussian miscentering case (only for reduced profile)
     def gaussian_pdf(r_mis_list, mean=0.0, sigma=0.1):
         return norm.pdf(r_mis_list, loc=mean, scale=sigma)
 
-<<<<<<< HEAD
-    baseline = cluster_reduced_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_reduced_profile.set_miscentering(
-        miscentering_frac, miscentering_distribution_function=gaussian_pdf
-    )
-    result_mis = cluster_reduced_profile.delta_sigma(log_mass, redshifts, radius)
-    cluster_reduced_profile.set_miscentering(
-        0.0, miscentering_distribution_function=gaussian_pdf
-    )
-    result_right_center = cluster_reduced_profile.delta_sigma(
-        log_mass, redshifts, radius
-    )
-    np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
-    assert result_mis.shape == baseline.shape
-    assert np.all(result_mis <= baseline)
-    assert np.all(result_mis >= 0)
-=======
     _check_miscentering_behavior(
         cluster_reduced_profile,
         log_mass,
@@ -250,4 +191,3 @@ def test_shear_profile_miscentering(
         miscentering_frac,
         pdf=gaussian_pdf,
     )
->>>>>>> implement_reduced_shear
