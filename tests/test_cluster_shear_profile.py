@@ -161,6 +161,19 @@ def test_shear_profile_returns_value_twoh_boost(
     _check_delta_sigma_output(result)
 
 
+def test_shear_profile_miscentering_fast(cluster_reduced_profile):
+    cosmo = pyccl.CosmologyVanillaLCDM()
+    log_mass = np.linspace(13, 17, 1)
+    redshifts = np.linspace(0.1, 1, 1)
+    radius = 5.0
+    miscentering_frac = 0.5
+
+    cluster_reduced_profile.cosmo = cosmo
+    _check_miscentering_behavior(
+        cluster_reduced_profile, log_mass, redshifts, radius, miscentering_frac
+    )
+
+
 @pytest.mark.slow
 def test_shear_profile_miscentering(
     cluster_deltasigma_profile, cluster_reduced_profile

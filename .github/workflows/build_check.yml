@@ -50,6 +50,15 @@ jobs:
           conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
           conda run -n ${{ env.CONDA_ENV }} coverage report -m
           conda run -n ${{ env.CONDA_ENV }} coverage xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   crow-matrix:
     name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
