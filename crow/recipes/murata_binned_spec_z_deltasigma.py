@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow.deltasigma import ClusterDeltaSigma
+from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
@@ -21,20 +21,18 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
     perfectly measured spec-zs.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        cluster_theory,
+        redshift_distribution,
+        mass_distribution,
+    ) -> None:
 
         self.integrator = NumCosmoIntegrator()
-        self.redshift_distribution = SpectroscopicRedshift()
-        pivot_mass, pivot_redshift = 14.625862906, 0.6
-        self.mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
 
-        hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-        min_mass, max_mass = 13.0, 16.0
-        min_z, max_z = 0.2, 0.8
-
-        self.cluster_theory = ClusterDeltaSigma(
-            (min_mass, max_mass), (min_z, max_z), hmf
-        )
+        self.cluster_theory = cluster_theory
+        self.redshift_distribution = redshift_distribution
+        self.mass_distribution = mass_distribution
 
     def get_theory_prediction(
         self,
@@ -72,14 +70,16 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
             if average_on is None:
                 # pylint: disable=no-member
                 raise ValueError(
-                    f"The property should be" f" {ClusterProperty.DELTASIGMA}."
+                    f"The property should be"
+                    f" {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR}."
                 )
 
-            for cluster_prop in ClusterProperty:
-                if cluster_prop == ClusterProperty.DELTASIGMA:
-                    prediction *= self.cluster_theory.delta_sigma(
-                        mass, z, radius_center, True, None
-                    )
+            if average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR):
+                prediction *= self.cluster_theory.delta_sigma(
+                    log_mass=mass,
+                    z=z,
+                    radius_center=radius_center,
+                )
             return prediction
 
         return theory_prediction
@@ -141,6 +141,7 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.integrator.extra_args = np.array(
             [*mass_proxy_edges, sky_area, radius_center]
         )
+        self.cluster_theory.set_beta_s_interp(*z_edges)
         theory_prediction = self.get_theory_prediction(average_on)
         prediction_wrapper = self.get_function_to_integrate(theory_prediction)
         deltasigma = self.integrator.integrate(prediction_wrapper)
