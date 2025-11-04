@@ -105,12 +105,12 @@ def test_shear_profile_returns_value_interp(cluster_reduced_interp_profile: Clus
 
     cluster_reduced_interp_profile.cosmo = cosmo
     result = cluster_reduced_profile.delta_sigma(
-        log_mass, redshifts, radius, False, None, True
+        log_mass, redshifts, radius,
     )
     _check_delta_sigma_output(result)
     cluster_reduced_profile.cosmo = cosmo
     result_exact = cluster_reduced_profile.delta_sigma(
-        log_mass, redshifts, radius, False, None, True
+        log_mass, redshifts, radius,
     )
     np.testing.assert_allclose(result, result_exact, rtol=1e-12)
 
@@ -122,13 +122,13 @@ def test_shear_profile_returns_value_twoh_boost(cluster_deltasigma_profile: Clus
 
     cluster_deltasigma_profile.cosmo = cosmo
     result = cluster_deltasigma_profile.delta_sigma(
-        log_mass, redshifts, radius, True, None, True
+        log_mass, redshifts, radius,
     )
     _check_delta_sigma_output(result)
 
     cluster_reduced_profile.cosmo = cosmo
     result = cluster_reduced_profile.delta_sigma(
-        log_mass, redshifts, radius, False, None, True
+        log_mass, redshifts, radius,
     )
     _check_delta_sigma_output(result)
 
