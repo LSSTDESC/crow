@@ -240,9 +240,6 @@ class ClusterShearProfile(ClusterAbundance):
         radius_center: np.float64,
     ) -> npt.NDArray[np.float64]:
         """Delta sigma for cprint(new_pred)lusters."""
-        cosmo_clmm = clmm.Cosmology()
-        # pylint: disable=protected-access
-        cosmo_clmm._init_from_cosmo(self._cosmo)
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
@@ -252,7 +249,7 @@ class ClusterShearProfile(ClusterAbundance):
             delta_mdef=mass_def.Delta,
             halo_profile_model="nfw",
         )
-        moo.set_cosmo(cosmo_clmm)
+        moo.set_cosmo(self._clmm_cosmo)
 
         # NOTE: value set up not to break use in pyccl with firecronw
         # to be investigated
