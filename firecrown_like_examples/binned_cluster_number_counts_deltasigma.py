@@ -18,8 +18,8 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
+from crow.recipes.murata_binned_spec_z import (
+    MurataBinnedSpecZRecipe,
 )
 from firecrown.models.cluster import (
     ClusterProperty,
@@ -41,7 +41,7 @@ class BinnedClusterShearProfile(BinnedCluster):
         self,
         cluster_properties: ClusterProperty,
         survey_name: str,
-        cluster_recipe: MurataBinnedSpecZDeltaSigmaRecipe,
+        cluster_recipe: MurataBinnedSpecZRecipe,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.
@@ -126,7 +126,7 @@ class BinnedClusterShearProfile(BinnedCluster):
                     this_bin.mass_proxy_edges,
                     self.sky_area,
                 )
-            total_observable = self.cluster_recipe.evaluate_theory_prediction(
+            total_observable = self.cluster_recipe.evaluate_theory_prediction_shear_profile(
                 this_bin.z_edges,
                 this_bin.mass_proxy_edges,
                 this_bin.radius_center,
