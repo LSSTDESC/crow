@@ -11,6 +11,8 @@ import numpy as np
 import numpy.typing as npt
 from scipy import special
 
+from crow.kernel import Purity
+
 
 class MassRichnessGaussian:
     """The representation of mass richness relations that are of a gaussian form."""
@@ -112,6 +114,7 @@ class MurataBinned(MassRichnessGaussian):
         self,
         pivot_mass: float,
         pivot_redshift: float,
+        purity: Purity = None,
     ):
         super().__init__()
         self.pivot_redshift = pivot_redshift
@@ -125,7 +128,22 @@ class MurataBinned(MassRichnessGaussian):
         self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
         self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
 
+        self.__purity = None
+        self.purity = purity
+
         # Verify this gets called last or first
+
+    @property
+    def purity(self):
+        return self.__purity
+
+    @purity.setter
+    def purity(self, value):
+        if value is None:
+            self._distribution = self._distribution_binned
+        else:
+            self._distribution = self._distribution_binned_unpure
+        self.__purity = value
 
     def get_proxy_mean(
         self,
@@ -155,6 +173,52 @@ class MurataBinned(MassRichnessGaussian):
             self.log1p_pivot_redshift,
         )
 
+    def _distribution_binned_unpure(self, mass, z, mass_proxy_limits):
+        integrator = NumCosmoIntegrator(
+            relative_tolerance=1e-2,
+            absolute_tolerance=1e-6,
+        )
+
+        def integration_func(int_args, extra_args):
+            mass_proxy = int_args[:, 0]
+            """
+            print(
+                np.array(
+                    [
+                        np.sum(
+                            self._distribution_unbinned(
+                                np.array([mass[i]]), np.array([z[i]]), mass_proxy
+                            )
+                            / self.purity.distribution(np.array([z[i]]), mass_proxy)
+                        )
+                        for i in range(len(mass))
+                    ]
+                )
+            )
+            print(
+                np.array(
+                    [
+                        np.sum(
+                            self._distribution_unbinned(mass, z, np.array([proxy]))
+                            / self.purity.distribution(z, np.array([proxy]))
+                            for proxy in mass_proxy
+                        )
+                    ][0]
+                )
+            )
+            """
+            return np.array(
+                [
+                    self._distribution_unbinned(mass, z, np.array([proxy]))
+                    / self.purity.distribution(z, np.array([proxy]))
+                    for proxy in mass_proxy
+                ]
+            )
+
+        integrator.integral_bounds = [(mass_proxy_limits[0], mass_proxy_limits[1])]
+
+        return integrator.integrate(integration_func)
+
     def distribution(
         self,
         mass: npt.NDArray[np.float64],
@@ -162,7 +226,7 @@ class MurataBinned(MassRichnessGaussian):
         mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_binned(mass, z, mass_proxy_limits)
+        return self._distribution(mass, z, mass_proxy_limits)
 
 
 class MurataUnbinned(MassRichnessGaussian):
