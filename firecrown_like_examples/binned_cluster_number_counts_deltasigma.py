@@ -6,6 +6,9 @@ surface mass of clusters within a single redshift and mass bin.
 
 from __future__ import annotations
 
+import os
+import sys
+
 # firecrown is needed for backward compatibility; remove support for deprecated
 # directory structure is removed.
 import firecrown  # pylint: disable=unused-import # noqa: F401
@@ -14,16 +17,14 @@ from firecrown.likelihood.source import SourceSystematic
 from firecrown.likelihood.statistic import TheoryVector
 from firecrown.modeling_tools import ModelingTools
 
-import sys
-import os
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
 from firecrown.models.cluster import (
     ClusterProperty,
     DeltaSigmaData,
+)
+
+from crow.recipes.murata_binned_spec_z_deltasigma import (
+    MurataBinnedSpecZDeltaSigmaRecipe,
 )
 
 from .binned_cluster import BinnedCluster

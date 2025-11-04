@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
 """Function to generate a SACC file for cluster number counts and cluster DeltaSigma."""
+import itertools
+import math
 import os
 from typing import Tuple
 
-import math
-import itertools
 import numpy as np
-from numcosmo_py import Nc, Ncm
-from astropy.table import Table
-from astropy.io import fits
-from scipy import stats
-import sacc
 import pyccl as ccl
+import sacc
+from astropy.io import fits
+from astropy.table import Table
+from numcosmo_py import Nc, Ncm
+from scipy import stats
 
 os.environ["CLMM_MODELING_BACKEND"] = "ccl"
 # pylint: disable=C0413
@@ -22,7 +22,6 @@ from clmm.utils.beta_lens import (
     compute_beta_s_mean_from_distribution,
     compute_beta_s_square_mean_from_distribution,
 )
-
 
 
 def generate_cosmo(
@@ -212,20 +211,20 @@ def compute_abundance_gt_statistic(
         mass = 10**log_mass
         moo.set_mass(mass)
         beta_s_mean = compute_beta_s_mean_from_distribution(
-                z_cl=redshift,
-                z_inf=10,
-                cosmo=moo.cosmo,
-                zmax=5.0,
+            z_cl=redshift,
+            z_inf=10,
+            cosmo=moo.cosmo,
+            zmax=5.0,
         )
         beta_s_square_mean = compute_beta_s_square_mean_from_distribution(
-                z_cl=redshift,
-                z_inf=10,
-                cosmo=moo.cosmo,
-                zmax=5.0,
+            z_cl=redshift,
+            z_inf=10,
+            cosmo=moo.cosmo,
+            zmax=5.0,
         )
 
         cluster_gt_list.append(
-                moo.eval_tangential_shear(
+            moo.eval_tangential_shear(
                 radius_centers,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),
@@ -382,9 +381,7 @@ def generate_sacc_file() -> None:
 
     s_count.add_covariance(covariance)
     s_count.to_canonical_order()
-    s_count.save_fits(
-        "cluster_redshift_richness_gt_sacc_data.fits", overwrite=True
-    )
+    s_count.save_fits("cluster_redshift_richness_gt_sacc_data.fits", overwrite=True)
 
 
 Ncm.cfg_init()  # pylint: disable=no-value-for-parameter

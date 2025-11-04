@@ -5,17 +5,17 @@ and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
-from typing import Optional, Tuple, Callable
-from scipy.interpolate import interp1d
+from typing import Callable, Optional, Tuple
+
 import clmm  # pylint: disable=import-error
+import numpy as np
+import numpy.typing as npt
+import pyccl
 from clmm.utils.beta_lens import (
     compute_beta_s_mean_from_distribution,
     compute_beta_s_square_mean_from_distribution,
 )
-
-import numpy as np
-import numpy.typing as npt
-import pyccl
+from scipy.interpolate import interp1d
 from scipy.stats import gamma
 
 from crow.abundance import ClusterAbundance
