@@ -6,12 +6,12 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
+from firecrown.models.cluster import ClusterProperty
 
 from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
-from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
