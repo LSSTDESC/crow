@@ -95,7 +95,7 @@ jobs:
       - name: Run tests
         run: |
           if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
-            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow-cov crow --cov-report xml --cov-branch -n auto
+            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow --cov crow --cov-report xml --cov-branch -n auto
           else
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
           fi
