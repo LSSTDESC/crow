@@ -10,7 +10,7 @@ from scipy.stats import norm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow.deltasigma import ClusterShearProfile
+from crow.shear_profile import ClusterShearProfile
 
 
 @pytest.fixture(name="cluster_deltasigma_profile")
