@@ -65,7 +65,8 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     needs: quick-validation
     if: >
-      (github.event_name == 'pull_request' && github.event.action == 'ready_for_review')
+      (github.event_name == 'pull_request' &&
+      (github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'ready_for_review' || github.event.action == 'reopened'))
       || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     strategy:
       fail-fast: false
@@ -103,7 +104,7 @@ jobs:
       - name: Run tests
         run: |
           if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
-            conda run -n ${{ env.CONDA_ENV }} pytest -vv ---runslow-cov crow --cov-report xml --cov-branch -n auto
+            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow-cov crow --cov-report xml --cov-branch -n auto
           else
             conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
           fi
