@@ -24,7 +24,7 @@ from firecrown_like_examples.binned_cluster_number_counts import (
     BinnedClusterNumberCounts,
 )
 from firecrown_like_examples.binned_cluster_number_counts_deltasigma import (
-    BinnedClusterDeltaSigma,
+    BinnedClusterShearProfile,
 )
 
 
@@ -40,20 +40,30 @@ def build_likelihood(
         average_on |= ClusterProperty.MASS
     if build_parameters.get_bool("use_mean_deltasigma", True):
         average_on |= ClusterProperty.DELTASIGMA
-        
+
     hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
     redshift_distribution = SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
     survey_name = "numcosmo_simulated_redshift_richness_gt"
-    
+
     likelihood = ConstGaussian(
         [
             BinnedClusterNumberCounts(
-                average_on, survey_name, MurataBinnedSpecZRecipe(hmf, redshift_distribution, mass_distribution)
+                average_on,
+                survey_name,
+                MurataBinnedSpecZRecipe(hmf, redshift_distribution, mass_distribution),
             ),
-            BinnedClusterDeltaSigma(
-                average_on, survey_name, MurataBinnedSpecZDeltaSigmaRecipe(hmf=hmf, redshift_distribution=redshift_distribution, mass_distribution=mass_distribution, is_delta_sigma=False, use_beta_interp=True)
+            BinnedClusterShearProfile(
+                average_on,
+                survey_name,
+                MurataBinnedSpecZDeltaSigmaRecipe(
+                    hmf=hmf,
+                    redshift_distribution=redshift_distribution,
+                    mass_distribution=mass_distribution,
+                    is_delta_sigma=False,
+                    use_beta_interp=True,
+                ),
             ),
         ]
     )

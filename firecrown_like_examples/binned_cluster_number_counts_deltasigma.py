@@ -16,8 +16,11 @@ from firecrown.modeling_tools import ModelingTools
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow.recipes.murata_binned_spec_z_deltasigma import MurataBinnedSpecZDeltaSigmaRecipe
+from crow.recipes.murata_binned_spec_z_deltasigma import (
+    MurataBinnedSpecZDeltaSigmaRecipe,
+)
 from firecrown.models.cluster import (
     ClusterProperty,
     DeltaSigmaData,
@@ -27,7 +30,7 @@ from .binned_cluster import BinnedCluster
 from .updatable_wrapper import UpdatableClusterObjects
 
 
-class BinnedClusterDeltaSigma(BinnedCluster):
+class BinnedClusterShearProfile(BinnedCluster):
     """The Binned Cluster Delta Sigma statistic.
 
     This class will make a prediction for the deltasigma of clusters in a z, mass,

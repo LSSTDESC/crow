@@ -9,14 +9,14 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow.deltasigma import ClusterDeltaSigma
+from crow.deltasigma import ClusterShearProfile
 
 
-@pytest.fixture(name="cluster_deltasigma")
+@pytest.fixture(name="cluster_shear_profile")
 def fixture_cluster_deltasigma_deltasigma():
     """Test fixture that represents an assembled cluster deltasigma class."""
     hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterDeltaSigma((13, 17), (0, 2), hmf, 4.0, True)
+    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, True)
     ca.set_beta_parameters(10.0)
     return ca
 
@@ -24,7 +24,7 @@ def fixture_cluster_deltasigma_deltasigma():
 def fixture_cluster_deltasigma_reduced():
     """Test fixture that represents an assembled cluster deltasigma class."""
     hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterDeltaSigma((13, 17), (0, 2), hmf, 4.0, False)
+    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, False)
     ca.set_beta_parameters(10.0)
     return ca
 
@@ -32,45 +32,44 @@ def fixture_cluster_deltasigma_reduced():
 def fixture_cluster_deltasigma_reduced_interp():
     """Test fixture that represents an assembled cluster deltasigma class."""
     hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterDeltaSigma((13, 17), (0, 2), hmf, 4.0, False, True)
+    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, False, True)
     ca.set_beta_parameters(10.0)
     return ca
 
-def test_cluster_update_ingredients(cluster_deltasigma: ClusterDeltaSigma, cluster_reduced: ClusterDeltaSigma):
+def test_cluster_update_ingredients(cluster_shear_profile: ClusterShearProfile, cluster_reduced: ClusterShearProfile):
     cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_deltasigma.cosmo = cosmo
+    cluster_shear_profile.cosmo = cosmo
     cluster_reduced.cosmo = cosmo
-    assert cluster_deltasigma.cosmo is not None
-    assert cluster_deltasigma.cosmo == cosmo
+    assert cluster_shear_profile.cosmo is not None
+    assert cluster_shear_profile.cosmo == cosmo
     # pylint: disable=protected-access
-    assert cluster_deltasigma._hmf_cache == {}
+    assert cluster_shear_profile._hmf_cache == {}
 
     assert cluster_reduced.cosmo is not None
     assert cluster_reduced.cosmo == cosmo
     # pylint: disable=protected-access
     assert cluster_reduced._hmf_cache == {}
 
-
-def test_cluster_deltasigma_init(cluster_deltasigma: ClusterDeltaSigma):
-    assert cluster_deltasigma is not None
-    assert cluster_deltasigma.cluster_concentration is not None
-    assert cluster_deltasigma.cosmo is None
+def test_cluster_shear_profile_init(cluster_shear_profile: ClusterShearProfile):
+    assert cluster_shear_profile is not None
+    assert cluster_shear_profile.cluster_concentration is not None
+    assert cluster_shear_profile.cosmo is None
     # pylint: disable=protected-access
-    assert cluster_deltasigma._hmf_cache == {}
+    assert cluster_shear_profile._hmf_cache == {}
     assert isinstance(
-        cluster_deltasigma.halo_mass_function, pyccl.halos.MassFuncBocquet16
+        cluster_shear_profile.halo_mass_function, pyccl.halos.MassFuncBocquet16
     )
-    assert cluster_deltasigma.min_mass == 13.0
-    assert cluster_deltasigma.max_mass == 17.0
-    assert cluster_deltasigma.min_z == 0.0
-    assert cluster_deltasigma.max_z == 2.0
+    assert cluster_shear_profile.min_mass == 13.0
+    assert cluster_shear_profile.max_mass == 17.0
+    assert cluster_shear_profile.min_z == 0.0
+    assert cluster_shear_profile.max_z == 2.0
 
 
-def test_deltasigma_profile_returns_value(cluster_deltasigma: ClusterDeltaSigma, cluster_reduced: ClusterDeltaSigma):
+def test_deltasigma_profile_returns_value(cluster_shear_profile: ClusterShearProfile, cluster_reduced: ClusterShearProfile):
     cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_deltasigma.cosmo = cosmo
+    cluster_shear_profile.cosmo = cosmo
 
-    result = cluster_deltasigma.delta_sigma(
+    result = cluster_shear_profile.delta_sigma(
         np.linspace(13, 17, 5, dtype=np.float64),
         np.linspace(0.1, 1, 5, dtype=np.float64),
         5.0,

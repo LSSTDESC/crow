@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow.deltasigma import ClusterDeltaSigma
+from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
@@ -37,7 +37,6 @@ class MurataBinnedSpecZDeltaSigmaRecipe:
         self.boost_factor = boost_factor
         self.cluster_theory = cluster_theory
             
-
     def get_theory_prediction(
         self,
         average_on: None | ClusterProperty = None,  # pylint: disable=unused-argument
