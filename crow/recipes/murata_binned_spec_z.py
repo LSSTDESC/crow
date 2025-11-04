@@ -38,7 +38,7 @@ class MurataBinnedSpecZRecipe:
         self.cluster_theory = ClusterAbundance(
             mass_interval=(min_mass, max_mass),
             z_interval=(min_z, max_z),
-            halo_mass_function=self.hmf,
+            halo_mass_function=hmf,
         )
 
     def get_theory_prediction(
