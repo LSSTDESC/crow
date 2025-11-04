@@ -13,8 +13,9 @@ from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 
 from crow.properties import ClusterProperty
+
 # To run with firecrown, use this import instead
-#from firecrown.models.cluster import ClusterProperty
+# from firecrown.models.cluster import ClusterProperty
 
 
 class MurataBinnedSpecZRecipe:
