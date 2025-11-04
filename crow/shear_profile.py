@@ -234,7 +234,7 @@ class ClusterShearProfile(ClusterAbundance):
             "z_distrib_func": z_distrib_func,
         }
 
-    def delta_sigma(
+    def compute_shear_profile(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],

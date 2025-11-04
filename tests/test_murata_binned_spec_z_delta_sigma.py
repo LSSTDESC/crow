@@ -11,11 +11,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from firecrown.models.cluster import ClusterProperty
 
-from crow.shear_profile import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from crow.shear_profile import ClusterShearProfile
 
 
 @pytest.fixture(name="murata_binned_spec_z")

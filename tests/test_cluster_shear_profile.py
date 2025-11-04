@@ -85,11 +85,11 @@ def _check_miscentering_behavior(
     cluster, log_mass, redshifts, radius, miscentering_frac, pdf=None
 ):
     """Shared logic for testing miscentering behavior."""
-    baseline = cluster.delta_sigma(log_mass, redshifts, radius)
+    baseline = cluster.compute_shear_profile(log_mass, redshifts, radius)
     cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
-    result_mis = cluster.delta_sigma(log_mass, redshifts, radius)
+    result_mis = cluster.compute_shear_profile(log_mass, redshifts, radius)
     cluster.set_miscentering(0.0, miscentering_distribution_function=pdf)
-    result_right_center = cluster.delta_sigma(log_mass, redshifts, radius)
+    result_right_center = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
     np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
     assert result_mis.shape == baseline.shape
@@ -108,7 +108,7 @@ def test_shear_profile_returns_value(
 
     for cluster in [cluster_deltasigma_profile, cluster_reduced_profile]:
         cluster.cosmo = cosmo
-        result = cluster.delta_sigma(log_mass, redshifts, radius)
+        result = cluster.compute_shear_profile(log_mass, redshifts, radius)
         _check_delta_sigma_output(result)
 
 
@@ -122,14 +122,14 @@ def test_shear_profile_returns_value_interp(
     radius = 5.0
 
     cluster_reduced_interp_profile.cosmo = cosmo
-    result = cluster_reduced_profile.delta_sigma(
+    result = cluster_reduced_profile.compute_shear_profile(
         log_mass,
         redshifts,
         radius,
     )
     _check_delta_sigma_output(result)
     cluster_reduced_profile.cosmo = cosmo
-    result_exact = cluster_reduced_profile.delta_sigma(
+    result_exact = cluster_reduced_profile.compute_shear_profile(
         log_mass,
         redshifts,
         radius,
@@ -147,7 +147,7 @@ def test_shear_profile_returns_value_twoh_boost(
     radius = 5.0
 
     cluster_deltasigma_profile.cosmo = cosmo
-    result = cluster_deltasigma_profile.delta_sigma(
+    result = cluster_deltasigma_profile.compute_shear_profile(
         log_mass,
         redshifts,
         radius,
@@ -155,7 +155,7 @@ def test_shear_profile_returns_value_twoh_boost(
     _check_delta_sigma_output(result)
 
     cluster_reduced_profile.cosmo = cosmo
-    result = cluster_reduced_profile.delta_sigma(
+    result = cluster_reduced_profile.compute_shear_profile(
         log_mass,
         redshifts,
         radius,

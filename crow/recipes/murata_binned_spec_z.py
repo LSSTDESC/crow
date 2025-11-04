@@ -7,11 +7,11 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow.shear_profile import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
+from crow.shear_profile import ClusterShearProfile
 
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
@@ -178,7 +178,7 @@ class MurataBinnedSpecZRecipe:
                 )
 
             if average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR):
-                prediction *= self.cluster_theory.delta_sigma(
+                prediction *= self.cluster_theory.compute_shear_profile(
                     log_mass=mass,
                     z=z,
                     radius_center=radius_center,
