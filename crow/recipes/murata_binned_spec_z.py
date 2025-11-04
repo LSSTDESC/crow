@@ -23,39 +23,16 @@ class MurataBinnedSpecZRecipe:
 
     def __init__(
         self,
-        hmf,
+        cluster_theory,
         redshift_distribution,
         mass_distribution,
-        min_mass=13.0,
-        max_mass=16.0,
-        min_z=0.2,
-        max_z=0.8,
-        is_delta_sigma=False,
-        cluster_concentration=None,
-        two_halo_term=False,
-        miscentering_frac=None,
-        boost_factor=False,
-        use_beta_interp=False,
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
 
+        self.cluster_theory = cluster_theory
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
-        self.two_halo_term = two_halo_term
-        self.miscentering_frac = miscentering_frac
-        self.boost_factor = boost_factor
-        self.cluster_theory = ClusterShearProfile(
-            mass_interval=(min_mass, max_mass),
-            z_interval=(min_z, max_z),
-            halo_mass_function=hmf,
-            is_delta_sigma=is_delta_sigma,
-            cluster_concentration=cluster_concentration,
-            use_beta_s_interp=True,
-        )
-        self.cluster_theory.set_beta_parameters(
-            z_inf=5.0, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
-        )
 
     def get_theory_prediction_counts(
         self,
@@ -202,9 +179,6 @@ class MurataBinnedSpecZRecipe:
                     log_mass=mass,
                     z=z,
                     radius_center=radius_center,
-                    two_halo_term=self.two_halo_term,
-                    miscentering_frac=self.miscentering_frac,
-                    boost_factor=self.boost_factor,
                 )
             return prediction
 
