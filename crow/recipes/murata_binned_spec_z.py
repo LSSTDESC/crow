@@ -46,9 +46,9 @@ class MurataBinnedSpecZRecipe:
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: Completeness | None,
-        mass_interval: tuple[float, float],
-        true_z_interval: tuple[float, float],
+        completeness: Completeness = None,
+        mass_interval: tuple[float, float] = (11.0, 17.0),
+        true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
