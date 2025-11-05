@@ -113,7 +113,7 @@ class ClusterAbundance:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ):
-        return self.__completeness(log_mass, z)
+        return self.completeness.distribution(log_mass, z)
 
     def completeness_distribution(
         self,
