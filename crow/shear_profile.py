@@ -129,7 +129,13 @@ class ClusterShearProfile(ClusterAbundance):
             self.eval_beta_s_square_mean = self._beta_s_square_mean_exact
 
     def set_beta_parameters(
-        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None, approx="order1",
+        self,
+        z_inf,
+        zmax=10.0,
+        delta_z_cut=0.1,
+        zmin=None,
+        z_distrib_func=None,
+        approx="order1",
     ):
         r"""Set parameters to comput mean value of the geometric lensing efficicency
 
@@ -154,7 +160,7 @@ class ClusterShearProfile(ClusterAbundance):
             Redshift distribution function. Default is Chang et al (2013) distribution function.
         approx : str, optional
             Type of computation to be made for reduced tangential shears, options are:
-            
+
                 * 'order1' : Same approach as in Weighing the Giants - III (equation 6 in
                   Applegate et al. 2014; https://arxiv.org/abs/1208.0605). `z_src_info` must be
                   'beta':
@@ -185,7 +191,7 @@ class ClusterShearProfile(ClusterAbundance):
             "zmin": zmin,
             "z_distrib_func": z_distrib_func,
         }
-        self.approx = approx
+        self.approx = approx.lower()
 
     def _beta_s_mean_exact(self, z_cl):
         return clmm.utils.compute_beta_s_mean_from_distribution(
@@ -427,10 +433,28 @@ class ClusterShearProfile(ClusterAbundance):
                 ]
             )
             if self.is_delta_sigma == False:
-                sigma_c = clmm_model.cosmo.eval_sigma_crit(
+                sigma_c_inf = clmm_model.cosmo.eval_sigma_crit(
                     redshift, z_src=clmm_model.z_inf
                 )
-                esd_vals = beta_s_mean * esd_vals / sigma_c
+                sigma_mis_vals = np.array(
+                    [
+                        clmm_model.eval_surface_density(
+                            np.array([radius_center]), redshift, r_mis=r_mis
+                        )[0]
+                        for r_mis in r_mis_list
+                    ]
+                )
+                esd_vals = (beta_s_mean * esd_vals) / (
+                    sigma_c_inf - beta_s_mean * sigma_mis_vals
+                )
+                if self.approx == "order2":
+                    esd_vals = esd_vals * (
+                        1.0
+                        + (beta_s_square_mean / beta_s_mean**2)
+                        * beta_s_mean
+                        * sigma_mis_vals
+                        / sigma_c_inf
+                    )
             if miscentering_distribution_function is not None:
                 pdf_vals = miscentering_distribution_function(r_mis_list)
             else:
