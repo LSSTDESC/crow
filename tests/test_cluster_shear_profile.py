@@ -10,7 +10,7 @@ from scipy.stats import norm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow.shear_profile import ClusterShearProfile
+from crow import ClusterShearProfile
 
 _TEST_COSMO = pyccl.CosmologyVanillaLCDM()
 

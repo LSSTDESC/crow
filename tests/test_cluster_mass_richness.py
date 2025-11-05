@@ -11,8 +11,7 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow.kernel import Purity
-from crow.mass_proxy import MassRichnessGaussian, MurataBinned, MurataUnbinned
+from crow import mass_proxy, purity
 
 PIVOT_Z = 0.6
 PIVOT_MASS = 14.625862906
@@ -26,10 +25,10 @@ MURATA_DEFAULT_SIGMA_P2 = 0.0
 
 
 @pytest.fixture(name="murata_binned_relation")
-def fixture_murata_binned() -> MurataBinned:
+def fixture_murata_binned() -> mass_proxy.MurataBinned:
     """Initialize cluster object."""
 
-    mr = MurataBinned(PIVOT_MASS, PIVOT_Z)
+    mr = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
 
     # Set the parameters to the values used in the test
     # they should be such that the variance is always positive.
@@ -44,10 +43,10 @@ def fixture_murata_binned() -> MurataBinned:
 
 
 @pytest.fixture(name="murata_unbinned_relation")
-def fixture_murata_unbinned() -> MurataUnbinned:
+def fixture_murata_unbinned() -> mass_proxy.MurataUnbinned:
     """Initialize cluster object."""
 
-    mr = MurataUnbinned(PIVOT_MASS, PIVOT_Z)
+    mr = mass_proxy.MurataUnbinned(PIVOT_MASS, PIVOT_Z)
 
     # Set the parameters to the values used in the test
     # they should be such that the variance is always positive.
@@ -62,7 +61,7 @@ def fixture_murata_unbinned() -> MurataUnbinned:
 
 
 def test_create_musigma_kernel():
-    mb = MurataBinned(1, 1)
+    mb = mass_proxy.MurataBinned(1, 1)
     assert mb.pivot_mass == 1 * np.log(10)
     assert mb.pivot_redshift == 1
     assert mb.log1p_pivot_redshift == np.log1p(1)
@@ -80,7 +79,9 @@ def test_cluster_observed_z_mathematical_property(z: float):
     """Test mathematical identity: f(z) = ln(1+z) using hypothesis."""
     zarray = np.atleast_1d(z)
     mass = np.atleast_1d(0)
-    f_z = MassRichnessGaussian.observed_value((0.0, 0.0, 1.0), mass, zarray, 0, 0)
+    f_z = mass_proxy.MassRichnessGaussian.observed_value(
+        (0.0, 0.0, 1.0), mass, zarray, 0, 0
+    )
     expected = np.log1p(zarray)
     assert f_z == pytest.approx(
         expected, rel=1.0e-7, abs=0.0
@@ -92,14 +93,18 @@ def test_cluster_observed_mass_mathematical_property(mass: float):
     """Test mathematical identity: f(mass) = mass * ln(10) using hypothesis."""
     z = np.atleast_1d(0)
     massarray = np.atleast_1d(mass)
-    f_logM = MassRichnessGaussian.observed_value((0.0, 1.0, 0.0), massarray, z, 0, 0)
+    f_logM = mass_proxy.MassRichnessGaussian.observed_value(
+        (0.0, 1.0, 0.0), massarray, z, 0, 0
+    )
     expected = mass * np.log(10.0)
     assert f_logM == pytest.approx(
         expected, rel=1.0e-7, abs=0.0
     ), f"Expected f(mass={mass}) = mass * ln(10) = {expected}, got {f_logM}"
 
 
-def test_cluster_murata_binned_distribution(murata_binned_relation: MurataBinned):
+def test_cluster_murata_binned_distribution(
+    murata_binned_relation: mass_proxy.MurataBinned,
+):
     mass_array = np.linspace(7.0, 26.0, 20, dtype=np.float64)
     mass_proxy_limits = (1.0, 5.0)
 
@@ -143,7 +148,7 @@ def test_cluster_murata_binned_distribution(murata_binned_relation: MurataBinned
 def test_cluster_distribution_properties(z: float, mass: float):
     """Mathematical properties of the cluster mass distribution using hypothesis."""
     # Create the relation inside the test to avoid fixture issues
-    murata_binned_relation = MurataBinned(PIVOT_MASS, PIVOT_Z)
+    murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
     murata_binned_relation.mu_p0 = 3.00
     murata_binned_relation.mu_p1 = 0.086
     murata_binned_relation.mu_p2 = 0.01
@@ -164,7 +169,9 @@ def test_cluster_distribution_properties(z: float, mass: float):
     assert probability >= 0, f"Probability must be non-negative, got {probability}"
 
     # Test with purity
-    murata_binned_relation_inpure = MurataBinned(PIVOT_MASS, PIVOT_Z, Purity())
+    murata_binned_relation_inpure = mass_proxy.MurataBinned(
+        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
+    )
     probability_inpure = murata_binned_relation_inpure.distribution(
         mass_array, z_array, mass_proxy_limits
     )
@@ -181,7 +188,7 @@ def test_cluster_distribution_unimodal_property(
 ):
     """Test that the distribution has at most one peak (unimodal) using hypothesis."""
     # Create the relation inside the test to avoid fixture issues
-    murata_binned_relation = MurataBinned(PIVOT_MASS, PIVOT_Z)
+    murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
     murata_binned_relation.mu_p0 = 3.00
     murata_binned_relation.mu_p1 = 0.086
     murata_binned_relation.mu_p2 = 0.01
@@ -207,14 +214,14 @@ def test_cluster_distribution_unimodal_property(
     assert prob2 >= 0, f"Probability at mass2={mass2} must be non-negative"
 
 
-def test_cluster_murata_binned_mean(murata_binned_relation: MurataBinned):
+def test_cluster_murata_binned_mean(murata_binned_relation: mass_proxy.MurataBinned):
     for mass in np.linspace(7.0, 26.0, 20):
         for z in np.geomspace(1.0e-18, 2.0, 20):
             massarray = np.atleast_1d(mass)
             zarray = np.atleast_1d(z)
             test = murata_binned_relation.get_proxy_mean(massarray, zarray)
 
-            true = MassRichnessGaussian.observed_value(
+            true = mass_proxy.MassRichnessGaussian.observed_value(
                 (3.00, 0.086, 0.01),
                 massarray,
                 zarray,
@@ -225,14 +232,16 @@ def test_cluster_murata_binned_mean(murata_binned_relation: MurataBinned):
             assert test == pytest.approx(true, rel=1e-7, abs=0.0)
 
 
-def test_cluster_murata_binned_variance(murata_binned_relation: MurataBinned):
+def test_cluster_murata_binned_variance(
+    murata_binned_relation: mass_proxy.MurataBinned,
+):
     for mass in np.linspace(7.0, 26.0, 20):
         for z in np.geomspace(1.0e-18, 2.0, 20):
             massarray = np.atleast_1d(mass)
             zarray = np.atleast_1d(z)
             test = murata_binned_relation.get_proxy_sigma(massarray, zarray)
 
-            true = MassRichnessGaussian.observed_value(
+            true = mass_proxy.MassRichnessGaussian.observed_value(
                 (3.00, 0.07, 0.01),
                 massarray,
                 zarray,
@@ -243,7 +252,9 @@ def test_cluster_murata_binned_variance(murata_binned_relation: MurataBinned):
             assert test == pytest.approx(true, rel=1e-7, abs=0.0)
 
 
-def test_cluster_murata_unbinned_distribution(murata_unbinned_relation: MurataUnbinned):
+def test_cluster_murata_unbinned_distribution(
+    murata_unbinned_relation: mass_proxy.MurataUnbinned,
+):
     mass_array = np.linspace(7.0, 26.0, 20, dtype=np.float64)
 
     for z in np.geomspace(1.0e-18, 2.0, 20):
@@ -280,7 +291,7 @@ def test_cluster_murata_unbinned_distribution(murata_unbinned_relation: MurataUn
 
 @pytest.mark.precision_sensitive
 def test_cluster_murata_unbinned_distribution_is_normalized(
-    murata_unbinned_relation: MurataUnbinned,
+    murata_unbinned_relation: mass_proxy.MurataUnbinned,
 ):
     for mass_i, z_i in zip(np.linspace(10.0, 16.0, 20), np.geomspace(1.0e-18, 2.0, 20)):
         mass = np.atleast_1d(mass_i)

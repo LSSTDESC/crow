@@ -7,14 +7,11 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
+from crow import ClusterShearProfile
+from crow import completeness as comp
+from crow import kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import Completeness, SpectroscopicRedshift
-from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
-from crow.shear_profile import ClusterShearProfile
-
-# To run with firecrown, use this import instead
-# from firecrown.models.cluster import ClusterProperty
 
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
@@ -28,12 +25,12 @@ class MurataBinnedSpecZRecipe:
     """
 
     @property
-    def completeness(self) -> Completeness | None:
+    def completeness(self) -> comp.Completeness | None:
         """The completeness used to predict the cluster number count."""
         return self.__completeness
 
     @completeness.setter
-    def completeness(self, completeness: Completeness) -> None:
+    def completeness(self, completeness: comp.Completeness) -> None:
         """Update the cluster abundance calculation with a new completeness."""
         self.__completeness = completeness
         if completeness is None:
@@ -46,7 +43,7 @@ class MurataBinnedSpecZRecipe:
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: Completeness = None,
+        completeness: comp.Completeness = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:

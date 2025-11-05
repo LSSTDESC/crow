@@ -12,10 +12,8 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow.abundance import ClusterAbundance
+from crow import ClusterAbundance, completeness, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import Completeness, SpectroscopicRedshift
-from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 
@@ -29,8 +27,8 @@ def get_base_murata_binned_spec_z(completeness) -> MurataBinnedSpecZRecipe:
             cosmo=pyccl.CosmologyVanillaLCDM(),
             halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
         ),
-        redshift_distribution=SpectroscopicRedshift(),
-        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+        redshift_distribution=kernel.SpectroscopicRedshift(),
+        mass_distribution=mass_proxy.MurataBinned(pivot_mass, pivot_redshift),
         completeness=completeness,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
@@ -63,9 +61,11 @@ def test_murata_binned_spec_z_init(
     assert murata_binned_spec_z.integrator is not None
     assert isinstance(murata_binned_spec_z.integrator, NumCosmoIntegrator)
     assert murata_binned_spec_z.redshift_distribution is not None
-    assert isinstance(murata_binned_spec_z.redshift_distribution, SpectroscopicRedshift)
+    assert isinstance(
+        murata_binned_spec_z.redshift_distribution, kernel.SpectroscopicRedshift
+    )
     assert murata_binned_spec_z.mass_distribution is not None
-    assert isinstance(murata_binned_spec_z.mass_distribution, MurataBinned)
+    assert isinstance(murata_binned_spec_z.mass_distribution, mass_proxy.MurataBinned)
 
 
 def test_get_theory_prediction_returns_value(
@@ -233,7 +233,9 @@ def test_evaluates_theory_prediction_with_completeness(
         z_edges, mass_proxy_edges, sky_area
     )
 
-    murata_binned_spec_z_w_comp = get_base_murata_binned_spec_z(Completeness())
+    murata_binned_spec_z_w_comp = get_base_murata_binned_spec_z(
+        completeness.CompletenessAguena16()
+    )
     prediction_w_comp = murata_binned_spec_z_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )

@@ -9,14 +9,11 @@ from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster import ClusterProperty
-import pyccl
 
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow.kernel import SpectroscopicRedshift
-from crow.mass_proxy import MurataBinned
+from crow import ClusterShearProfile, kernel, mass_proxy
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.shear_profile import ClusterShearProfile
 
 # to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
@@ -40,18 +37,25 @@ def build_likelihood(
     if build_parameters.get_bool("use_mean_deltasigma", True):
         average_on |= ClusterProperty.DELTASIGMA
 
-    hmf = pyccl.halos.MassFuncTinker08(mass_def="200c")
-    redshift_distribution = SpectroscopicRedshift()
+    redshift_distribution = kernel.SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
-    mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
+    mass_distribution = mass_proxy.MurataBinned(pivot_mass, pivot_redshift)
     survey_name = "numcosmo_simulated_redshift_richness_deltasigma"
 
-    cluster_theory = ClusterShearProfile((12, 17), (0.1, 2.0), hmf, 4.0, True)
-
+    cluster_theory = ClusterShearProfile(
+        cosmo=pyccl.CosmologyVanillaLCDM(),
+        halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        cluster_concentration=4.0,
+        is_delta_sigma=True,
+        use_beta_s_interp=True,
+    )
     recipe = MurataBinnedSpecZRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=redshift_distribution,
         mass_distribution=mass_distribution,
+        completeness=None,
+        mass_interval=(12, 17),
+        true_z_interval=(0.1, 2.0),
     )
     likelihood = ConstGaussian(
         [
