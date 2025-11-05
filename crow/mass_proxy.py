@@ -11,6 +11,7 @@ import numpy as np
 import numpy.typing as npt
 from scipy import special
 
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import Purity
 
 
@@ -128,7 +129,6 @@ class MurataBinned(MassRichnessGaussian):
         self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
         self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
 
-        self.__purity = None
         self.purity = purity
 
         # Verify this gets called last or first
@@ -142,7 +142,7 @@ class MurataBinned(MassRichnessGaussian):
         if value is None:
             self._distribution = self._distribution_binned
         else:
-            self._distribution = self._distribution_binned_unpure
+            self._distribution = self._distribution_binned_inpure
         self.__purity = value
 
     def get_proxy_mean(
@@ -173,7 +173,7 @@ class MurataBinned(MassRichnessGaussian):
             self.log1p_pivot_redshift,
         )
 
-    def _distribution_binned_unpure(self, mass, z, mass_proxy_limits):
+    def _distribution_binned_inpure(self, mass, z, mass_proxy_limits):
         integrator = NumCosmoIntegrator(
             relative_tolerance=1e-2,
             absolute_tolerance=1e-6,

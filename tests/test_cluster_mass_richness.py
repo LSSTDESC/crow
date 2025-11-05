@@ -11,6 +11,7 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from crow.kernel import Purity
 from crow.mass_proxy import MassRichnessGaussian, MurataBinned, MurataUnbinned
 
 PIVOT_Z = 0.6
@@ -161,6 +162,13 @@ def test_cluster_distribution_properties(z: float, mass: float):
 
     # Test non-negativity property
     assert probability >= 0, f"Probability must be non-negative, got {probability}"
+
+    # Test with purity
+    murata_binned_relation_inpure = MurataBinned(PIVOT_MASS, PIVOT_Z, Purity())
+    probability_inpure = murata_binned_relation_inpure.distribution(
+        mass_array, z_array, mass_proxy_limits
+    )
+    assert (probability > probability_inpure).all()
 
 
 @given(
