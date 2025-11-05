@@ -85,16 +85,42 @@ def _check_miscentering_behavior(
     cluster, log_mass, redshifts, radius, miscentering_frac, pdf=None
 ):
     """Shared logic for testing miscentering behavior."""
-    baseline = cluster.compute_shear_profile(log_mass, redshifts, radius)
-    cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
-    result_mis = cluster.compute_shear_profile(log_mass, redshifts, radius)
-    cluster.set_miscentering(0.0, miscentering_distribution_function=pdf)
-    result_right_center = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
+    def reset_cluster():
+        cluster.miscentering_parameters = None
+        cluster.approx = None
+
+    reset_cluster()
+    cluster.set_beta_parameters(10.0, approx="order1")
+    baseline = cluster.compute_shear_profile(log_mass, redshifts, radius)
+
+    reset_cluster()
+    cluster.set_beta_parameters(10.0, approx="order2")
+    baseline2 = cluster.compute_shear_profile(log_mass, redshifts, radius)
+
+    reset_cluster()
+    cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
+    cluster.set_beta_parameters(10.0, approx="order1")
+    result_mis = cluster.compute_shear_profile(log_mass, redshifts, radius)
+
+    reset_cluster()
+    cluster.set_miscentering(0.0, miscentering_distribution_function=pdf)
+    cluster.set_beta_parameters(10.0, approx="order1")
+    result_right_center = cluster.compute_shear_profile(log_mass, redshifts, radius)
     np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
+
+    reset_cluster()
+    cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
+    cluster.set_beta_parameters(10.0, approx="order2")
+    result_mis_order2 = cluster.compute_shear_profile(log_mass, redshifts, radius)
+
     assert result_mis.shape == baseline.shape
-    assert np.all(result_mis <= baseline)
     assert np.all(result_mis >= 0)
+    assert np.all(result_mis <= baseline)
+
+    assert result_mis_order2.shape == baseline2.shape
+    assert np.all(result_mis_order2 >= 0)
+    assert np.all(result_mis_order2 <= baseline2)
 
 
 def test_shear_profile_returns_value(
