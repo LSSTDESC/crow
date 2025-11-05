@@ -11,6 +11,7 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from crow.kernel import Purity
 from crow.mass_proxy import MassRichnessGaussian, MurataBinned, MurataUnbinned
 
 PIVOT_Z = 0.6
@@ -162,6 +163,13 @@ def test_cluster_distribution_properties(z: float, mass: float):
     # Test non-negativity property
     assert probability >= 0, f"Probability must be non-negative, got {probability}"
 
+    # Test with purity
+    murata_binned_relation_inpure = MurataBinned(PIVOT_MASS, PIVOT_Z, Purity())
+    probability_inpure = murata_binned_relation_inpure.distribution(
+        mass_array, z_array, mass_proxy_limits
+    )
+    assert (probability > probability_inpure).all()
+
 
 @given(
     z=floats(min_value=1e-15, max_value=2.0),
@@ -281,7 +289,6 @@ def test_cluster_murata_unbinned_distribution_is_normalized(
         mean = murata_unbinned_relation.get_proxy_mean(mass, z)[0]
         sigma = murata_unbinned_relation.get_proxy_sigma(mass, z)[0]
         mass_proxy_limits = np.array([mean - 5 * sigma, mean + 5 * sigma])
-        print(mass_proxy_limits, mean, sigma)
 
         def integrand(ln_mass_proxy) -> float:
             """Evaluate the unbinned distribution at fixed mass and redshift."""

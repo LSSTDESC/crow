@@ -8,10 +8,13 @@ import numpy.typing as npt
 import pyccl as ccl
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import SpectroscopicRedshift
+from crow.kernel import Completeness, SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.shear_profile import ClusterShearProfile
+
+# To run with firecrown, use this import instead
+# from firecrown.models.cluster import ClusterProperty
 
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
@@ -24,11 +27,28 @@ class MurataBinnedSpecZRecipe:
     perfectly measured spec-zs.
     """
 
+    @property
+    def completeness(self) -> Completeness | None:
+        """The completeness used to predict the cluster number count."""
+        return self.__completeness
+
+    @completeness.setter
+    def completeness(self, completeness: Completeness) -> None:
+        """Update the cluster abundance calculation with a new completeness."""
+        self.__completeness = completeness
+        if completeness is None:
+            self._completeness_distribution = self._complete_distribution
+        else:
+            self._completeness_distribution = self._incomplete_distribution
+
     def __init__(
         self,
         cluster_theory,
         redshift_distribution,
         mass_distribution,
+        completeness: Completeness | None,
+        mass_interval: tuple[float, float],
+        true_z_interval: tuple[float, float],
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
@@ -36,6 +56,32 @@ class MurataBinnedSpecZRecipe:
         self.cluster_theory = cluster_theory
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
+        self.completeness = completeness
+        self.mass_interval = mass_interval
+        self.true_z_interval = true_z_interval
+
+    def _complete_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ):
+        return 1.0
+
+    def _incomplete_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ):
+        return self.completeness.distribution(log_mass, z)
+
+    def completeness_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Evaluates and returns the completeness contribution to the integrand."""
+
+        return self._completeness_distribution(log_mass, z)
 
     def get_theory_prediction_counts(
         self,
@@ -60,6 +106,7 @@ class MurataBinnedSpecZRecipe:
             prediction = (
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
+                * self.completeness_distribution(mass, z)
                 * self.redshift_distribution.distribution()
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
@@ -125,7 +172,7 @@ class MurataBinnedSpecZRecipe:
         measured redshifts.
         """
         self.integrator.integral_bounds = [
-            (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
+            self.mass_interval,
             z_edges,
         ]
         self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
@@ -237,7 +284,7 @@ class MurataBinnedSpecZRecipe:
         measured redshifts.
         """
         self.integrator.integral_bounds = [
-            (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
+            self.mass_interval,
             z_edges,
         ]
         radius_center = radius_center
