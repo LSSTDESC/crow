@@ -110,6 +110,7 @@ class ClusterShearProfile(ClusterAbundance):
 
         self.use_beta_s_interp = use_beta_s_interp
         self.miscentering_parameters = None
+        self.approx = None
 
     @property
     def use_beta_s_interp(self):
@@ -128,7 +129,7 @@ class ClusterShearProfile(ClusterAbundance):
             self.eval_beta_s_square_mean = self._beta_s_square_mean_exact
 
     def set_beta_parameters(
-        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
+        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None, approx="order1",
     ):
         r"""Set parameters to comput mean value of the geometric lensing efficicency
 
@@ -151,7 +152,27 @@ class ClusterShearProfile(ClusterAbundance):
             Default: None
         z_distrib_func: one-parameter function, optional
             Redshift distribution function. Default is Chang et al (2013) distribution function.
+        approx : str, optional
+            Type of computation to be made for reduced tangential shears, options are:
+            
+                * 'order1' : Same approach as in Weighing the Giants - III (equation 6 in
+                  Applegate et al. 2014; https://arxiv.org/abs/1208.0605). `z_src_info` must be
+                  'beta':
 
+                  .. math::
+                      g_t\approx\frac{\left<\beta_s\right>\gamma_{\infty}}
+                      {1-\left<\beta_s\right>\kappa_{\infty}}
+
+                * 'order2' : Same approach as in Cluster Mass Calibration at High
+                  Redshift (equation 12 in Schrabback et al. 2017;
+                  https://arxiv.org/abs/1611.03866).
+                  `z_src_info` must be 'beta':
+
+                  .. math::
+                      g_t\approx\frac{\left<\beta_s\right>\gamma_{\infty}}
+                      {1-\left<\beta_s\right>\kappa_{\infty}}
+                      \left(1+\left(\frac{\left<\beta_s^2\right>}
+                      {\left<\beta_s\right>^2}-1\right)\left<\beta_s\right>\kappa_{\infty}\right)
         Returns
         -------
         float
@@ -164,6 +185,7 @@ class ClusterShearProfile(ClusterAbundance):
             "zmin": zmin,
             "z_distrib_func": z_distrib_func,
         }
+        self.approx = approx
 
     def _beta_s_mean_exact(self, z_cl):
         return clmm.utils.compute_beta_s_mean_from_distribution(
@@ -291,11 +313,12 @@ class ClusterShearProfile(ClusterAbundance):
         else:
             beta_s_mean = float(self.eval_beta_s_mean(redshift))
             beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
-            first_halo_right_centered = clmm_model.eval_tangential_shear(
+            first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
                 radius_center,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),
                 z_src_info="beta",
+                approx=self.approx,
             )
 
         if self.miscentering_parameters is not None:
