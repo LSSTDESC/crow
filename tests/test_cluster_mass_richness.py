@@ -289,7 +289,6 @@ def test_cluster_murata_unbinned_distribution_is_normalized(
         mean = murata_unbinned_relation.get_proxy_mean(mass, z)[0]
         sigma = murata_unbinned_relation.get_proxy_sigma(mass, z)[0]
         mass_proxy_limits = np.array([mean - 5 * sigma, mean + 5 * sigma])
-        print(mass_proxy_limits, mean, sigma)
 
         def integrand(ln_mass_proxy) -> float:
             """Evaluate the unbinned distribution at fixed mass and redshift."""
