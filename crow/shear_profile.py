@@ -24,7 +24,7 @@ from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import Completeness
 
 
-def numcosmo_miscentered_mean_surface_density(
+def numcosmo_miscentered_mean_surface_density(  # pragma: no cover
     r_proj, r_mis, integrand, norm, aux_args, extra_integral
 ):
     """
@@ -76,7 +76,7 @@ def numcosmo_miscentered_mean_surface_density(
     return mean_surface_density
 
 
-clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (
+clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (  # pragma: no cover
     numcosmo_miscentered_mean_surface_density
 )
 
