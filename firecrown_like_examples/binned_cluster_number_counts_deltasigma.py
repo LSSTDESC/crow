@@ -23,8 +23,8 @@ from firecrown.models.cluster import (
     DeltaSigmaData,
 )
 
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
+from crow.recipes.murata_binned_spec_z import (
+    MurataBinnedSpecZRecipe,
 )
 
 from .binned_cluster import BinnedCluster
@@ -42,7 +42,7 @@ class BinnedClusterShearProfile(BinnedCluster):
         self,
         cluster_properties: ClusterProperty,
         survey_name: str,
-        cluster_recipe: MurataBinnedSpecZDeltaSigmaRecipe,
+        cluster_recipe: MurataBinnedSpecZRecipe,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.
@@ -127,12 +127,14 @@ class BinnedClusterShearProfile(BinnedCluster):
                     this_bin.mass_proxy_edges,
                     self.sky_area,
                 )
-            total_observable = self.cluster_recipe.evaluate_theory_prediction(
-                this_bin.z_edges,
-                this_bin.mass_proxy_edges,
-                this_bin.radius_center,
-                self.sky_area,
-                cluster_properties,
+            total_observable = (
+                self.cluster_recipe.evaluate_theory_prediction_shear_profile(
+                    this_bin.z_edges,
+                    this_bin.mass_proxy_edges,
+                    this_bin.radius_center,
+                    self.sky_area,
+                    cluster_properties,
+                )
             )
             mean_observable = total_observable / counts
             mean_values.append(mean_observable)

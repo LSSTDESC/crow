@@ -9,21 +9,28 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow.deltasigma import ClusterShearProfile
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
+from crow.shear_profile import ClusterShearProfile
+
+# from firecrown.models.cluster import ClusterProperty
 
 
 @pytest.fixture(name="murata_binned_spec_z")
 def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
+    cluster_theory = ClusterShearProfile(
+        z_interval=(0, 2),
+        mass_interval=(13, 17),
+        halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        cluster_concentration=4.0,
+        is_delta_sigma=True,
+    )
+    cluster_theory.set_beta_parameters(10.0)
     cluster_recipe = MurataBinnedSpecZRecipe(
-        hmf=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        cluster_theory=cluster_theory,
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
     )
@@ -39,7 +46,7 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
 
 
 @pytest.fixture(name="murata_binned_spec_z_deltasigma")
-def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZDeltaSigmaRecipe:
+def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     cluster_theory = ClusterShearProfile(
         z_interval=(0, 2),
@@ -49,7 +56,7 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZDeltaSigmaReci
         is_delta_sigma=True,
     )
     cluster_theory.set_beta_parameters(10.0)
-    cluster_recipe = MurataBinnedSpecZDeltaSigmaRecipe(
+    cluster_recipe = MurataBinnedSpecZRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
@@ -75,14 +82,14 @@ def test_murata_binned_spec_z_deltasigma_init():
         is_delta_sigma=True,
     )
     cluster_theory.set_beta_parameters(10.0)
-    recipe = MurataBinnedSpecZDeltaSigmaRecipe(
+    recipe = MurataBinnedSpecZRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
     )
 
     assert recipe is not None
-    assert isinstance(recipe, MurataBinnedSpecZDeltaSigmaRecipe)
+    assert isinstance(recipe, MurataBinnedSpecZRecipe)
     assert recipe.integrator is not None
     assert isinstance(recipe.integrator, NumCosmoIntegrator)
     assert recipe.redshift_distribution is not None
@@ -92,12 +99,14 @@ def test_murata_binned_spec_z_deltasigma_init():
 
 
 def test_get_theory_prediction_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZDeltaSigmaRecipe,
+    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
 ):
-    prediction_none = murata_binned_spec_z_deltasigma.get_theory_prediction(
-        average_on=None
+    prediction_none = (
+        murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
+            average_on=None
+        )
     )
-    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction(
+    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
         ClusterProperty.DELTASIGMA
     )
     prediction_c = murata_binned_spec_z_deltasigma.get_theory_prediction_counts()
@@ -133,13 +142,15 @@ def test_get_theory_prediction_returns_value(
 
 
 def test_get_function_to_integrate_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZDeltaSigmaRecipe,
+    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
 ):
-    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction(
+    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
         ClusterProperty.DELTASIGMA
     )
-    function_to_integrate = murata_binned_spec_z_deltasigma.get_function_to_integrate(
-        prediction
+    function_to_integrate = (
+        murata_binned_spec_z_deltasigma.get_function_to_integrate_shear_profile(
+            prediction
+        )
     )
 
     assert function_to_integrate is not None
@@ -174,7 +185,7 @@ def test_get_function_to_integrate_returns_value(
 
 
 def test_evaluates_theory_prediction_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZDeltaSigmaRecipe,
+    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
 ):
 
     mass_proxy_edges = (2, 5)
@@ -182,8 +193,10 @@ def test_evaluates_theory_prediction_returns_value(
     radius_center = 1.5
     average_on = ClusterProperty.DELTASIGMA
 
-    prediction = murata_binned_spec_z_deltasigma.evaluate_theory_prediction(
-        z_edges, mass_proxy_edges, radius_center, 360**2, average_on
+    prediction = (
+        murata_binned_spec_z_deltasigma.evaluate_theory_prediction_shear_profile(
+            z_edges, mass_proxy_edges, radius_center, 360**2, average_on
+        )
     )
     prediction_c = murata_binned_spec_z_deltasigma.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, 360**2

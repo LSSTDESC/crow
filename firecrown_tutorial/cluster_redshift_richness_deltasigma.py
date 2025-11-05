@@ -3,6 +3,7 @@
 import os
 import sys
 
+import pyccl
 import sacc
 from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
@@ -14,9 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.recipes.murata_binned_spec_z_deltasigma import (
-    MurataBinnedSpecZDeltaSigmaRecipe,
-)
+from crow.shear_profile import ClusterShearProfile
 
 # to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
@@ -40,28 +39,30 @@ def build_likelihood(
     if build_parameters.get_bool("use_mean_deltasigma", True):
         average_on |= ClusterProperty.DELTASIGMA
 
-    hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
+    hmf = pyccl.halos.MassFuncTinker08(mass_def="200c")
     redshift_distribution = SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
     survey_name = "numcosmo_simulated_redshift_richness_deltasigma"
 
+    cluster_theory = ClusterShearProfile((12, 17), (0.1, 2.0), hmf, 4.0, True)
+
+    recipe = MurataBinnedSpecZRecipe(
+        cluster_theory=cluster_theory,
+        redshift_distribution=redshift_distribution,
+        mass_distribution=mass_distribution,
+    )
     likelihood = ConstGaussian(
         [
             BinnedClusterNumberCounts(
                 average_on,
                 survey_name,
-                MurataBinnedSpecZRecipe(hmf, redshift_distribution, mass_distribution),
+                recipe,
             ),
             BinnedClusterShearProfile(
                 average_on,
                 survey_name,
-                MurataBinnedSpecZDeltaSigmaRecipe(
-                    hmf=hmf,
-                    redshift_distribution=redshift_distribution,
-                    mass_distribution=mass_distribution,
-                    is_delta_sigma=True,
-                ),
+                recipe,
             ),
         ]
     )

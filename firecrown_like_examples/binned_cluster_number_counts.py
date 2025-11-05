@@ -97,7 +97,7 @@ class BinnedClusterNumberCounts(BinnedCluster):
 
         mean_values = []
         for this_bin, counts in zip(self.bins, cluster_counts):
-            total_observable = self.cluster_recipe.evaluate_theory_prediction(
+            total_observable = self.cluster_recipe.evaluate_theory_prediction_counts(
                 this_bin.z_edges,
                 this_bin.mass_proxy_edges,
                 self.sky_area,
@@ -121,7 +121,7 @@ class BinnedClusterNumberCounts(BinnedCluster):
 
         cluster_counts = []
         for this_bin in self.bins:
-            counts = self.cluster_recipe.evaluate_theory_prediction(
+            counts = self.cluster_recipe.evaluate_theory_prediction_counts(
                 this_bin.z_edges, this_bin.mass_proxy_edges, self.sky_area
             )
             cluster_counts.append(counts)

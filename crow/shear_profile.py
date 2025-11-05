@@ -194,6 +194,7 @@ class ClusterShearProfile(ClusterAbundance):
             kind="quadratic",
             fill_value="extrapolate",
         )
+        self.use_beta_s_interp = self.use_beta_s_interp
 
     def set_miscentering_parameters(
         self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
@@ -233,7 +234,7 @@ class ClusterShearProfile(ClusterAbundance):
             "z_distrib_func": z_distrib_func,
         }
 
-    def delta_sigma(
+    def compute_shear_profile(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -250,7 +251,11 @@ class ClusterShearProfile(ClusterAbundance):
             halo_profile_model="nfw",
         )
         moo.set_cosmo(self._clmm_cosmo)
+
+        # NOTE: value set up not to break use in pyccl with firecronw
+        # to be investigated
         moo.z_inf = 10.0
+
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
@@ -284,8 +289,8 @@ class ClusterShearProfile(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = self.eval_beta_s_mean(redshift)
-            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
+            beta_s_mean = float(self.eval_beta_s_mean(redshift))
+            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
             first_halo_right_centered = clmm_model.eval_tangential_shear(
                 radius_center,
                 redshift,
