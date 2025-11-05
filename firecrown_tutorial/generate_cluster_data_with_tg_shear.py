@@ -224,11 +224,12 @@ def compute_abundance_gt_statistic(
         )
 
         cluster_gt_list.append(
-            moo.eval_tangential_shear(
+            moo.eval_reduced_tangential_shear(
                 radius_centers,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),
                 z_src_info="beta",
+                approx="order1",
             )
         )
     cluster_gt = np.array(cluster_gt_list)
