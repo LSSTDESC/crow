@@ -67,6 +67,7 @@ class MurataBinnedSpecZRecipe:
             prediction = (
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
+                * self.cluster_theory.completeness_distribution(mass, z)
                 * self.redshift_distribution.distribution()
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
