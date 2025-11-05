@@ -14,9 +14,6 @@ from crow.properties import ClusterProperty
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
 
-# To run with firecrown, use this import instead
-# from firecrown.models.cluster import ClusterProperty
-
 
 class MurataBinnedSpecZRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.

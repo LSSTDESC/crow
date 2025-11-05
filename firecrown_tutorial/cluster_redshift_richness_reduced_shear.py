@@ -3,7 +3,7 @@
 import os
 import sys
 
-import pyccl as ccl
+import pyccl
 import sacc
 from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
@@ -12,9 +12,7 @@ from firecrown.models.cluster import ClusterProperty
 
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from crow import ClusterShearProfile
-from crow.kernel import SpectroscopicRedshift
-from crow.mass_proxy import MurataBinned
+from crow import ClusterShearProfile, kernel, mass_proxy
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
 
 # to be moved to firecrown eventually
@@ -39,14 +37,17 @@ def build_likelihood(
     if build_parameters.get_bool("use_mean_deltasigma", True):
         average_on |= ClusterProperty.DELTASIGMA
 
-    hmf = ccl.halos.MassFuncTinker08(mass_def="200c")
-    redshift_distribution = SpectroscopicRedshift()
+    redshift_distribution = kernel.SpectroscopicRedshift()
     pivot_mass, pivot_redshift = 14.625862906, 0.6
-    mass_distribution = MurataBinned(pivot_mass, pivot_redshift)
+    mass_distribution = mass_proxy.MurataBinned(pivot_mass, pivot_redshift)
     survey_name = "numcosmo_simulated_redshift_richness_gt"
 
     cluster_theory = ClusterShearProfile(
-        (12, 17), (0.1, 2.0), hmf, 4.0, False, use_beta_s_interp=True
+        cosmo=pyccl.CosmologyVanillaLCDM(),
+        halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        cluster_concentration=4.0,
+        is_delta_sigma=False,
+        use_beta_s_interp=True,
     )
     cluster_theory.set_beta_parameters(10.0, 5.0)
 
@@ -54,6 +55,9 @@ def build_likelihood(
         cluster_theory=cluster_theory,
         redshift_distribution=redshift_distribution,
         mass_distribution=mass_distribution,
+        completeness=None,
+        mass_interval=(12, 17),
+        true_z_interval=(0.1, 2.0),
     )
 
     likelihood = ConstGaussian(
