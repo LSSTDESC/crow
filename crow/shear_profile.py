@@ -15,6 +15,7 @@ from clmm.utils.beta_lens import (
     compute_beta_s_mean_from_distribution,
     compute_beta_s_square_mean_from_distribution,
 )
+from pyccl.cosmology import Cosmology
 from scipy.interpolate import interp1d
 from scipy.stats import gamma
 
