@@ -12,7 +12,7 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow import ClusterAbundance, kernel, mass_proxy
+from crow import ClusterAbundance, completeness, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
@@ -233,7 +233,9 @@ def test_evaluates_theory_prediction_with_completeness(
         z_edges, mass_proxy_edges, sky_area
     )
 
-    murata_binned_spec_z_w_comp = get_base_murata_binned_spec_z(kernel.Completeness())
+    murata_binned_spec_z_w_comp = get_base_murata_binned_spec_z(
+        completeness.CompletenessAguena16()
+    )
     prediction_w_comp = murata_binned_spec_z_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )

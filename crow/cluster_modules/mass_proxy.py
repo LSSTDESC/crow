@@ -13,7 +13,7 @@ from scipy import special
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-from .kernel import Purity
+from .purity import Purity
 
 
 class MassRichnessGaussian:

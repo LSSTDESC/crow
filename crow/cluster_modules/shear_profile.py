@@ -22,7 +22,7 @@ from scipy.stats import gamma
 from crow import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-from .kernel import Completeness
+from .completeness import Completeness
 
 
 def numcosmo_miscentered_mean_surface_density(

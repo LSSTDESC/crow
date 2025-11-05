@@ -8,7 +8,7 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow import kernel
+from crow import completeness, kernel, purity
 
 
 def test_create_spectroscopic_redshift_kernel():
@@ -22,7 +22,7 @@ def test_create_mass_kernel():
 
 
 def test_create_completeness_kernel():
-    ck = kernel.Completeness()
+    ck = completeness.CompletenessAguena16()
     ck.ac_mc = 13.31
     ck.bc_mc = 0.2025
     ck.ac_nc = 0.38
@@ -35,7 +35,7 @@ def test_create_completeness_kernel():
 
 
 def test_create_purity_kernel():
-    pk = kernel.Purity()
+    pk = purity.PurityAguena16()
     pk.ap_nc = 3.9193
     pk.bp_nc = -0.3323
     pk.ap_rc = 1.1839
@@ -59,7 +59,7 @@ def test_true_mass_distribution():
 
 @pytest.mark.precision_sensitive
 def test_purity_distribution():
-    pk = kernel.Purity()
+    pk = purity.PurityAguena16()
     pk.ap_nc = 3.9193
     pk.bp_nc = -0.3323
     pk.ap_rc = 1.1839
@@ -85,15 +85,15 @@ def test_purity_distribution():
         dtype=np.float64,
     )
 
-    purity = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
-    assert isinstance(purity, np.ndarray)
-    for ref, true in zip(purity, truth):
+    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    assert isinstance(purity_values, np.ndarray)
+    for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-5, abs=0.0)
 
 
 @pytest.mark.precision_sensitive
 def test_purity_distribution_uses_mean():
-    pk = kernel.Purity()
+    pk = purity.PurityAguena16()
     pk.ap_nc = 3.9193
     pk.bp_nc = -0.3323
     pk.ap_rc = 1.1839
@@ -117,15 +117,15 @@ def test_purity_distribution_uses_mean():
         ],
         dtype=np.float64,
     )
-    purity = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
-    assert isinstance(purity, np.ndarray)
-    for ref, true in zip(purity, truth):
+    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    assert isinstance(purity_values, np.ndarray)
+    for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-7, abs=0.0)
 
 
 @pytest.mark.precision_sensitive
 def test_completeness_distribution():
-    ck = kernel.Completeness()
+    ck = completeness.CompletenessAguena16()
     ck.ac_mc = 13.31
     ck.bc_mc = 0.2025
     ck.ac_nc = 0.38
@@ -155,7 +155,7 @@ def test_completeness_distribution():
 
 
 def test_purity_distribution_raises_without_limits():
-    pk = kernel.Purity()
+    pk = purity.PurityAguena16()
     z = np.array([0.5], dtype=np.float64)
     mass_proxy = np.array([-1.0], dtype=np.float64)
 

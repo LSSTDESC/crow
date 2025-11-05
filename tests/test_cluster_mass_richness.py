@@ -11,7 +11,7 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow import kernel, mass_proxy
+from crow import mass_proxy, purity
 
 PIVOT_Z = 0.6
 PIVOT_MASS = 14.625862906
@@ -170,7 +170,7 @@ def test_cluster_distribution_properties(z: float, mass: float):
 
     # Test with purity
     murata_binned_relation_inpure = mass_proxy.MurataBinned(
-        PIVOT_MASS, PIVOT_Z, kernel.Purity()
+        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
     )
     probability_inpure = murata_binned_relation_inpure.distribution(
         mass_array, z_array, mass_proxy_limits
