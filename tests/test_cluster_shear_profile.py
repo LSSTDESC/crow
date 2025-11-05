@@ -21,6 +21,7 @@ def fixture_cluster_deltasigma_profile():
     delta_sigma = ClusterShearProfile(
         _TEST_COSMO,
         pyccl.halos.MassFuncBocquet16(),
+        None,  # completeness
         4.0,  # concentration
         True,  # is_delta_sigma
     )
@@ -34,6 +35,7 @@ def fixture_cluster_reduced_profile():
     gt = ClusterShearProfile(
         _TEST_COSMO,
         pyccl.halos.MassFuncBocquet16(),
+        None,  # completeness
         4.0,  # concentration
         False,  # is_delta_sigma
     )
@@ -47,6 +49,7 @@ def fixture_cluster_reduced_interp_profile():
     gt = ClusterShearProfile(
         _TEST_COSMO,
         pyccl.halos.MassFuncBocquet16(),
+        None,  # completeness
         4.0,  # concentration
         False,  # is_delta_sigma
         True,  # use_beta_s_interp

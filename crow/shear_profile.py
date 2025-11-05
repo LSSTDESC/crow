@@ -20,6 +20,7 @@ from scipy.stats import gamma
 
 from crow.abundance import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
+from crow.kernel import Completeness
 
 
 def numcosmo_miscentered_mean_surface_density(
@@ -88,13 +89,14 @@ class ClusterShearProfile(ClusterAbundance):
         self,
         cosmo: Cosmology,
         halo_mass_function: pyccl.halos.MassFunc,
+        completeness: Completeness | None = None,
         cluster_concentration: float | None = None,
         is_delta_sigma: bool = False,
         use_beta_s_interp: bool = False,
         two_halo_term: bool = False,
         boost_factor: bool = False,
     ) -> None:
-        super().__init__(cosmo, halo_mass_function)
+        super().__init__(cosmo, halo_mass_function, completeness)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 

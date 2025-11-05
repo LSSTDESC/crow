@@ -34,6 +34,20 @@ class ClusterAbundance:
         self._cosmo = cosmo
         self._hmf_cache: dict[tuple[float, float], float] = {}
 
+    @property
+    def completeness(self) -> Completeness | None:
+        """The completeness used to predict the cluster number count."""
+        return self.__completeness
+
+    @completeness.setter
+    def completeness(self, completeness: Completeness) -> None:
+        """Update the cluster abundance calculation with a new completeness."""
+        self.__completeness = completeness
+        if completeness is None:
+            self._completeness_distribution = self._complete_distribution
+        else:
+            self._completeness_distribution = self._incomplete_distribution
+
     def __init__(
         self,
         cosmo: Cosmology,
@@ -43,6 +57,7 @@ class ClusterAbundance:
         super().__init__()
         self.cosmo = cosmo
         self.halo_mass_function = halo_mass_function
+        self.completeness = completeness
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0
@@ -85,3 +100,26 @@ class ClusterAbundance:
             return_vals.append(val)
 
         return np.asarray(return_vals, dtype=np.float64)
+
+    def _complete_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ):
+        return 1.0
+
+    def _incomplete_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ):
+        return self.__completeness(log_mass, z)
+
+    def completeness_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Evaluates and returns the completeness contribution to the integrand."""
+
+        return self._completeness_distribution(log_mass, z)
