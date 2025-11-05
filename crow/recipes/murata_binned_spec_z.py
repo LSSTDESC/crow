@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow import ClusterShearProfile, kernel
+from crow import ClusterShearProfile, completeness, kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 
@@ -23,12 +23,12 @@ class MurataBinnedSpecZRecipe:
     """
 
     @property
-    def completeness(self) -> kernel.Completeness | None:
+    def completeness(self) -> completeness.Completeness | None:
         """The completeness used to predict the cluster number count."""
         return self.__completeness
 
     @completeness.setter
-    def completeness(self, completeness: kernel.Completeness) -> None:
+    def completeness(self, completeness: completeness.Completeness) -> None:
         """Update the cluster abundance calculation with a new completeness."""
         self.__completeness = completeness
         if completeness is None:
