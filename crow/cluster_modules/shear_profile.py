@@ -19,9 +19,10 @@ from pyccl.cosmology import Cosmology
 from scipy.interpolate import interp1d
 from scipy.stats import gamma
 
-from crow.abundance import ClusterAbundance
+from crow import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import Completeness
+
+from .kernel import Completeness
 
 
 def numcosmo_miscentered_mean_surface_density(

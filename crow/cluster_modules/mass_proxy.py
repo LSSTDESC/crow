@@ -12,7 +12,8 @@ import numpy.typing as npt
 from scipy import special
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import Purity
+
+from .kernel import Purity
 
 
 class MassRichnessGaussian:

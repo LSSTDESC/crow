@@ -9,12 +9,10 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from crow import ClusterShearProfile, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
-from crow.kernel import SpectroscopicRedshift
-from crow.mass_proxy import MurataBinned
 from crow.properties import ClusterProperty
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.shear_profile import ClusterShearProfile
 
 # from firecrown.models.cluster import ClusterProperty
 
@@ -31,8 +29,8 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
     cluster_theory.set_beta_parameters(10.0)
     cluster_recipe = MurataBinnedSpecZRecipe(
         cluster_theory=cluster_theory,
-        redshift_distribution=SpectroscopicRedshift(),
-        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+        redshift_distribution=kernel.SpectroscopicRedshift(),
+        mass_distribution=mass_proxy.MurataBinned(pivot_mass, pivot_redshift),
         completeness=None,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
@@ -56,10 +54,13 @@ def test_murata_binned_spec_z_deltasigma_init(
     assert isinstance(murata_binned_spec_z_deltasigma.integrator, NumCosmoIntegrator)
     assert murata_binned_spec_z_deltasigma.redshift_distribution is not None
     assert isinstance(
-        murata_binned_spec_z_deltasigma.redshift_distribution, SpectroscopicRedshift
+        murata_binned_spec_z_deltasigma.redshift_distribution,
+        kernel.SpectroscopicRedshift,
     )
     assert murata_binned_spec_z_deltasigma.mass_distribution is not None
-    assert isinstance(murata_binned_spec_z_deltasigma.mass_distribution, MurataBinned)
+    assert isinstance(
+        murata_binned_spec_z_deltasigma.mass_distribution, mass_proxy.MurataBinned
+    )
 
 
 def test_get_theory_prediction_returns_value(

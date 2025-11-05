@@ -9,14 +9,13 @@ from firecrown.likelihood.gaussian import ConstGaussian
 from firecrown.likelihood.likelihood import Likelihood, NamedParameters
 from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster import ClusterProperty
-import pyccl
 
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from crow import ClusterShearProfile
 from crow.kernel import SpectroscopicRedshift
 from crow.mass_proxy import MurataBinned
 from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
-from crow.shear_profile import ClusterShearProfile
 
 # to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
