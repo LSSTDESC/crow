@@ -30,6 +30,10 @@ from firecrown.models.cluster import (
     DeltaSigmaData,
 )
 
+from crow.recipes.murata_binned_spec_z import (
+    MurataBinnedSpecZRecipe,
+)
+
 from .binned_cluster import BinnedCluster
 from .updatable_wrapper import UpdatableClusterObjects
 
