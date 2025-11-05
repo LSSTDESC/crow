@@ -27,12 +27,13 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     cluster_recipe = MurataBinnedSpecZRecipe(
         cluster_theory=ClusterAbundance(
-            z_interval=(0, 2),
-            mass_interval=(13, 17),
+            cosmo=pyccl.CosmologyVanillaLCDM(),
             halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
         ),
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+        mass_interval=(13, 17),
+        true_z_interval=(0, 2),
     )
     cluster_recipe.mass_distribution.mu_p0 = 3.0
     cluster_recipe.mass_distribution.mu_p1 = 0.86
@@ -40,31 +41,26 @@ def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
     cluster_recipe.mass_distribution.sigma_p0 = 3.0
     cluster_recipe.mass_distribution.sigma_p1 = 0.7
     cluster_recipe.mass_distribution.sigma_p2 = 0.0
-    cosmo_ccl = pyccl.CosmologyVanillaLCDM()
-    cluster_recipe.cluster_theory.cosmo = cosmo_ccl
     return cluster_recipe
 
 
-def test_murata_binned_spec_z_init():
-    pivot_mass, pivot_redshift = 14.625862906, 0.6
-    recipe = MurataBinnedSpecZRecipe(
-        cluster_theory=ClusterAbundance(
-            z_interval=(0, 2),
-            mass_interval=(13, 17),
-            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
-        ),
-        redshift_distribution=SpectroscopicRedshift(),
-        mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
-    )
+def test_murata_binned_spec_z_init(
+    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+):
 
-    assert recipe is not None
-    assert isinstance(recipe, MurataBinnedSpecZRecipe)
-    assert recipe.integrator is not None
-    assert isinstance(recipe.integrator, NumCosmoIntegrator)
-    assert recipe.redshift_distribution is not None
-    assert isinstance(recipe.redshift_distribution, SpectroscopicRedshift)
-    assert recipe.mass_distribution is not None
-    assert isinstance(recipe.mass_distribution, MurataBinned)
+    assert murata_binned_spec_z.mass_interval[0] == 13.0
+    assert murata_binned_spec_z.mass_interval[1] == 17.0
+    assert murata_binned_spec_z.true_z_interval[0] == 0.0
+    assert murata_binned_spec_z.true_z_interval[1] == 2.0
+
+    assert murata_binned_spec_z is not None
+    assert isinstance(murata_binned_spec_z, MurataBinnedSpecZRecipe)
+    assert murata_binned_spec_z.integrator is not None
+    assert isinstance(murata_binned_spec_z.integrator, NumCosmoIntegrator)
+    assert murata_binned_spec_z.redshift_distribution is not None
+    assert isinstance(murata_binned_spec_z.redshift_distribution, SpectroscopicRedshift)
+    assert murata_binned_spec_z.mass_distribution is not None
+    assert isinstance(murata_binned_spec_z.mass_distribution, MurataBinned)
 
 
 def test_get_theory_prediction_returns_value(

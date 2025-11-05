@@ -12,33 +12,48 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from crow.shear_profile import ClusterShearProfile
 
+_TEST_COSMO = pyccl.CosmologyVanillaLCDM()
+
 
 @pytest.fixture(name="cluster_deltasigma_profile")
 def fixture_cluster_deltasigma_profile():
     """Test fixture that represents an assembled cluster deltasigma class."""
-    hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, True)
-    ca.set_beta_parameters(10.0)
-    return ca
+    delta_sigma = ClusterShearProfile(
+        _TEST_COSMO,
+        pyccl.halos.MassFuncBocquet16(),
+        4.0,  # concentration
+        True,  # is_delta_sigma
+    )
+    delta_sigma.set_beta_parameters(10.0)
+    return delta_sigma
 
 
 @pytest.fixture(name="cluster_reduced_profile")
 def fixture_cluster_reduced_profile():
     """Test fixture that represents an assembled cluster deltasigma class."""
-    hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, False)
-    ca.set_beta_parameters(10.0)
-    return ca
+    gt = ClusterShearProfile(
+        _TEST_COSMO,
+        pyccl.halos.MassFuncBocquet16(),
+        4.0,  # concentration
+        False,  # is_delta_sigma
+    )
+    gt.set_beta_parameters(10.0)
+    return gt
 
 
 @pytest.fixture(name="cluster_reduced_interp_profile")
 def fixture_cluster_reduced_interp_profile():
     """Test fixture that represents an assembled cluster deltasigma class."""
-    hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterShearProfile((13, 17), (0, 2), hmf, 4.0, False, True)
-    ca.set_beta_parameters(10.0)
-    ca.set_beta_s_interp(0, 2)
-    return ca
+    gt = ClusterShearProfile(
+        _TEST_COSMO,
+        pyccl.halos.MassFuncBocquet16(),
+        4.0,  # concentration
+        False,  # is_delta_sigma
+        True,  # use_beta_s_interp
+    )
+    gt.set_beta_parameters(10.0)
+    gt.set_beta_s_interp(0, 2)
+    return gt
 
 
 def test_cluster_update_ingredients(
@@ -51,7 +66,7 @@ def test_cluster_update_ingredients(
 
     for cluster in [cluster_deltasigma_profile, cluster_reduced_profile]:
         assert cluster.cosmo is not None
-        assert cluster.cosmo == cosmo  # pylint: disable=protected-access
+        assert cluster.cosmo == _TEST_COSMO  # pylint: disable=protected-access
         assert cluster._hmf_cache == {}  # pylint: disable=protected-access
 
 
@@ -60,17 +75,13 @@ def test_cluster_deltasigma_profile_init(
 ):
     assert cluster_deltasigma_profile is not None
     assert cluster_deltasigma_profile.cluster_concentration is not None
-    assert cluster_deltasigma_profile.cosmo is None  # pylint: disable=protected-access
+    # pylint: disable=protected-access
     assert (
         cluster_deltasigma_profile._hmf_cache == {}
     )  # pylint: disable=protected-access
     assert isinstance(
         cluster_deltasigma_profile.halo_mass_function, pyccl.halos.MassFuncBocquet16
     )
-    assert cluster_deltasigma_profile.min_mass == 13.0
-    assert cluster_deltasigma_profile.max_mass == 17.0
-    assert cluster_deltasigma_profile.min_z == 0.0
-    assert cluster_deltasigma_profile.max_z == 2.0
 
 
 # ---- Helpers for repeated checks ----

@@ -11,6 +11,8 @@ import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
 
+from crow.kernel import Completeness
+
 
 class ClusterAbundance:
     """The class that calculates the predicted number counts of galaxy clusters.
@@ -30,22 +32,17 @@ class ClusterAbundance:
     def cosmo(self, cosmo: Cosmology) -> None:
         """Update the cluster abundance calculation with a new cosmology."""
         self._cosmo = cosmo
-        self._hmf_cache = {}
+        self._hmf_cache: dict[tuple[float, float], float] = {}
 
     def __init__(
         self,
-        mass_interval: tuple[float, float],
-        z_interval: tuple[float, float],
+        cosmo: Cosmology,
         halo_mass_function: pyccl.halos.MassFunc,
+        completeness: Completeness | None = None,
     ) -> None:
         super().__init__()
+        self.cosmo = cosmo
         self.halo_mass_function = halo_mass_function
-        self.min_mass = mass_interval[0]
-        self.max_mass = mass_interval[1]
-        self.min_z = z_interval[0]
-        self.max_z = z_interval[1]
-        self._hmf_cache: dict[tuple[float, float], float] = {}
-        self._cosmo: Cosmology | None = None
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0

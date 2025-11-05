@@ -11,42 +11,32 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from crow.abundance import ClusterAbundance
 
+_TEST_COSMO = pyccl.CosmologyVanillaLCDM()
+
 
 @pytest.fixture(name="cluster_abundance")
 def fixture_cluster_abundance():
     """Test fixture that represents an assembled cluster abundance class."""
-    hmf = pyccl.halos.MassFuncBocquet16()
-    ca = ClusterAbundance((13, 17), (0, 2), hmf)
+    ca = ClusterAbundance(_TEST_COSMO, pyccl.halos.MassFuncBocquet16())
     return ca
 
 
 def test_cluster_abundance_init(cluster_abundance: ClusterAbundance):
     assert cluster_abundance is not None
-    assert cluster_abundance.cosmo is None
+    assert cluster_abundance.cosmo == _TEST_COSMO
     # pylint: disable=protected-access
     assert cluster_abundance._hmf_cache == {}
     assert isinstance(
         cluster_abundance.halo_mass_function, pyccl.halos.MassFuncBocquet16
     )
-    assert cluster_abundance.min_mass == 13.0
-    assert cluster_abundance.max_mass == 17.0
-    assert cluster_abundance.min_z == 0.0
-    assert cluster_abundance.max_z == 2.0
 
 
 def test_cluster_update_ingredients(cluster_abundance: ClusterAbundance):
-    cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_abundance.cosmo = cosmo
-    assert cluster_abundance.cosmo is not None
-    assert cluster_abundance.cosmo == cosmo
     # pylint: disable=protected-access
     assert cluster_abundance._hmf_cache == {}
 
 
 def test_abundance_comoving_returns_value(cluster_abundance: ClusterAbundance):
-    cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_abundance.cosmo = cosmo
-
     result = cluster_abundance.comoving_volume(
         np.linspace(0.1, 1, 10, dtype=np.float64), 360**2
     )
@@ -58,9 +48,6 @@ def test_abundance_comoving_returns_value(cluster_abundance: ClusterAbundance):
 
 # @pytest.mark.slow
 def test_abundance_massfunc_returns_value(cluster_abundance: ClusterAbundance):
-    cosmo = pyccl.CosmologyVanillaLCDM()
-    cluster_abundance.cosmo = cosmo
-
     result = cluster_abundance.mass_function(
         np.linspace(13, 17, 5, dtype=np.float64),
         np.linspace(0.1, 1, 5, dtype=np.float64),

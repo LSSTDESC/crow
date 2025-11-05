@@ -32,6 +32,8 @@ class MurataBinnedSpecZRecipe:
         cluster_theory,
         redshift_distribution,
         mass_distribution,
+        mass_interval: tuple[float, float],
+        true_z_interval: tuple[float, float],
     ) -> None:
 
         self.integrator = NumCosmoIntegrator()
@@ -39,6 +41,8 @@ class MurataBinnedSpecZRecipe:
         self.cluster_theory = cluster_theory
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
+        self.mass_interval = mass_interval
+        self.true_z_interval = true_z_interval
 
     def get_theory_prediction_counts(
         self,
@@ -128,7 +132,7 @@ class MurataBinnedSpecZRecipe:
         measured redshifts.
         """
         self.integrator.integral_bounds = [
-            (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
+            self.mass_interval,
             z_edges,
         ]
         self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
@@ -240,7 +244,7 @@ class MurataBinnedSpecZRecipe:
         measured redshifts.
         """
         self.integrator.integral_bounds = [
-            (self.cluster_theory.min_mass, self.cluster_theory.max_mass),
+            self.mass_interval,
             z_edges,
         ]
         radius_center = radius_center

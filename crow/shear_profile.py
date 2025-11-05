@@ -86,8 +86,7 @@ class ClusterShearProfile(ClusterAbundance):
 
     def __init__(
         self,
-        mass_interval: tuple[float, float],
-        z_interval: tuple[float, float],
+        cosmo: Cosmology,
         halo_mass_function: pyccl.halos.MassFunc,
         cluster_concentration: float | None = None,
         is_delta_sigma: bool = False,
@@ -95,7 +94,7 @@ class ClusterShearProfile(ClusterAbundance):
         two_halo_term: bool = False,
         boost_factor: bool = False,
     ) -> None:
-        super().__init__(mass_interval, z_interval, halo_mass_function)
+        super().__init__(cosmo, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 
