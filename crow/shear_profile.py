@@ -89,14 +89,13 @@ class ClusterShearProfile(ClusterAbundance):
         self,
         cosmo: Cosmology,
         halo_mass_function: pyccl.halos.MassFunc,
-        completeness: Completeness | None = None,
         cluster_concentration: float | None = None,
         is_delta_sigma: bool = False,
         use_beta_s_interp: bool = False,
         two_halo_term: bool = False,
         boost_factor: bool = False,
     ) -> None:
-        super().__init__(cosmo, halo_mass_function, completeness)
+        super().__init__(cosmo, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
         self.cluster_concentration = cluster_concentration
 
@@ -224,44 +223,6 @@ class ClusterShearProfile(ClusterAbundance):
             fill_value="extrapolate",
         )
         self.use_beta_s_interp = self.use_beta_s_interp
-
-    def set_miscentering_parameters(
-        self, z_inf, zmax=10.0, delta_z_cut=0.1, zmin=None, z_distrib_func=None
-    ):
-        r"""Set parameters to comput mean value of the geometric lensing efficicency
-
-        .. math::
-           \left<\beta_s\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
-           {\int_{z = z_{min}}^{z_{max}}N(z)}
-
-        Parameters
-        ----------
-        z_inf: float
-            Redshift at infinity
-        zmax: float, optional
-            Maximum redshift to be set as the source of the galaxy when performing the sum.
-            Default: 10
-        delta_z_cut: float, optional
-            Redshift interval to be summed with :math:`z_{cl}` to return :math:`z_{min}`.
-            This feature is not used if :math:`z_{min}` is provided by the user. Default: 0.1
-        zmin: float, None, optional
-            Minimum redshift to be set as the source of the galaxy when performing the sum.
-            Default: None
-        z_distrib_func: one-parameter function, optional
-            Redshift distribution function. Default is Chang et al (2013) distribution function.
-
-        Returns
-        -------
-        float
-            Mean value of the geometric lensing efficicency
-        """
-        self._beta_parameters = {
-            "z_inf": z_inf,
-            "zmax": zmax,
-            "delta_z_cut": delta_z_cut,
-            "zmin": zmin,
-            "z_distrib_func": z_distrib_func,
-        }
 
     def compute_shear_profile(
         self,

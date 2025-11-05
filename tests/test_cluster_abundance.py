@@ -10,7 +10,6 @@ import pytest
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from crow.abundance import ClusterAbundance
-from crow.kernel import Completeness
 
 _TEST_COSMO = pyccl.CosmologyVanillaLCDM()
 
@@ -18,9 +17,7 @@ _TEST_COSMO = pyccl.CosmologyVanillaLCDM()
 @pytest.fixture(name="cluster_abundance")
 def fixture_cluster_abundance():
     """Test fixture that represents an assembled cluster abundance class."""
-    return ClusterAbundance(
-        _TEST_COSMO, pyccl.halos.MassFuncBocquet16(), Completeness()
-    )
+    return ClusterAbundance(_TEST_COSMO, pyccl.halos.MassFuncBocquet16())
 
 
 def test_cluster_abundance_init(cluster_abundance: ClusterAbundance):
@@ -46,10 +43,6 @@ def test_abundance_comoving_returns_value(cluster_abundance: ClusterAbundance):
     assert np.issubdtype(result.dtype, np.float64)
     assert len(result) == 10
     assert np.all(result > 0)
-    completeness = cluster_abundance.completeness_distribution(
-        np.array([14]), np.array([0.5])
-    )
-    assert (completeness < 1.0).all()
 
 
 # @pytest.mark.slow

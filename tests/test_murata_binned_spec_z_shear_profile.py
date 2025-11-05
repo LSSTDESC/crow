@@ -33,6 +33,7 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
         cluster_theory=cluster_theory,
         redshift_distribution=SpectroscopicRedshift(),
         mass_distribution=MurataBinned(pivot_mass, pivot_redshift),
+        completeness=None,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
     )
