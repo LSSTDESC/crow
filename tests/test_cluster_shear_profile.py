@@ -90,7 +90,9 @@ def _check_miscentering_behavior(
     result_mis = cluster.compute_shear_profile(log_mass, redshifts, radius)
     cluster.set_miscentering(0.0, miscentering_distribution_function=pdf)
     result_right_center = cluster.compute_shear_profile(log_mass, redshifts, radius)
-
+    cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
+    cluster.set_beta_parameters(10.0, approx="order2")
+    result_mis_order2 = cluster.compute_shear_profile(log_mass, redshifts, radius)
     np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
     assert result_mis.shape == baseline.shape
     assert np.all(result_mis <= baseline)
