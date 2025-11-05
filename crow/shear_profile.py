@@ -451,7 +451,7 @@ class ClusterShearProfile(ClusterAbundance):
                 if self.approx == "order2":
                     esd_vals = esd_vals * (
                         1.0
-                        + (beta_s_square_mean / beta_s_mean**2)
+                        + (beta_s_square_mean / beta_s_mean**2 - 1.0)
                         * beta_s_mean
                         * sigma_mis_vals
                         / sigma_c_inf

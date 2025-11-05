@@ -20,8 +20,6 @@ from crow.shear_profile import ClusterShearProfile
 # from firecrown.models.cluster import ClusterProperty
 
 
-
-
 class MurataBinnedSpecZRecipe:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
