@@ -25,7 +25,7 @@ from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from .completeness import Completeness
 
 
-def numcosmo_miscentered_mean_surface_density(
+def numcosmo_miscentered_mean_surface_density(  # pragma: no cover
     r_proj, r_mis, integrand, norm, aux_args, extra_integral
 ):
     """
@@ -47,7 +47,11 @@ def numcosmo_miscentered_mean_surface_density(
     integrator.extra_args = np.array(args)
     for r_low, r_high in zip(r_lower, r_proj):
         if extra_integral:
-            integrator.integral_bounds = [(r_low, r_high), (0.0, np.pi), (0.5, np.inf)]
+            integrator.integral_bounds = [
+                (r_low, r_high),
+                (1.0e-6, np.pi),
+                (0.0, np.inf),
+            ]
 
             def integrand_numcosmo(int_args, extra_args):
                 r_local = int_args[:, 0]
@@ -56,7 +60,7 @@ def numcosmo_miscentered_mean_surface_density(
                 return integrand(theta, r_local, extra, *extra_args)
 
         else:
-            integrator.integral_bounds = [(r_low, r_high), (0.0, np.pi)]
+            integrator.integral_bounds = [(r_low, r_high), (1.0e-6, np.pi)]
 
             def integrand_numcosmo(int_args, extra_args):
                 r_local = int_args[:, 0]
@@ -73,7 +77,7 @@ def numcosmo_miscentered_mean_surface_density(
     return mean_surface_density
 
 
-clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (
+clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (  # pragma: no cover
     numcosmo_miscentered_mean_surface_density
 )
 
