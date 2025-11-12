@@ -32,12 +32,12 @@ def fixture_murata_binned() -> mass_proxy.MurataBinned:
 
     # Set the parameters to the values used in the test
     # they should be such that the variance is always positive.
-    mr.mu_p0 = 3.00
-    mr.mu_p1 = 0.086
-    mr.mu_p2 = 0.01
-    mr.sigma_p0 = 3.0
-    mr.sigma_p1 = 0.07
-    mr.sigma_p2 = 0.01
+    mr.parameters["mu0"] = 3.00
+    mr.parameters["mu1"] = 0.086
+    mr.parameters["mu2"] = 0.01
+    mr.parameters["sigma0"] = 3.0
+    mr.parameters["sigma1"] = 0.07
+    mr.parameters["sigma2"] = 0.01
 
     return mr
 
@@ -50,12 +50,12 @@ def fixture_murata_unbinned() -> mass_proxy.MurataUnbinned:
 
     # Set the parameters to the values used in the test
     # they should be such that the variance is always positive.
-    mr.mu_p0 = 3.00
-    mr.mu_p1 = 0.086
-    mr.mu_p2 = 0.01
-    mr.sigma_p0 = 3.0
-    mr.sigma_p1 = 0.07
-    mr.sigma_p2 = 0.01
+    mr.parameters["mu0"] = 3.00
+    mr.parameters["mu1"] = 0.086
+    mr.parameters["mu2"] = 0.01
+    mr.parameters["sigma0"] = 3.0
+    mr.parameters["sigma1"] = 0.07
+    mr.parameters["sigma2"] = 0.01
 
     return mr
 
@@ -66,12 +66,12 @@ def test_create_musigma_kernel():
     assert mb.pivot_redshift == 1
     assert mb.log1p_pivot_redshift == np.log1p(1)
 
-    assert mb.mu_p0 == MURATA_DEFAULT_MU_P0
-    assert mb.mu_p1 == MURATA_DEFAULT_MU_P1
-    assert mb.mu_p2 == MURATA_DEFAULT_MU_P2
-    assert mb.sigma_p0 == MURATA_DEFAULT_SIGMA_P0
-    assert mb.sigma_p1 == MURATA_DEFAULT_SIGMA_P1
-    assert mb.sigma_p2 == MURATA_DEFAULT_SIGMA_P2
+    assert mb.parameters["mu0"] == MURATA_DEFAULT_MU_P0
+    assert mb.parameters["mu1"] == MURATA_DEFAULT_MU_P1
+    assert mb.parameters["mu2"] == MURATA_DEFAULT_MU_P2
+    assert mb.parameters["sigma0"] == MURATA_DEFAULT_SIGMA_P0
+    assert mb.parameters["sigma1"] == MURATA_DEFAULT_SIGMA_P1
+    assert mb.parameters["sigma2"] == MURATA_DEFAULT_SIGMA_P2
 
 
 @given(z=floats(min_value=1e-15, max_value=2.0))
@@ -149,12 +149,12 @@ def test_cluster_distribution_properties(z: float, mass: float):
     """Mathematical properties of the cluster mass distribution using hypothesis."""
     # Create the relation inside the test to avoid fixture issues
     murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
-    murata_binned_relation.mu_p0 = 3.00
-    murata_binned_relation.mu_p1 = 0.086
-    murata_binned_relation.mu_p2 = 0.01
-    murata_binned_relation.sigma_p0 = 3.0
-    murata_binned_relation.sigma_p1 = 0.07
-    murata_binned_relation.sigma_p2 = 0.01
+    murata_binned_relation.parameters["mu0"] = 3.00
+    murata_binned_relation.parameters["mu1"] = 0.086
+    murata_binned_relation.parameters["mu2"] = 0.01
+    murata_binned_relation.parameters["sigma0"] = 3.0
+    murata_binned_relation.parameters["sigma1"] = 0.07
+    murata_binned_relation.parameters["sigma2"] = 0.01
 
     mass_proxy_limits = (1.0, 5.0)
 
@@ -189,12 +189,12 @@ def test_cluster_distribution_unimodal_property(
     """Test that the distribution has at most one peak (unimodal) using hypothesis."""
     # Create the relation inside the test to avoid fixture issues
     murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
-    murata_binned_relation.mu_p0 = 3.00
-    murata_binned_relation.mu_p1 = 0.086
-    murata_binned_relation.mu_p2 = 0.01
-    murata_binned_relation.sigma_p0 = 3.0
-    murata_binned_relation.sigma_p1 = 0.07
-    murata_binned_relation.sigma_p2 = 0.01
+    murata_binned_relation.parameters["mu0"] = 3.00
+    murata_binned_relation.parameters["mu1"] = 0.086
+    murata_binned_relation.parameters["mu2"] = 0.01
+    murata_binned_relation.parameters["sigma0"] = 3.0
+    murata_binned_relation.parameters["sigma1"] = 0.07
+    murata_binned_relation.parameters["sigma2"] = 0.01
 
     mass_proxy_limits = (1.0, 5.0)
     mass2 = mass1 + mass_delta

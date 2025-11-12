@@ -101,12 +101,14 @@ class MassRichnessGaussian:
         return result
 
 
-MURATA_DEFAULT_MU_P0 = 3.0
-MURATA_DEFAULT_MU_P1 = 0.8
-MURATA_DEFAULT_MU_P2 = -0.3
-MURATA_DEFAULT_SIGMA_P0 = 0.3
-MURATA_DEFAULT_SIGMA_P1 = 0.0
-MURATA_DEFAULT_SIGMA_P2 = 0.0
+MURATA_DEFAULT_PARAMETERS = {
+    "mu0": 3.0,
+    "mu1": 0.8,
+    "mu2": -0.3,
+    "sigma0": 0.3,
+    "sigma1": 0.0,
+    "sigma2": 0.0,
+}
 
 
 class MurataBinned(MassRichnessGaussian):
@@ -123,12 +125,7 @@ class MurataBinned(MassRichnessGaussian):
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
-        self.mu_p0 = MURATA_DEFAULT_MU_P0
-        self.mu_p1 = MURATA_DEFAULT_MU_P1
-        self.mu_p2 = MURATA_DEFAULT_MU_P2
-        self.sigma_p0 = MURATA_DEFAULT_SIGMA_P0
-        self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
-        self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
+        self.parameters = {**MURATA_DEFAULT_PARAMETERS}
 
         self.purity = purity
 
@@ -153,7 +150,7 @@ class MurataBinned(MassRichnessGaussian):
     ) -> npt.NDArray[np.float64]:
         """Return observed quantity corrected by redshift and mass."""
         return MassRichnessGaussian.observed_value(
-            (self.mu_p0, self.mu_p1, self.mu_p2),
+            (self.parameters["mu0"], self.parameters["mu1"], self.parameters["mu2"]),
             mass,
             z,
             self.pivot_mass,
@@ -167,7 +164,11 @@ class MurataBinned(MassRichnessGaussian):
     ) -> npt.NDArray[np.float64]:
         """Return observed scatter corrected by redshift and mass."""
         return MassRichnessGaussian.observed_value(
-            (self.sigma_p0, self.sigma_p1, self.sigma_p2),
+            (
+                self.parameters["sigma0"],
+                self.parameters["sigma1"],
+                self.parameters["sigma2"],
+            ),
             mass,
             z,
             self.pivot_mass,
@@ -243,12 +244,7 @@ class MurataUnbinned(MassRichnessGaussian):
         self.pivot_mass = pivot_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
-        self.mu_p0 = MURATA_DEFAULT_MU_P0
-        self.mu_p1 = MURATA_DEFAULT_MU_P1
-        self.mu_p2 = MURATA_DEFAULT_MU_P2
-        self.sigma_p0 = MURATA_DEFAULT_SIGMA_P0
-        self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
-        self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
+        self.parameters = {**MURATA_DEFAULT_PARAMETERS}
 
     def get_proxy_mean(
         self,
@@ -257,7 +253,7 @@ class MurataUnbinned(MassRichnessGaussian):
     ) -> npt.NDArray[np.float64]:
         """Return observed quantity corrected by redshift and mass."""
         return MassRichnessGaussian.observed_value(
-            (self.mu_p0, self.mu_p1, self.mu_p2),
+            (self.parameters["mu0"], self.parameters["mu1"], self.parameters["mu2"]),
             mass,
             z,
             self.pivot_mass,
@@ -271,7 +267,11 @@ class MurataUnbinned(MassRichnessGaussian):
     ) -> npt.NDArray[np.float64]:
         """Return observed scatter corrected by redshift and mass."""
         return MassRichnessGaussian.observed_value(
-            (self.sigma_p0, self.sigma_p1, self.sigma_p2),
+            (
+                self.parameters["sigma0"],
+                self.parameters["sigma1"],
+                self.parameters["sigma2"],
+            ),
             mass,
             z,
             self.pivot_mass,

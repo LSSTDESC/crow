@@ -27,10 +27,12 @@ class Completeness:
         raise NotImplementedError
 
 
-REDMAPPER_DEFAULT_AC_NC = 0.38
-REDMAPPER_DEFAULT_BC_NC = 1.2634
-REDMAPPER_DEFAULT_AC_MC = 13.31
-REDMAPPER_DEFAULT_BC_MC = 0.2025
+REDMAPPER_DEFAULT_PARAMETERS = {
+    "ac_nc": 0.38,
+    "bc_nc": 1.2634,
+    "ac_mc": 13.31,
+    "bc_mc": 0.2025,
+}
 
 
 class CompletenessAguena16(Completeness):
@@ -43,21 +45,18 @@ class CompletenessAguena16(Completeness):
     def __init__(
         self,
     ):
-        self.ac_nc = REDMAPPER_DEFAULT_AC_NC
-        self.bc_nc = REDMAPPER_DEFAULT_BC_NC
-        self.ac_mc = REDMAPPER_DEFAULT_AC_MC
-        self.bc_mc = REDMAPPER_DEFAULT_BC_MC
+        self.parameters = {**REDMAPPER_DEFAULT_PARAMETERS}
 
     def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_mc = self.ac_mc
-        bc_mc = self.bc_mc
+        ac_mc = self.parameters["ac_mc"]
+        bc_mc = self.parameters["bc_mc"]
         log_mc = ac_mc + bc_mc * (1.0 + z)
         mc = 10.0**log_mc
         return mc.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_nc = self.ac_nc
-        bc_nc = self.bc_nc
+        ac_nc = self.parameters["ac_nc"]
+        bc_nc = self.parameters["bc_nc"]
         nc = ac_nc + bc_nc * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc

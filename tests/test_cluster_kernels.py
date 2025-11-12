@@ -23,28 +23,28 @@ def test_create_mass_kernel():
 
 def test_create_completeness_kernel():
     ck = completeness.CompletenessAguena16()
-    ck.ac_mc = 13.31
-    ck.bc_mc = 0.2025
-    ck.ac_nc = 0.38
-    ck.bc_nc = 1.2634
+    ck.parameters["ac_mc"] = 13.31
+    ck.parameters["bc_mc"] = 0.2025
+    ck.parameters["ac_nc"] = 0.38
+    ck.parameters["bc_nc"] = 1.2634
     assert ck is not None
-    assert ck.ac_mc == 13.31
-    assert ck.bc_mc == 0.2025
-    assert ck.ac_nc == 0.38
-    assert ck.bc_nc == 1.2634
+    assert ck.parameters["ac_mc"] == 13.31
+    assert ck.parameters["bc_mc"] == 0.2025
+    assert ck.parameters["ac_nc"] == 0.38
+    assert ck.parameters["bc_nc"] == 1.2634
 
 
 def test_create_purity_kernel():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
+    pk.parameters["ap_nc"] = 3.9193
+    pk.parameters["bp_nc"] = -0.3323
+    pk.parameters["ap_rc"] = 1.1839
+    pk.parameters["bp_rc"] = -0.4077
     assert pk is not None
-    assert pk.ap_nc == 3.9193
-    assert pk.bp_nc == -0.3323
-    assert pk.ap_rc == 1.1839
-    assert pk.bp_rc == -0.4077
+    assert pk.parameters["ap_nc"] == 3.9193
+    assert pk.parameters["bp_nc"] == -0.3323
+    assert pk.parameters["ap_rc"] == 1.1839
+    assert pk.parameters["bp_rc"] == -0.4077
 
 
 def test_spec_z_distribution():
@@ -60,10 +60,10 @@ def test_true_mass_distribution():
 @pytest.mark.precision_sensitive
 def test_purity_distribution():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
+    pk.parameters["ap_nc"] = 3.9193
+    pk.parameters["bp_nc"] = -0.3323
+    pk.parameters["ap_rc"] = 1.1839
+    pk.parameters["bp_rc"] = -0.4077
     mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
 
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
@@ -94,10 +94,10 @@ def test_purity_distribution():
 @pytest.mark.precision_sensitive
 def test_purity_distribution_uses_mean():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
+    pk.parameters["ap_nc"] = 3.9193
+    pk.parameters["bp_nc"] = -0.3323
+    pk.parameters["ap_rc"] = 1.1839
+    pk.parameters["bp_rc"] = -0.4077
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
     mass_proxy = np.array([-1.0], dtype=np.float64)
     mass_proxy_limits = (0.0, 2.0)
@@ -126,10 +126,10 @@ def test_purity_distribution_uses_mean():
 @pytest.mark.precision_sensitive
 def test_completeness_distribution():
     ck = completeness.CompletenessAguena16()
-    ck.ac_mc = 13.31
-    ck.bc_mc = 0.2025
-    ck.ac_nc = 0.38
-    ck.bc_nc = 1.2634
+    ck.parameters["ac_mc"] = 13.31
+    ck.parameters["bc_mc"] = 0.2025
+    ck.parameters["ac_nc"] = 0.38
+    ck.parameters["bc_nc"] = 1.2634
     mass = np.linspace(13.0, 15.0, 10, dtype=np.float64)
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
 

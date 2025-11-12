@@ -30,10 +30,12 @@ class Purity:
         raise NotImplementedError
 
 
-REDMAPPER_DEFAULT_AP_NC = 3.9193
-REDMAPPER_DEFAULT_BP_NC = -0.3323
-REDMAPPER_DEFAULT_AP_RC = 1.1839
-REDMAPPER_DEFAULT_BP_RC = -0.4077
+REDMAPPER_DEFAULT_PARAMETERS = {
+    "ap_nc": 3.9193,
+    "bp_nc": -0.3323,
+    "ap_rc": 1.1839,
+    "bp_rc": -0.4077,
+}
 
 
 class PurityAguena16(Purity):
@@ -45,21 +47,18 @@ class PurityAguena16(Purity):
 
     def __init__(self):
         super().__init__()
-        self.ap_nc = REDMAPPER_DEFAULT_AP_NC
-        self.bp_nc = REDMAPPER_DEFAULT_BP_NC
-        self.ap_rc = REDMAPPER_DEFAULT_AP_RC
-        self.bp_rc = REDMAPPER_DEFAULT_BP_RC
+        self.parameters = {**REDMAPPER_DEFAULT_PARAMETERS}
 
     def _rc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ap_rc = self.ap_rc
-        bp_rc = self.bp_rc
+        ap_rc = self.parameters["ap_rc"]
+        bp_rc = self.parameters["bp_rc"]
         log_rc = ap_rc + bp_rc * (1.0 + z)
         rc = 10**log_rc
         return rc.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        bp_nc = self.bp_nc
-        ap_nc = self.ap_nc
+        bp_nc = self.parameters["bp_nc"]
+        ap_nc = self.parameters["ap_nc"]
         nc = ap_nc + bp_nc * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
