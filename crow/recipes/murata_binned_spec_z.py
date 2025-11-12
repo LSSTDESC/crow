@@ -38,6 +38,11 @@ class MurataBinnedSpecZRecipe:
         else:
             self._completeness_distribution = self._incomplete_distribution
 
+    @property
+    def purity(self) -> comp.Completeness | None:
+        """The completeness used to predict the cluster number count."""
+        return self.mass_distribution.purity
+
     def __init__(
         self,
         cluster_theory,
