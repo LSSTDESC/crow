@@ -62,7 +62,7 @@ def fixture_murata_unbinned() -> mass_proxy.MurataUnbinned:
 
 def test_create_musigma_kernel():
     mb = mass_proxy.MurataBinned(1, 1)
-    assert mb.pivot_mass == 1 * np.log(10)
+    assert mb.pivot_ln_mass == 1 * np.log(10)
     assert mb.pivot_redshift == 1
     assert mb.log1p_pivot_redshift == np.log1p(1)
 
@@ -219,7 +219,7 @@ def test_cluster_murata_binned_mean(murata_binned_relation: mass_proxy.MurataBin
         for z in np.geomspace(1.0e-18, 2.0, 20):
             massarray = np.atleast_1d(mass)
             zarray = np.atleast_1d(z)
-            test = murata_binned_relation.get_proxy_mean(massarray, zarray)
+            test = murata_binned_relation.get_ln_mass_proxy_mean(massarray, zarray)
 
             true = mass_proxy.MassRichnessGaussian.observed_value(
                 (3.00, 0.086, 0.01),
@@ -239,7 +239,7 @@ def test_cluster_murata_binned_variance(
         for z in np.geomspace(1.0e-18, 2.0, 20):
             massarray = np.atleast_1d(mass)
             zarray = np.atleast_1d(z)
-            test = murata_binned_relation.get_proxy_sigma(massarray, zarray)
+            test = murata_binned_relation.get_ln_mass_proxy_sigma(massarray, zarray)
 
             true = mass_proxy.MassRichnessGaussian.observed_value(
                 (3.00, 0.07, 0.01),
@@ -297,8 +297,8 @@ def test_cluster_murata_unbinned_distribution_is_normalized(
         mass = np.atleast_1d(mass_i)
         z = np.atleast_1d(z_i)
 
-        mean = murata_unbinned_relation.get_proxy_mean(mass, z)[0]
-        sigma = murata_unbinned_relation.get_proxy_sigma(mass, z)[0]
+        mean = murata_unbinned_relation.get_ln_mass_proxy_mean(mass, z)[0]
+        sigma = murata_unbinned_relation.get_ln_mass_proxy_sigma(mass, z)[0]
         mass_proxy_limits = np.array([mean - 5 * sigma, mean + 5 * sigma])
 
         def integrand(ln_mass_proxy) -> float:

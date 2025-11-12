@@ -64,10 +64,10 @@ def test_purity_distribution():
     pk.parameters["bp_nc"] = -0.3323
     pk.parameters["ap_rc"] = 1.1839
     pk.parameters["bp_rc"] = -0.4077
-    mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
+    log_mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
 
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
-    mass_proxy_limits = (1.0, 10.0)
+    log_mass_proxy_limits = (1.0, 10.0)
 
     truth = np.array(
         [
@@ -85,7 +85,7 @@ def test_purity_distribution():
         dtype=np.float64,
     )
 
-    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-5, abs=0.0)
@@ -99,8 +99,8 @@ def test_purity_distribution_uses_mean():
     pk.parameters["ap_rc"] = 1.1839
     pk.parameters["bp_rc"] = -0.4077
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
-    mass_proxy = np.array([-1.0], dtype=np.float64)
-    mass_proxy_limits = (0.0, 2.0)
+    log_mass_proxy = np.array([-1.0], dtype=np.float64)
+    log_mass_proxy_limits = (0.0, 2.0)
 
     truth = np.array(
         [
@@ -117,7 +117,7 @@ def test_purity_distribution_uses_mean():
         ],
         dtype=np.float64,
     )
-    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-7, abs=0.0)
@@ -157,9 +157,10 @@ def test_completeness_distribution():
 def test_purity_distribution_raises_without_limits():
     pk = purity.PurityAguena16()
     z = np.array([0.5], dtype=np.float64)
-    mass_proxy = np.array([-1.0], dtype=np.float64)
+    log_mass_proxy = np.array([-1.0], dtype=np.float64)
 
     with pytest.raises(
-        ValueError, match="mass_proxy_limits must be provided when mass_proxy == -1"
+        ValueError,
+        match="log_mass_proxy_limits must be provided when log_mass_proxy == -1",
     ):
-        pk.distribution(z=z, mass_proxy=mass_proxy, mass_proxy_limits=None)
+        pk.distribution(z=z, log_mass_proxy=log_mass_proxy, log_mass_proxy_limits=None)
