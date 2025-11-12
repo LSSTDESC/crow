@@ -37,7 +37,7 @@ class MassRichnessGaussian:
         return result
 
     @abstractmethod
-    def get_proxy_mean(
+    def get_ln_mass_proxy_mean(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -45,7 +45,7 @@ class MassRichnessGaussian:
         """Return observed quantity corrected by redshift and mass."""
 
     @abstractmethod
-    def get_proxy_sigma(
+    def get_ln_mass_proxy_sigma(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -58,14 +58,14 @@ class MassRichnessGaussian:
         z: npt.NDArray[np.float64],
         log_mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
-        proxy_mean = self.get_proxy_mean(log_mass, z)
-        proxy_sigma = self.get_proxy_sigma(log_mass, z)
+        ln_mass_proxy_mean = self.get_ln_mass_proxy_mean(log_mass, z)
+        ln_mass_proxy_sigma = self.get_ln_mass_proxy_sigma(log_mass, z)
 
-        x_min = (proxy_mean - log_mass_proxy_limits[0] * np.log(10.0)) / (
-            np.sqrt(2.0) * proxy_sigma
+        x_min = (ln_mass_proxy_mean - log_mass_proxy_limits[0] * np.log(10.0)) / (
+            np.sqrt(2.0) * ln_mass_proxy_sigma
         )
-        x_max = (proxy_mean - log_mass_proxy_limits[1] * np.log(10.0)) / (
-            np.sqrt(2.0) * proxy_sigma
+        x_max = (ln_mass_proxy_mean - log_mass_proxy_limits[1] * np.log(10.0)) / (
+            np.sqrt(2.0) * ln_mass_proxy_sigma
         )
 
         return_vals = np.empty_like(x_min)
@@ -89,12 +89,14 @@ class MassRichnessGaussian:
         z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        proxy_mean = self.get_proxy_mean(log_mass, z)
-        proxy_sigma = self.get_proxy_sigma(log_mass, z)
+        ln_mass_proxy_mean = self.get_ln_mass_proxy_mean(log_mass, z)
+        ln_mass_proxy_sigma = self.get_ln_mass_proxy_sigma(log_mass, z)
 
-        normalization = 1 / np.sqrt(2 * np.pi * proxy_sigma**2)
+        normalization = 1 / np.sqrt(2 * np.pi * ln_mass_proxy_sigma**2)
         result = normalization * np.exp(
-            -0.5 * ((log_mass_proxy * np.log(10) - proxy_mean) / proxy_sigma) ** 2
+            -0.5
+            * ((log_mass_proxy * np.log(10) - ln_mass_proxy_mean) / ln_mass_proxy_sigma)
+            ** 2
         )
 
         assert isinstance(result, np.ndarray)
@@ -146,7 +148,7 @@ class MurataBinned(MassRichnessGaussian):
             self._distribution = self._distribution_binned_inpure
         self.__purity = value
 
-    def get_proxy_mean(
+    def get_ln_mass_proxy_mean(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -160,7 +162,7 @@ class MurataBinned(MassRichnessGaussian):
             self.log1p_pivot_redshift,
         )
 
-    def get_proxy_sigma(
+    def get_ln_mass_proxy_sigma(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -182,37 +184,13 @@ class MurataBinned(MassRichnessGaussian):
 
         def integration_func(int_args, extra_args):
             log_mass_proxy = int_args[:, 0]
-            """
-            print(
-                np.array(
-                    [
-                        np.sum(
-                            self._distribution_unbinned(
-                                np.array([log_mass[i]]), np.array([z[i]]), log_mass_proxy
-                            )
-                            / self.purity.distribution(np.array([z[i]]), log_mass_proxy)
-                        )
-                        for i in range(len(log_mass))
-                    ]
-                )
-            )
-            print(
-                np.array(
-                    [
-                        np.sum(
-                            self._distribution_unbinned(log_mass, z, np.array([proxy]))
-                            / self.purity.distribution(z, np.array([proxy]))
-                            for proxy in log_mass_proxy
-                        )
-                    ][0]
-                )
-            )
-            """
             return np.array(
                 [
-                    self._distribution_unbinned(log_mass, z, np.array([proxy]))
-                    / self.purity.distribution(z, np.array([proxy]))
-                    for proxy in log_mass_proxy
+                    self._distribution_unbinned(
+                        log_mass, z, np.array([_log_mass_proxy])
+                    )
+                    / self.purity.distribution(z, np.array([_log_mass_proxy]))
+                    for _log_mass_proxy in log_mass_proxy
                 ]
             )
 
@@ -252,7 +230,7 @@ class MurataUnbinned(MassRichnessGaussian):
         self.sigma_p1 = MURATA_DEFAULT_SIGMA_P1
         self.sigma_p2 = MURATA_DEFAULT_SIGMA_P2
 
-    def get_proxy_mean(
+    def get_ln_mass_proxy_mean(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -266,7 +244,7 @@ class MurataUnbinned(MassRichnessGaussian):
             self.log1p_pivot_redshift,
         )
 
-    def get_proxy_sigma(
+    def get_ln_mass_proxy_sigma(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
