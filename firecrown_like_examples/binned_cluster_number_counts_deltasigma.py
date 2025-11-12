@@ -28,7 +28,6 @@ from crow.recipes.murata_binned_spec_z import (
 )
 
 from .binned_cluster import BinnedCluster
-from .updatable_wrapper import UpdatableClusterObjects
 
 
 class BinnedClusterShearProfile(BinnedCluster):
@@ -53,28 +52,6 @@ class BinnedClusterShearProfile(BinnedCluster):
         :param systematics: The systematics to apply to this statistic.
         """
         super().__init__(cluster_properties, survey_name, cluster_recipe, systematics)
-
-    def _create_updatable_parameters(self):
-        self.updatable_parameters = UpdatableClusterObjects(
-            (
-                {
-                    "recipe_attribute_name": "mass_distribution",
-                    "parameters": [
-                        "mu0",
-                        "mu1",
-                        "mu2",
-                        "sigma0",
-                        "sigma1",
-                        "sigma2",
-                    ],
-                },
-                {
-                    "recipe_attribute_name": "cluster_theory",
-                    "parameters": ["cluster_concentration"],
-                    "has_cosmo": True,
-                },
-            )
-        )
 
     def read(self, sacc_data: sacc.Sacc) -> None:
         """Read the data for this statistic and mark it as ready for use.

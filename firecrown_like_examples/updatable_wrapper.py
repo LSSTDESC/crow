@@ -36,8 +36,6 @@ class UpdatableParameters(Updatable):
             cluster object to get the defalt parameters from.
         """
         for par_name in self.updatable_parameters:
-            print(cluster_object)
-            print(cluster_object.parameters.keys())
             setattr(
                 self,
                 self._ini_file_par_name(par_name),
@@ -83,7 +81,7 @@ class UpdatableClusterObjects(Updatable):
         },
         {
             "recipe_attribute_name": "cluster_theory",
-            "parameters": [],
+            "parameters": ["cluster_concentration"], # if wl profile
             "has_cosmo": True,
         },
         {

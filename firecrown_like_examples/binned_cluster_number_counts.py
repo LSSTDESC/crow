@@ -8,33 +8,10 @@ from firecrown.modeling_tools import ModelingTools
 from firecrown.models.cluster import AbundanceData, ClusterProperty
 
 from .binned_cluster import BinnedCluster
-from .updatable_wrapper import UpdatableClusterObjects
 
 
 class BinnedClusterNumberCounts(BinnedCluster):
     """A statistic representing the number of clusters in a z, mass bin."""
-
-    def _create_updatable_parameters(self):
-        self.updatable_parameters = UpdatableClusterObjects(
-            (
-                {
-                    "recipe_attribute_name": "mass_distribution",
-                    "parameters": [
-                        "mu0",
-                        "mu1",
-                        "mu2",
-                        "sigma0",
-                        "sigma1",
-                        "sigma2",
-                    ],
-                },
-                {
-                    "recipe_attribute_name": "cluster_theory",
-                    "parameters": [],
-                    "has_cosmo": True,
-                },
-            )
-        )
 
     def read(self, sacc_data: sacc.Sacc) -> None:
         """Read the data for this statistic and mark it as ready for use.
