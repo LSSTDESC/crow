@@ -6,6 +6,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
+from scipy.integrate import simpson
 
 from crow import ClusterShearProfile
 from crow import completeness as comp
@@ -181,6 +182,42 @@ class MurataBinnedSpecZRecipe:
 
         return counts
 
+    def evaluate_theory_prediction_counts_grid(
+        self,
+        z_edges,
+        mass_proxy_edges,
+        sky_area: float,
+        average_on: None | ClusterProperty = None,
+        mass_p: int = 100,
+        z_p: int = 100,
+    ) -> float:
+        """Evaluate the 2D (mass, z) integral for cluster counts using Simpson integration."""
+
+        # 1. Build the tabulation grids
+        log_mass_interval = np.linspace(self.mass_interval[0], self.mass_interval[1], mass_p)
+        z_interval = np.linspace(z_edges[0], z_edges[1], z_p)
+
+        # 2. Allocate the integrand grid
+        integrand_grid = np.zeros((mass_p, z_p))
+
+        # 3. Get the theory prediction function
+        theory_prediction = self.get_theory_prediction_counts(average_on)
+
+        # 4. Fill the grid
+        for i, log_mass in enumerate(log_mass_interval):
+            for j, z in enumerate(z_interval):
+                integrand_grid[i, j] = theory_prediction(
+                    np.array([log_mass]), np.array([z]),
+                    (mass_proxy_edges[0], mass_proxy_edges[1]), sky_area
+                )
+
+        # 5. Perform 2D Simpson integration
+        # Integrate first along z, then along log_mass
+        integral_z = simpson(integrand_grid, z_interval, axis=1)
+        total_integral = simpson(integral_z, log_mass_interval)
+
+        return total_integral
+
     def get_theory_prediction_shear_profile(
         self,
         average_on: None | ClusterProperty = None,  # pylint: disable=unused-argument
@@ -295,4 +332,37 @@ class MurataBinnedSpecZRecipe:
             theory_prediction
         )
         deltasigma = self.integrator.integrate(prediction_wrapper)
+        return deltasigma
+
+    def evaluate_theory_prediction_shear_profile_grid(
+        self,
+        z_edges,
+        mass_proxy_edges,
+        radius_center,
+        sky_area: float,
+        average_on: None | ClusterProperty = None,
+        mass_p: int = 100,
+        z_p: int = 100,
+    ) -> float:
+        """Evaluate the theoretical shear profile using tabulated 2D Simpson integration."""
+
+        log_mass_interval = np.linspace(self.mass_interval[0], self.mass_interval[1], mass_p)
+        z_interval = np.linspace(z_edges[0], z_edges[1], z_p)
+
+        integrand_grid = np.zeros((mass_p, z_p))
+
+        theory_prediction = self.get_theory_prediction_shear_profile(average_on)
+        for i, log_mass in enumerate(log_mass_interval):
+            for j, z in enumerate(z_interval):
+                integrand_grid[i, j] = theory_prediction(
+                    np.array([log_mass]),
+                    np.array([z]),
+                    (mass_proxy_edges[0], mass_proxy_edges[1]),
+                    sky_area,
+                    radius_center,
+                )
+
+        integral_z = simpson(integrand_grid, z_interval, axis=1)
+        deltasigma = simpson(integral_z, log_mass_interval)
+
         return deltasigma
