@@ -18,18 +18,18 @@ class BinnedClusterNumberCounts(BinnedCluster):
         self.updatable_parameters = UpdatableClusterObjects(
             (
                 {
-                    "attribute_name": "mass_distribution",
+                    "recipe_attribute_name": "mass_distribution",
                     "parameters": [
-                        "mu_p0",
-                        "mu_p1",
-                        "mu_p2",
-                        "sigma_p0",
-                        "sigma_p1",
-                        "sigma_p2",
+                        "mu0",
+                        "mu1",
+                        "mu2",
+                        "sigma0",
+                        "sigma1",
+                        "sigma2",
                     ],
                 },
                 {
-                    "attribute_name": "cluster_theory",
+                    "recipe_attribute_name": "cluster_theory",
                     "parameters": [],
                     "has_cosmo": True,
                 },
