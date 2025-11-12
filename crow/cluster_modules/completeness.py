@@ -7,6 +7,8 @@ in the cluster abundance integrand.
 import numpy as np
 import numpy.typing as npt
 
+from .parameters import Parameters
+
 
 class Completeness:
     """The completeness kernel for the numcosmo simulated survey.
@@ -45,7 +47,7 @@ class CompletenessAguena16(Completeness):
     def __init__(
         self,
     ):
-        self.parameters = {**REDMAPPER_DEFAULT_PARAMETERS}
+        self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
     def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ac_mc = self.parameters["ac_mc"]

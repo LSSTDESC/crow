@@ -9,6 +9,8 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 
+from .parameters import Parameters
+
 
 class Purity:
     """The purity kernel for the numcosmo simulated survey.
@@ -47,7 +49,7 @@ class PurityAguena16(Purity):
 
     def __init__(self):
         super().__init__()
-        self.parameters = {**REDMAPPER_DEFAULT_PARAMETERS}
+        self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
     def _rc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         ap_rc = self.parameters["ap_rc"]

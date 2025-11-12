@@ -13,6 +13,7 @@ from scipy import special
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
+from .parameters import Parameters
 from .purity import Purity
 
 
@@ -127,7 +128,7 @@ class MurataBinned(MassRichnessGaussian):
         self.pivot_ln_mass = pivot_log_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
-        self.parameters = {**MURATA_DEFAULT_PARAMETERS}
+        self.parameters = Parameters({**MURATA_DEFAULT_PARAMETERS})
 
         self.purity = purity
 
@@ -224,7 +225,7 @@ class MurataUnbinned(MassRichnessGaussian):
         self.pivot_ln_mass = pivot_log_mass * np.log(10.0)  # ln(M)
         self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
 
-        self.parameters = {**MURATA_DEFAULT_PARAMETERS}
+        self.parameters = Parameters({**MURATA_DEFAULT_PARAMETERS})
 
     def get_ln_mass_proxy_mean(
         self,
