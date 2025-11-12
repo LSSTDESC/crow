@@ -23,8 +23,8 @@ class Purity:
     def distribution(
         self,
         z: npt.NDArray[np.float64],
-        mass_proxy: npt.NDArray[np.float64],
-        mass_proxy_limits: Optional[tuple[float, float]] = None,
+        log_mass_proxy: npt.NDArray[np.float64],
+        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
         raise NotImplementedError
@@ -67,22 +67,22 @@ class PurityAguena16(Purity):
     def distribution(
         self,
         z: npt.NDArray[np.float64],
-        mass_proxy: npt.NDArray[np.float64],
-        mass_proxy_limits: Optional[tuple[float, float]] = None,
+        log_mass_proxy: npt.NDArray[np.float64],
+        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
-        if all(mass_proxy == -1.0):
-            if mass_proxy_limits is None:
+        _log_mass_proxy = log_mass_proxy
+        if all(log_mass_proxy == -1.0):
+            if log_mass_proxy_limits is None:
                 raise ValueError(
-                    "mass_proxy_limits must be provided when mass_proxy == -1"
+                    "log_mass_proxy_limits must be provided when log_mass_proxy == -1"
                 )
-            mean_mass = (mass_proxy_limits[0] + mass_proxy_limits[1]) / 2
-            r = np.array([np.power(10.0, mean_mass)], dtype=np.float64)
-        else:
-            r = np.array([np.power(10.0, mass_proxy)], dtype=np.float64)
+            _log_mass_proxy = (log_mass_proxy_limits[0] + log_mass_proxy_limits[1]) / 2
 
-        r_over_rc = r / self._rc(z)
+        rich_norm_pow = (
+            np.array([10**_log_mass_proxy], dtype=np.float64) / self._rc(z)
+        ) ** self._nc(z)
 
-        purity = (r_over_rc) ** self._nc(z) / (r_over_rc ** self._nc(z) + 1.0)
+        purity = rich_norm_pow / (rich_norm_pow + 1.0)
         assert isinstance(purity, np.ndarray)
         return purity

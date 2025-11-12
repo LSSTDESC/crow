@@ -67,18 +67,18 @@ class ClusterAbundance:
 
     def mass_function(
         self,
-        mass: npt.NDArray[np.float64],
+        log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """The mass function at z and mass."""
         scale_factor = 1.0 / (1.0 + z)
         return_vals = []
 
-        for m, a in zip(mass.astype(float), scale_factor.astype(float)):
-            val = self._hmf_cache.get((m, a))
+        for logm, a in zip(log_mass.astype(float), scale_factor.astype(float)):
+            val = self._hmf_cache.get((logm, a))
             if val is None:
-                val = self.halo_mass_function(self.cosmo, 10**m, a)
-                self._hmf_cache[(m, a)] = val
+                val = self.halo_mass_function(self.cosmo, 10**logm, a)
+                self._hmf_cache[(logm, a)] = val
             return_vals.append(val)
 
         return np.asarray(return_vals, dtype=np.float64)
