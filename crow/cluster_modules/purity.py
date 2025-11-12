@@ -23,8 +23,8 @@ class Purity:
     def distribution(
         self,
         z: npt.NDArray[np.float64],
-        mass_proxy: npt.NDArray[np.float64],
-        mass_proxy_limits: Optional[tuple[float, float]] = None,
+        log_mass_proxy: npt.NDArray[np.float64],
+        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
         raise NotImplementedError
@@ -67,19 +67,19 @@ class PurityAguena16(Purity):
     def distribution(
         self,
         z: npt.NDArray[np.float64],
-        mass_proxy: npt.NDArray[np.float64],
-        mass_proxy_limits: Optional[tuple[float, float]] = None,
+        log_mass_proxy: npt.NDArray[np.float64],
+        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
-        if all(mass_proxy == -1.0):
-            if mass_proxy_limits is None:
+        if all(log_mass_proxy == -1.0):
+            if log_mass_proxy_limits is None:
                 raise ValueError(
-                    "mass_proxy_limits must be provided when mass_proxy == -1"
+                    "log_mass_proxy_limits must be provided when log_mass_proxy == -1"
                 )
-            mean_mass = (mass_proxy_limits[0] + mass_proxy_limits[1]) / 2
+            mean_mass = (log_mass_proxy_limits[0] + log_mass_proxy_limits[1]) / 2
             r = np.array([np.power(10.0, mean_mass)], dtype=np.float64)
         else:
-            r = np.array([np.power(10.0, mass_proxy)], dtype=np.float64)
+            r = np.array([np.power(10.0, log_mass_proxy)], dtype=np.float64)
 
         r_over_rc = r / self._rc(z)
 

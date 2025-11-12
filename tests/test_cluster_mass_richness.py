@@ -62,7 +62,7 @@ def fixture_murata_unbinned() -> mass_proxy.MurataUnbinned:
 
 def test_create_musigma_kernel():
     mb = mass_proxy.MurataBinned(1, 1)
-    assert mb.pivot_mass == 1 * np.log(10)
+    assert mb.pivot_ln_mass == 1 * np.log(10)
     assert mb.pivot_redshift == 1
     assert mb.log1p_pivot_redshift == np.log1p(1)
 
