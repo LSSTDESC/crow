@@ -30,10 +30,10 @@ class Completeness:
 
 
 REDMAPPER_DEFAULT_PARAMETERS = {
-    "ac_nc": 0.38,
-    "bc_nc": 1.2634,
-    "ac_mc": 13.31,
-    "bc_mc": 0.2025,
+    "a_n": 0.38,
+    "b_n": 1.2634,
+    "a_logm_piv": 13.31,
+    "b_logm_piv": 0.2025,
 }
 
 
@@ -49,17 +49,15 @@ class CompletenessAguena16(Completeness):
     ):
         self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
-    def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_mc = self.parameters["ac_mc"]
-        bc_mc = self.parameters["bc_mc"]
-        log_mc = ac_mc + bc_mc * (1.0 + z)
-        mc = 10.0**log_mc
-        return mc.astype(np.float64)
+    def _mpiv(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        log_mpiv = self.parameters["a_logm_piv"] + self.parameters["b_logm_piv"] * (
+            1.0 + z
+        )
+        mpiv = 10.0**log_mpiv
+        return mpiv.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_nc = self.parameters["ac_nc"]
-        bc_nc = self.parameters["bc_nc"]
-        nc = ac_nc + bc_nc * (1.0 + z)
+        nc = self.parameters["a_n"] + self.parameters["b_n"] * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
 
@@ -71,7 +69,7 @@ class CompletenessAguena16(Completeness):
         """Evaluates and returns the completeness contribution to the integrand."""
         mass = 10.0**log_mass
 
-        mass_norm_pow = (mass / self._mc(z)) ** self._nc(z)
+        mass_norm_pow = (mass / self._mpiv(z)) ** self._nc(z)
 
         completeness = mass_norm_pow / (mass_norm_pow + 1.0)
         assert isinstance(completeness, np.ndarray)

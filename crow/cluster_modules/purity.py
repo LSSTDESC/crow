@@ -33,10 +33,10 @@ class Purity:
 
 
 REDMAPPER_DEFAULT_PARAMETERS = {
-    "ap_nc": 3.9193,
-    "bp_nc": -0.3323,
-    "ap_rc": 1.1839,
-    "bp_rc": -0.4077,
+    "a_n": 3.9193,
+    "b_n": -0.3323,
+    "a_logm_piv": 1.1839,
+    "b_logm_piv": -0.4077,
 }
 
 
@@ -51,17 +51,15 @@ class PurityAguena16(Purity):
         super().__init__()
         self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
-    def _rc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ap_rc = self.parameters["ap_rc"]
-        bp_rc = self.parameters["bp_rc"]
-        log_rc = ap_rc + bp_rc * (1.0 + z)
-        rc = 10**log_rc
-        return rc.astype(np.float64)
+    def _mpiv(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        log_mpiv = self.parameters["a_logm_piv"] + self.parameters["b_logm_piv"] * (
+            1.0 + z
+        )
+        mpiv = 10**log_mpiv
+        return mpiv.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        bp_nc = self.parameters["bp_nc"]
-        ap_nc = self.parameters["ap_nc"]
-        nc = ap_nc + bp_nc * (1.0 + z)
+        nc = self.parameters["a_n"] + self.parameters["b_n"] * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
 
@@ -81,7 +79,7 @@ class PurityAguena16(Purity):
             _log_mass_proxy = (log_mass_proxy_limits[0] + log_mass_proxy_limits[1]) / 2
 
         rich_norm_pow = (
-            np.array([10**_log_mass_proxy], dtype=np.float64) / self._rc(z)
+            np.array([10**_log_mass_proxy], dtype=np.float64) / self._mpiv(z)
         ) ** self._nc(z)
 
         purity = rich_norm_pow / (rich_norm_pow + 1.0)
