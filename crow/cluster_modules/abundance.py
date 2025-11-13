@@ -11,6 +11,8 @@ import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
 
+from .parameters import Parameters
+
 
 class ClusterAbundance:
     """The class that calculates the predicted number counts of galaxy clusters.
@@ -40,6 +42,7 @@ class ClusterAbundance:
         super().__init__()
         self.cosmo = cosmo
         self.halo_mass_function = halo_mass_function
+        self.parameters = Parameters({})
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0

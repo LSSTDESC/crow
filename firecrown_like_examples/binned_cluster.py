@@ -11,6 +11,8 @@ from firecrown.likelihood.source import SourceSystematic
 from firecrown.likelihood.statistic import Statistic
 from firecrown.models.cluster import ClusterData, ClusterProperty, SaccBin
 
+from .updatable_wrapper import UpdatableClusterObjects
+
 
 class BinnedCluster(Statistic):
     """A statistic representing clusters in a z, mass bin."""
@@ -42,7 +44,18 @@ class BinnedCluster(Statistic):
         self.updatable_parameters.init_all_parameters(self.cluster_recipe)
 
     def _create_updatable_parameters(self):
-        raise NotImplementedError("method _create_updatable_parameters missing!")
+        cluster_objects_configs = []
+        for name in ("cluster_theory", "mass_distribution", "completeness", "purity"):
+            _rec_attr = getattr(self.cluster_recipe, name)
+            if _rec_attr is not None:
+                cluster_objects_configs.append(
+                    {
+                        "recipe_attribute_name": name,
+                        "parameters": _rec_attr.parameters.keys(),
+                        "has_cosmo": hasattr(_rec_attr, "cosmo"),
+                    }
+                )
+        self.updatable_parameters = UpdatableClusterObjects(cluster_objects_configs)
 
     def _read(self, cluster_data: ClusterData) -> None:
         sacc_adapter = cluster_data

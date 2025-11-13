@@ -33,12 +33,12 @@ def get_base_murata_binned_spec_z(completeness) -> MurataBinnedSpecZRecipe:
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
     )
-    cluster_recipe.mass_distribution.mu_p0 = 3.0
-    cluster_recipe.mass_distribution.mu_p1 = 0.86
-    cluster_recipe.mass_distribution.mu_p2 = 0.0
-    cluster_recipe.mass_distribution.sigma_p0 = 3.0
-    cluster_recipe.mass_distribution.sigma_p1 = 0.7
-    cluster_recipe.mass_distribution.sigma_p2 = 0.0
+    cluster_recipe.mass_distribution.parameters["mu0"] = 3.0
+    cluster_recipe.mass_distribution.parameters["mu1"] = 0.86
+    cluster_recipe.mass_distribution.parameters["mu2"] = 0.0
+    cluster_recipe.mass_distribution.parameters["sigma0"] = 3.0
+    cluster_recipe.mass_distribution.parameters["sigma1"] = 0.7
+    cluster_recipe.mass_distribution.parameters["sigma2"] = 0.0
     return cluster_recipe
 
 
