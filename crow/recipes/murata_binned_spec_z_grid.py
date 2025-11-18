@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 from scipy.integrate import simpson
+from numba import njit
 
 from crow import ClusterShearProfile
 from crow import completeness as comp
@@ -17,6 +18,41 @@ from crow.properties import ClusterProperty
 
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
+
+
+
+@njit(fastmath=True)
+def numba_simpson(y, dx: float, axis: int = -1):
+    """Numba-compatible 1D Simpson integration for uniformly spaced data (dx constant)."""
+    # NOTE: This implementation handles both odd and even number of points
+    y = np.asarray(y)
+    N = y.shape[axis]
+    
+    # Calculate Simpson integral up to the largest odd number of points (N_simpson)
+    if N % 2 == 0:
+        N_simpson = N - 1
+        # Apply trapezoid rule to the last interval
+        result = (y.take(N - 1, axis=axis) + y.take(N - 2, axis=axis)) * dx / 2.0
+    else:
+        N_simpson = N
+        result = 0.0
+
+    # Simpson integration up to N_simpson
+    if N_simpson >= 3:
+        y_simpson = y.take(np.arange(N_simpson), axis=axis)
+        
+        s = y_simpson.take(np.arange(1, N_simpson - 1, 2), axis=axis).sum() * 4.0
+        s += y_simpson.take(np.arange(2, N_simpson - 1, 2), axis=axis).sum() * 2.0
+        s += y_simpson.take(0, axis=axis)
+        s += y_simpson.take(N_simpson - 1, axis=axis)
+        result += s * dx / 3.0
+    elif N_simpson == 2: # Only 2 points, use trapezoid rule instead of simpson
+        result += (y.take(0, axis=axis) + y.take(1, axis=axis)) * dx / 2.0
+    elif N_simpson == 1:
+        result += 0.0 # Integral of a single point is zero
+        
+    return result
+
 
 
 class MurataBinnedSpecZRecipeGrid:
@@ -103,7 +139,10 @@ class MurataBinnedSpecZRecipeGrid:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ):
-        return 1.0
+        nz = len(z)
+        nm = len(log_mass)
+
+        return np.ones((nz, nm), dtype=np.float64)
 
     def _incomplete_distribution(
         self,
@@ -126,7 +165,9 @@ class MurataBinnedSpecZRecipeGrid:
         log_proxy: tuple[float, float],
         z: npt.NDArray[np.float64],
     ):
-        return 1.0
+        nz = len(z)
+        nprox = len(self.log_proxy_points)
+        return np.ones((nprox, nz), dtype=np.float64)
 
     def _inpure_distribution(
         self,
@@ -147,62 +188,52 @@ class MurataBinnedSpecZRecipeGrid:
         """Compute HMF × comoving volume and store in the class."""
         nz, nm = len(self.z_points), len(self.log_mass_points)
         grid_2d = np.zeros((nz, nm))
-    
-        for i, z_i in enumerate(self.z_points):
-            vol = self.cluster_theory.comoving_volume(np.array([z_i]), sky_area)[0]
-            for j, log_mass_j in enumerate(self.log_mass_points):
-                grid_2d[i, j] = vol * self.cluster_theory.mass_function(np.array([log_mass_j]), np.array([z_i]))
-        
+        vol = self.cluster_theory.comoving_volume(np.array(self.z_points), sky_area)
+        mass_function_2d = self.cluster_theory.mass_function(self.log_mass_points, self.z_points)
+        grid_2d = vol[:, np.newaxis] * mass_function_2d 
         self._hmf_grid = grid_2d
     
     
     def compute_mass_richness_grid(self):
         """Compute mass-richness grid and store in the class."""
-        n_proxy = len(self.log_proxy_points)
-        nz, nm = len(self.z_points), len(self.log_mass_points)
-        grid = np.zeros((n_proxy, nz, nm))
-    
-        for i, z_i in enumerate(self.z_points):
-            for j, log_mass_j in enumerate(self.log_mass_points):
-                for k, log_proxy_k in enumerate(self.log_proxy_points):
-                    grid[k, i, j] = self.mass_distribution.distribution(
-                        np.array([log_mass_j]), np.array([z_i]), np.array([log_proxy_k])
-                    )
-        self._mass_richness_grid = grid
+        z_grid, log_mass_grid, log_proxy_grid = np.meshgrid(
+            self.z_points, self.log_mass_points, self.log_proxy_points, indexing='ij'
+        )
+        grid_3d = self.mass_distribution.distribution(log_mass_grid, z_grid, log_proxy_grid)
+        self._mass_richness_grid = grid_3d.transpose(2, 0, 1)
     
     
     def compute_completeness_grid(self):
         """Compute completeness grid and store in the class."""
-        nz, nm = len(self.z_points), len(self.log_mass_points)
-        grid_2d = np.zeros((nz, nm))
-        for i, z_i in enumerate(self.z_points):
-            for j, log_mass_j in enumerate(self.log_mass_points):
-                grid_2d[i, j] = self.completeness_distribution(np.array([log_mass_j]), np.array([z_i]))
+        z_grid, log_mass_grid = np.meshgrid(
+            self.z_points, self.log_mass_points, indexing='ij'
+        )
+
+        grid_2d = self.completeness_distribution(log_mass_grid, z_grid)
         self._completeness_grid = grid_2d
-    
     
     def compute_purity_grid(self):
         """Compute purity grid and store in the class."""
-        nz, nr = len(self.z_points), len(self.log_proxy_points)
-        grid_2d = np.zeros((nz, nr))
-        for i, z_i in enumerate(self.z_points):
-            for k, log_proxy_k in enumerate(self.log_proxy_points):
-                grid_2d[i, k] = self.purity_distribution(np.array([log_proxy_k]), np.array([z_i]))
+        z_grid, log_proxy_grid = np.meshgrid(
+            self.z_points, self.log_proxy_points, indexing='ij'
+        )
+
+        grid_2d = self.purity_distribution(log_proxy_grid, z_grid)
         self._purity_grid = grid_2d
-    
     
     def compute_shear_grid(self, radius_center: float):
         """Compute shear grid for a specific radius and store in the class."""
         nz, nm = len(self.z_points), len(self.log_mass_points)
-        grid_2d = np.zeros((nz, nm))
-        for i, z_i in enumerate(self.z_points):
-            for j, log_mass_j in enumerate(self.log_mass_points):
-                grid_2d[i, j] = self.cluster_theory.compute_shear_profile(
-                    log_mass=np.array([log_mass_j]),
-                    z=np.array([z_i]),
+        
+        z_flat = np.repeat(self.z_points, nm)
+        log_mass_flat = np.tile(self.log_mass_points, nz)
+        grid_2d_flat = self.cluster_theory.compute_shear_profile(
+                    log_mass=log_mass_flat,
+                    z=z_flat,
                     radius_center=radius_center,
                 )
-        self._shear_grids[radius_center] = grid_2d
+        grid_2d = grid_2d_flat.reshape(nz, nm)
+        self._shear_grids[radius_center] = grid_2d 
 
     def counts_integrand_grid(self) -> np.ndarray:
         """
@@ -257,7 +288,6 @@ class MurataBinnedSpecZRecipeGrid:
         if radius_center not in self._shear_grids:
             raise RuntimeError(f"Shear grid for radius_center={radius_center} not computed. "
                                "Run compute_shear_grid(radius_center) first.")
-    
         hmf = self._hmf_grid[np.newaxis, :, :]           # (1, n_z, n_mass)
         completeness = self._completeness_grid[np.newaxis, :, :]  # (1, n_z, n_mass)
         mass_richness = self._mass_richness_grid         # (n_proxy, n_z, n_mass)
@@ -267,6 +297,7 @@ class MurataBinnedSpecZRecipeGrid:
         integrand = hmf * mass_richness * completeness * shear / purity
         return integrand
 
+   # @njit
     def recompute_all_grids(self, sky_area: float, radius_centers: list[float] | None = None):
         """Compute all necessary grids and store them in the class.
     
@@ -282,7 +313,7 @@ class MurataBinnedSpecZRecipeGrid:
         for radius in radius_centers:
             self.compute_shear_grid(radius)  
     
-
+#@njit(fastmath=True)
     def evaluate_theory_prediction_counts(
         self,
         z_edges: tuple[float, float],
@@ -330,7 +361,7 @@ class MurataBinnedSpecZRecipeGrid:
         counts = simpson(int_z, x=proxy_sub, axis=0)
     
         return counts
-
+#@njit(fastmath=True)
     def evaluate_theory_prediction_shear_profile(
         self,
         z_edges: tuple[float, float],
