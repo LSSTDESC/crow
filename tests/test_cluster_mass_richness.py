@@ -159,12 +159,12 @@ def test_cluster_distribution_properties(z: float, mass: float):
     murata_binned_relation_inpure = mass_proxy.MurataBinned(
         PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
     )
-    murata_binned_relation_inpure.mu_p0 = 3.00
-    murata_binned_relation_inpure.mu_p1 = 0.086
-    murata_binned_relation_inpure.mu_p2 = 0.01
-    murata_binned_relation_inpure.sigma_p0 = 3.0
-    murata_binned_relation_inpure.sigma_p1 = 0.07
-    murata_binned_relation_inpure.sigma_p2 = 0.01
+    murata_binned_relation_inpure.parameters["mu0"] = 3.00
+    murata_binned_relation_inpure.parameters["mu1"] = 0.086
+    murata_binned_relation_inpure.parameters["mu2"] = 0.01
+    murata_binned_relation_inpure.parameters["sigma0"] = 3.0
+    murata_binned_relation_inpure.parameters["sigma1"] = 0.07
+    murata_binned_relation_inpure.parameters["sigma2"] = 0.01
 
     mass_proxy_limits = (1.0, 5.0)
 
