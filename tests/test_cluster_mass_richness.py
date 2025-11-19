@@ -156,6 +156,16 @@ def test_cluster_distribution_properties(z: float, mass: float):
     murata_binned_relation.parameters["sigma1"] = 0.07
     murata_binned_relation.parameters["sigma2"] = 0.01
 
+    murata_binned_relation_inpure = mass_proxy.MurataBinned(
+        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
+    )
+    murata_binned_relation_inpure.mu_p0 = 3.00
+    murata_binned_relation_inpure.mu_p1 = 0.086
+    murata_binned_relation_inpure.mu_p2 = 0.01
+    murata_binned_relation_inpure.sigma_p0 = 3.0
+    murata_binned_relation_inpure.sigma_p1 = 0.07
+    murata_binned_relation_inpure.sigma_p2 = 0.01
+
     mass_proxy_limits = (1.0, 5.0)
 
     mass_array = np.atleast_1d(mass)
@@ -169,13 +179,10 @@ def test_cluster_distribution_properties(z: float, mass: float):
     assert probability >= 0, f"Probability must be non-negative, got {probability}"
 
     # Test with purity
-    murata_binned_relation_inpure = mass_proxy.MurataBinned(
-        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
-    )
     probability_inpure = murata_binned_relation_inpure.distribution(
         mass_array, z_array, mass_proxy_limits
     )
-    assert (probability > probability_inpure).all()
+    assert (probability < probability_inpure).all()
 
 
 @given(

@@ -180,12 +180,13 @@ class MurataBinned(MassRichnessGaussian):
 
     def _distribution_binned_inpure(self, log_mass, z, log_mass_proxy_limits):
         integrator = NumCosmoIntegrator(
-            relative_tolerance=1e-2,
-            absolute_tolerance=1e-6,
+            relative_tolerance=1e-6,
+            absolute_tolerance=1e-12,
         )
 
         def integration_func(int_args, extra_args):
-            log_mass_proxy = int_args[:, 0]
+            ln_mass_proxy = int_args[:, 0]
+            log_mass_proxy = ln_mass_proxy / np.log(10.0)
             return np.array(
                 [
                     self._distribution_unbinned(
@@ -197,7 +198,10 @@ class MurataBinned(MassRichnessGaussian):
             )
 
         integrator.integral_bounds = [
-            (log_mass_proxy_limits[0], log_mass_proxy_limits[1])
+            (
+                np.log(10.0) * log_mass_proxy_limits[0],
+                np.log(10.0) * log_mass_proxy_limits[1],
+            )
         ]
 
         return integrator.integrate(integration_func)
