@@ -19,42 +19,6 @@ from crow.properties import ClusterProperty
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
 
-
-
-@njit(fastmath=True)
-def numba_simpson(y, dx: float, axis: int = -1):
-    """Numba-compatible 1D Simpson integration for uniformly spaced data (dx constant)."""
-    # NOTE: This implementation handles both odd and even number of points
-    y = np.asarray(y)
-    N = y.shape[axis]
-    
-    # Calculate Simpson integral up to the largest odd number of points (N_simpson)
-    if N % 2 == 0:
-        N_simpson = N - 1
-        # Apply trapezoid rule to the last interval
-        result = (y.take(N - 1, axis=axis) + y.take(N - 2, axis=axis)) * dx / 2.0
-    else:
-        N_simpson = N
-        result = 0.0
-
-    # Simpson integration up to N_simpson
-    if N_simpson >= 3:
-        y_simpson = y.take(np.arange(N_simpson), axis=axis)
-        
-        s = y_simpson.take(np.arange(1, N_simpson - 1, 2), axis=axis).sum() * 4.0
-        s += y_simpson.take(np.arange(2, N_simpson - 1, 2), axis=axis).sum() * 2.0
-        s += y_simpson.take(0, axis=axis)
-        s += y_simpson.take(N_simpson - 1, axis=axis)
-        result += s * dx / 3.0
-    elif N_simpson == 2: # Only 2 points, use trapezoid rule instead of simpson
-        result += (y.take(0, axis=axis) + y.take(1, axis=axis)) * dx / 2.0
-    elif N_simpson == 1:
-        result += 0.0 # Integral of a single point is zero
-        
-    return result
-
-
-
 class MurataBinnedSpecZRecipeGrid:
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
@@ -98,7 +62,7 @@ class MurataBinnedSpecZRecipeGrid:
         mass_distribution,
         completeness: comp.Completeness = None,
         purity: pur.Purity = None,
-        mass_interval: tuple[float, float] = (11.0, 17.0),
+        mass_interval: tuple[float, float] = (12.0, 15.5),
         true_z_interval: tuple[float, float] = (0.01, 1.5),
         proxy_interval: tuple[float, float] = (0.0, 2.0),
         richness_points: int = 30,
@@ -120,7 +84,7 @@ class MurataBinnedSpecZRecipeGrid:
         self.log_mass_points = log_mass_points
         self.proxy_interval = proxy_interval
         
-        self.log_proxy_points = np.linspace(*self.proxy_interval, self.richness_points)  # adjust if needed
+        self.ln_proxy_points = np.linspace(self.proxy_interval[0] * np.log(10.0), self.proxy_interval[1] * np.log(10.0), self.richness_points)  # adjust if needed
         self.z_points = np.linspace(*self.true_z_interval, self.redshift_points)
         self.log_mass_points = np.linspace(*self.mass_interval, self.log_mass_points)
 
@@ -130,7 +94,7 @@ class MurataBinnedSpecZRecipeGrid:
         self._completeness_grid = None  # (n_z, n_mass)
         self._purity_grid = None        # (n_z, n_proxy)
         self._shear_grids = {}          # dict: radius_center -> (n_z, n_mass)
-        self._log_proxy_grid = self.log_proxy_points
+        self._ln_proxy_grid = self.ln_proxy_points
         self._z_grid = self.z_points
         self._log_mass_grid = self.log_mass_points
     
@@ -162,27 +126,40 @@ class MurataBinnedSpecZRecipeGrid:
 
     def _pure_distribution(
         self,
-        log_proxy: tuple[float, float],
+        ln_proxy: tuple[float, float],
         z: npt.NDArray[np.float64],
     ):
         nz = len(z)
-        nprox = len(self.log_proxy_points)
+        nprox = len(self.ln_proxy_points)
         return np.ones((nprox, nz), dtype=np.float64)
 
     def _inpure_distribution(
         self,
-        log_proxy: tuple[float, float],
+        ln_proxy: tuple[float, float],
         z: npt.NDArray[np.float64],
     ):
-        return self.purity.distribution(z, log_proxy)
+        return self.purity.distribution(z, ln_proxy)
 
     def purity_distribution(
         self,
-        log_proxy: npt.NDArray[np.float64],
+        ln_proxy: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
+        log_proxy = ln_proxy / np.log(10.0)
         return self._purity_distribution(log_proxy, z)
+
+
+    def compute_hmf_grid(self, sky_area: float):
+        """Compute HMF × comoving volume and store in the class."""
+        nz, nm = len(self.z_points), len(self.log_mass_points)
+        vol = self.cluster_theory.comoving_volume(self.z_points, sky_area)
+        z_flat= np.repeat(self.z_points, nm) 
+        log_mass_flat = np.tile(self.log_mass_points, nz)
+        hmf_flat = self.cluster_theory.mass_function(log_mass_flat, z_flat)
+        mass_function_2d = hmf_flat.reshape(nz, nm)
+        grid_2d = vol[:, np.newaxis] * mass_function_2d 
+        self._hmf_grid = grid_2d
 
     def compute_hmf_grid(self, sky_area: float):
         """Compute HMF × comoving volume and store in the class."""
@@ -196,9 +173,10 @@ class MurataBinnedSpecZRecipeGrid:
     
     def compute_mass_richness_grid(self):
         """Compute mass-richness grid and store in the class."""
-        z_grid, log_mass_grid, log_proxy_grid = np.meshgrid(
-            self.z_points, self.log_mass_points, self.log_proxy_points, indexing='ij'
+        z_grid, log_mass_grid, ln_proxy_grid = np.meshgrid(
+            self.z_points, self.log_mass_points, self.ln_proxy_points, indexing='ij'
         )
+        log_proxy_grid = ln_proxy_grid / np.log(10.0)
         grid_3d = self.mass_distribution.distribution(log_mass_grid, z_grid, log_proxy_grid)
         self._mass_richness_grid = grid_3d.transpose(2, 0, 1)
     
@@ -214,10 +192,10 @@ class MurataBinnedSpecZRecipeGrid:
     
     def compute_purity_grid(self):
         """Compute purity grid and store in the class."""
-        z_grid, log_proxy_grid = np.meshgrid(
-            self.z_points, self.log_proxy_points, indexing='ij'
+        z_grid, ln_proxy_grid = np.meshgrid(
+            self.z_points, self.ln_proxy_points, indexing='ij'
         )
-
+        log_proxy_grid = ln_proxy_grid / np.log(10.0)
         grid_2d = self.purity_distribution(log_proxy_grid, z_grid)
         self._purity_grid = grid_2d
     
@@ -347,11 +325,11 @@ class MurataBinnedSpecZRecipeGrid:
         integrand = self.counts_integrand_grid()  # (n_proxy, n_z, n_mass)
     
         z = self._z_grid
-        proxy = self._log_proxy_grid
+        proxy = self._ln_proxy_grid
         log_mass = self._log_mass_grid
     
         z_mask = (z >= z_edges[0]) & (z <= z_edges[1])
-        proxy_mask = (proxy >= mass_proxy_edges[0]) & (proxy <= mass_proxy_edges[1])
+        proxy_mask = (proxy >= mass_proxy_edges[0] * np.log(10.0)) & (proxy <= mass_proxy_edges[1] * np.log(10.0))
     
         z_sub = z[z_mask]
         proxy_sub = proxy[proxy_mask]
@@ -402,19 +380,18 @@ class MurataBinnedSpecZRecipeGrid:
         integrand = self.shear_integrand_grid(radius_center)  # (n_proxy, n_z, n_mass)
     
         z = self._z_grid
-        proxy = self._log_proxy_grid
+        proxy = self._ln_proxy_grid
         log_mass = self._log_mass_grid
     
         z_mask = (z >= z_edges[0]) & (z <= z_edges[1])
-        proxy_mask = (proxy >= mass_proxy_edges[0]) & (proxy <= mass_proxy_edges[1])
-    
+        proxy_mask = (proxy >= mass_proxy_edges[0] * np.log(10.0)) & (proxy <= mass_proxy_edges[1] * np.log(10.0))
         z_sub = z[z_mask]
         proxy_sub = proxy[proxy_mask]
         integrand_sub = integrand[np.ix_(proxy_mask, z_mask, np.arange(len(log_mass)))]
     
-        int_mass = simpson(integrand_sub, x=log_mass, axis=2)
-        int_z = simpson(int_mass, x=z_sub, axis=1)
-        deltasigma = simpson(int_z, x=proxy_sub, axis=0)
+        int_mass = simpson(integrand_sub, log_mass, axis=2)
+        int_z = simpson(int_mass, z_sub, axis=1)
+        deltasigma = simpson(int_z, proxy_sub, axis=0)
     
         return deltasigma
 
