@@ -124,7 +124,7 @@ class ClusterShearProfile(ClusterAbundance):
         return self.parameters["cluster_concentration"]
 
     @cluster_concentration.setter
-    def use_beta_s_interp(self, value):
+    def cluster_concentration(self, value):
         self.parameters["cluster_concentration"] = value
 
     @property
