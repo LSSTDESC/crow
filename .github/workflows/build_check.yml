@@ -93,12 +93,22 @@ jobs:
             echo "Version at crow/__init__.py has not been updated!"
             exit 1
           fi
+          echo "[ok] Version has changed!"
       - name: Check version update
         run: |
           if [ "$(printf "%s\n%s" "$CURRENT_VERSION" "$MAIN_VERSION" | sort -V | tail -n 1)" != "$CURRENT_VERSION" ]; then
             echo "Current version ($CURRENT_VERSION) < Main version ($MAIN_VERSION)"
             exit 1
           fi
+          echo "[ok] Version increased changed!"
+      # Add version number to PR title
+      - name : Make new title for PR
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          NEW_TITLE="${TITLE%(version:*}(version:$CURRENT_VERSION)"
+          echo "New title: $NEW_TITLE"
+          echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
 
   crow-matrix:
     name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
