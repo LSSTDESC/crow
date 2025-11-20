@@ -107,9 +107,8 @@ jobs:
         run: |
           if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
             echo "Version at crow/__init__.py has not been updated!"
-            echo "Removing version from PR title"
             # Use the GitHub API to update the PR title
-            echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
+            echo "Removing version from PR title: $NEW_TITLE"
             curl -s -X PATCH \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
@@ -124,9 +123,8 @@ jobs:
         run: |
           if [ "$(printf "%s\n%s" "$CURRENT_VERSION" "$MAIN_VERSION" | sort -V | tail -n 1)" != "$CURRENT_VERSION" ]; then
             echo "Current version ($CURRENT_VERSION) < Main version ($MAIN_VERSION)"
-            echo "Removing version from PR title"
             # Use the GitHub API to update the PR title
-            echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
+            echo "Removing version from PR title: $NEW_TITLE"
             curl -s -X PATCH \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
