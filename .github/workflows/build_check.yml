@@ -86,42 +86,67 @@ jobs:
             MAIN_VERSION="0.0.0"
           fi
           echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
-      # Compare
-      - name: Check version change
-        run: |
-          if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
-            echo "Version at crow/__init__.py has not been updated!"
-            exit 1
-          fi
-          echo "[ok] Version has changed!"
-      - name: Check version update
-        run: |
-          if [ "$(printf "%s\n%s" "$CURRENT_VERSION" "$MAIN_VERSION" | sort -V | tail -n 1)" != "$CURRENT_VERSION" ]; then
-            echo "Current version ($CURRENT_VERSION) < Main version ($MAIN_VERSION)"
-            exit 1
-          fi
-          echo "[ok] Version increased changed!"
-      # Add version number to PR title
-      - name : Make new title for PR
+      # Get PR title to be updated with version
+      - name : Get PR title and clean version number from it
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
-          NEW_TITLE="${TITLE% [version:*} [version:$CURRENT_VERSION]"
+          CLEAN_TITLE"${TITLE% [version:*}"
           echo "New title: $NEW_TITLE"
-          echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
+          echo "CLEAN_TITLE$NEW_TITLE" >> $GITHUB_ENV
       - name: Get PR number
         id: pr_number
         run: |
           # Fetch the pull request number from the GitHub context
           PR_NUMBER=$(echo $GITHUB_REF | sed 's/refs\/pull\/\([0-9]*\)\/merge/\1/')
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+      # Compare
+      - name: Check version change
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
+            echo "Version at crow/__init__.py has not been updated!"
+            echo "Removing version from PR title"
+            # Use the GitHub API to update the PR title
+            echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
+            curl -X PATCH \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"title\":\"$NEW_TITLE\"}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+            exit 1
+          fi
+          echo "[ok] Version has changed!"
+      - name: Check version update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(printf "%s\n%s" "$CURRENT_VERSION" "$MAIN_VERSION" | sort -V | tail -n 1)" != "$CURRENT_VERSION" ]; then
+            echo "Current version ($CURRENT_VERSION) < Main version ($MAIN_VERSION)"
+            echo "Removing version from PR title"
+            # Use the GitHub API to update the PR title
+            echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
+            curl -X PATCH \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"title\":\"$NEW_TITLE\"}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+            exit 1
+          fi
+          echo "[ok] Version increased changed!"
+      # Add version number to PR title
+      - name : Make new title for PR
+        run: |
+          NEW_TITLE="${CLEAN_TITLE} [version:$CURRENT_VERSION]"
+          echo "New title: $NEW_TITLE"
+          echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
       - name: Update PR title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Use the GitHub API to update the PR title
           echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
-
           curl -X PATCH \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
