@@ -23,28 +23,28 @@ def test_create_mass_kernel():
 
 def test_create_completeness_kernel():
     ck = completeness.CompletenessAguena16()
-    ck.ac_mc = 13.31
-    ck.bc_mc = 0.2025
-    ck.ac_nc = 0.38
-    ck.bc_nc = 1.2634
+    ck.parameters["a_logm_piv"] = 13.31
+    ck.parameters["b_logm_piv"] = 0.2025
+    ck.parameters["a_n"] = 0.38
+    ck.parameters["b_n"] = 1.2634
     assert ck is not None
-    assert ck.ac_mc == 13.31
-    assert ck.bc_mc == 0.2025
-    assert ck.ac_nc == 0.38
-    assert ck.bc_nc == 1.2634
+    assert ck.parameters["a_logm_piv"] == 13.31
+    assert ck.parameters["b_logm_piv"] == 0.2025
+    assert ck.parameters["a_n"] == 0.38
+    assert ck.parameters["b_n"] == 1.2634
 
 
 def test_create_purity_kernel():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
+    pk.parameters["a_n"] = 3.9193
+    pk.parameters["b_n"] = -0.3323
+    pk.parameters["a_logm_piv"] = 1.1839
+    pk.parameters["b_logm_piv"] = -0.4077
     assert pk is not None
-    assert pk.ap_nc == 3.9193
-    assert pk.bp_nc == -0.3323
-    assert pk.ap_rc == 1.1839
-    assert pk.bp_rc == -0.4077
+    assert pk.parameters["a_n"] == 3.9193
+    assert pk.parameters["b_n"] == -0.3323
+    assert pk.parameters["a_logm_piv"] == 1.1839
+    assert pk.parameters["b_logm_piv"] == -0.4077
 
 
 def test_spec_z_distribution():
@@ -60,14 +60,14 @@ def test_true_mass_distribution():
 @pytest.mark.precision_sensitive
 def test_purity_distribution():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
-    mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
+    pk.parameters["a_n"] = 3.9193
+    pk.parameters["b_n"] = -0.3323
+    pk.parameters["a_logm_piv"] = 1.1839
+    pk.parameters["b_logm_piv"] = -0.4077
+    log_mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
 
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
-    mass_proxy_limits = (1.0, 10.0)
+    log_mass_proxy_limits = (1.0, 10.0)
 
     truth = np.array(
         [
@@ -85,7 +85,7 @@ def test_purity_distribution():
         dtype=np.float64,
     )
 
-    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-5, abs=0.0)
@@ -94,13 +94,13 @@ def test_purity_distribution():
 @pytest.mark.precision_sensitive
 def test_purity_distribution_uses_mean():
     pk = purity.PurityAguena16()
-    pk.ap_nc = 3.9193
-    pk.bp_nc = -0.3323
-    pk.ap_rc = 1.1839
-    pk.bp_rc = -0.4077
+    pk.parameters["a_n"] = 3.9193
+    pk.parameters["b_n"] = -0.3323
+    pk.parameters["a_logm_piv"] = 1.1839
+    pk.parameters["b_logm_piv"] = -0.4077
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
-    mass_proxy = np.array([-1.0], dtype=np.float64)
-    mass_proxy_limits = (0.0, 2.0)
+    log_mass_proxy = np.array([-1.0], dtype=np.float64)
+    log_mass_proxy_limits = (0.0, 2.0)
 
     truth = np.array(
         [
@@ -117,7 +117,7 @@ def test_purity_distribution_uses_mean():
         ],
         dtype=np.float64,
     )
-    purity_values = pk.distribution(z, mass_proxy, mass_proxy_limits).flatten()
+    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-7, abs=0.0)
@@ -126,10 +126,10 @@ def test_purity_distribution_uses_mean():
 @pytest.mark.precision_sensitive
 def test_completeness_distribution():
     ck = completeness.CompletenessAguena16()
-    ck.ac_mc = 13.31
-    ck.bc_mc = 0.2025
-    ck.ac_nc = 0.38
-    ck.bc_nc = 1.2634
+    ck.parameters["a_logm_piv"] = 13.31
+    ck.parameters["b_logm_piv"] = 0.2025
+    ck.parameters["a_n"] = 0.38
+    ck.parameters["b_n"] = 1.2634
     mass = np.linspace(13.0, 15.0, 10, dtype=np.float64)
     z = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], dtype=np.float64)
 
@@ -157,9 +157,10 @@ def test_completeness_distribution():
 def test_purity_distribution_raises_without_limits():
     pk = purity.PurityAguena16()
     z = np.array([0.5], dtype=np.float64)
-    mass_proxy = np.array([-1.0], dtype=np.float64)
+    log_mass_proxy = np.array([-1.0], dtype=np.float64)
 
     with pytest.raises(
-        ValueError, match="mass_proxy_limits must be provided when mass_proxy == -1"
+        ValueError,
+        match="log_mass_proxy_limits must be provided when log_mass_proxy == -1",
     ):
-        pk.distribution(z=z, mass_proxy=mass_proxy, mass_proxy_limits=None)
+        pk.distribution(z=z, log_mass_proxy=log_mass_proxy, log_mass_proxy_limits=None)
