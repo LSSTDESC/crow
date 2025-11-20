@@ -110,7 +110,7 @@ jobs:
             echo "Removing version from PR title"
             # Use the GitHub API to update the PR title
             echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
-            curl -X PATCH \
+            curl -s -X PATCH \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               -d "{\"title\":\"$NEW_TITLE\"}" \
@@ -127,7 +127,7 @@ jobs:
             echo "Removing version from PR title"
             # Use the GitHub API to update the PR title
             echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
-            curl -X PATCH \
+            curl -s -X PATCH \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               -d "{\"title\":\"$NEW_TITLE\"}" \
@@ -147,7 +147,7 @@ jobs:
         run: |
           # Use the GitHub API to update the PR title
           echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
-          curl -X PATCH \
+          curl -s -X PATCH \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -d "{\"title\":\"$NEW_TITLE\"}" \
