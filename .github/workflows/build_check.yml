@@ -114,7 +114,7 @@ jobs:
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               -d "{\"title\":\"$NEW_TITLE\"}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" > /dev/null
             exit 1
           fi
           echo "[ok] Version has changed!"
@@ -131,7 +131,7 @@ jobs:
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               -d "{\"title\":\"$NEW_TITLE\"}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" > /dev/null
             exit 1
           fi
           echo "[ok] Version increased changed!"
@@ -151,7 +151,7 @@ jobs:
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -d "{\"title\":\"$NEW_TITLE\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" > /dev/null
 
 ###>>  crow-matrix:
 ###>>    name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
