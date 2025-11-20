@@ -7,6 +7,8 @@ in the cluster abundance integrand.
 import numpy as np
 import numpy.typing as npt
 
+from .parameters import Parameters
+
 
 class Completeness:
     """The completeness kernel for the numcosmo simulated survey.
@@ -27,10 +29,12 @@ class Completeness:
         raise NotImplementedError
 
 
-REDMAPPER_DEFAULT_AC_NC = 0.38
-REDMAPPER_DEFAULT_BC_NC = 1.2634
-REDMAPPER_DEFAULT_AC_MC = 13.31
-REDMAPPER_DEFAULT_BC_MC = 0.2025
+REDMAPPER_DEFAULT_PARAMETERS = {
+    "a_n": 0.38,
+    "b_n": 1.2634,
+    "a_logm_piv": 13.31,
+    "b_logm_piv": 0.2025,
+}
 
 
 class CompletenessAguena16(Completeness):
@@ -43,22 +47,17 @@ class CompletenessAguena16(Completeness):
     def __init__(
         self,
     ):
-        self.ac_nc = REDMAPPER_DEFAULT_AC_NC
-        self.bc_nc = REDMAPPER_DEFAULT_BC_NC
-        self.ac_mc = REDMAPPER_DEFAULT_AC_MC
-        self.bc_mc = REDMAPPER_DEFAULT_BC_MC
+        self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
-    def _mc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_mc = self.ac_mc
-        bc_mc = self.bc_mc
-        log_mc = ac_mc + bc_mc * (1.0 + z)
-        mc = 10.0**log_mc
-        return mc.astype(np.float64)
+    def _mpiv(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        log_mpiv = self.parameters["a_logm_piv"] + self.parameters["b_logm_piv"] * (
+            1.0 + z
+        )
+        mpiv = 10.0**log_mpiv
+        return mpiv.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        ac_nc = self.ac_nc
-        bc_nc = self.bc_nc
-        nc = ac_nc + bc_nc * (1.0 + z)
+        nc = self.parameters["a_n"] + self.parameters["b_n"] * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
 
@@ -68,9 +67,10 @@ class CompletenessAguena16(Completeness):
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the completeness contribution to the integrand."""
-        mc = self._mc(z)
         mass = 10.0**log_mass
-        nc = self._nc(z)
-        completeness = (mass / mc) ** nc / ((mass / mc) ** nc + 1.0)
+
+        mass_norm_pow = (mass / self._mpiv(z)) ** self._nc(z)
+
+        completeness = mass_norm_pow / (mass_norm_pow + 1.0)
         assert isinstance(completeness, np.ndarray)
         return completeness

@@ -11,6 +11,8 @@ import pyccl
 import pyccl.background as bkg
 from pyccl.cosmology import Cosmology
 
+from .parameters import Parameters
+
 
 class ClusterAbundance:
     """The class that calculates the predicted number counts of galaxy clusters.
@@ -40,6 +42,7 @@ class ClusterAbundance:
         super().__init__()
         self.cosmo = cosmo
         self.halo_mass_function = halo_mass_function
+        self.parameters = Parameters({})
 
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0
@@ -67,18 +70,18 @@ class ClusterAbundance:
 
     def mass_function(
         self,
-        mass: npt.NDArray[np.float64],
+        log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """The mass function at z and mass."""
         scale_factor = 1.0 / (1.0 + z)
         return_vals = []
 
-        for m, a in zip(mass.astype(float), scale_factor.astype(float)):
-            val = self._hmf_cache.get((m, a))
+        for logm, a in zip(log_mass.astype(float), scale_factor.astype(float)):
+            val = self._hmf_cache.get((logm, a))
             if val is None:
-                val = self.halo_mass_function(self.cosmo, 10**m, a)
-                self._hmf_cache[(m, a)] = val
+                val = self.halo_mass_function(self.cosmo, 10**logm, a)
+                self._hmf_cache[(logm, a)] = val
             return_vals.append(val)
 
         return np.asarray(return_vals, dtype=np.float64)
