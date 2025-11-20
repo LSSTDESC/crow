@@ -63,6 +63,7 @@ jobs:
     name: Verify code version update
     runs-on: ubuntu-latest
     steps:
+      # Get current version
       - name: Check out the code
         uses: actions/checkout@v4
       - name: Get version from current branch
@@ -70,12 +71,12 @@ jobs:
         run: |
           CURRENT_VERSION="$(grep -oP '__version__ = "\K[^"]+' crow/__init__.py)"
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+      # Get main version
       - name: Checkout the main branch to get its version
+        uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Get version from main branch
-        uses: actions/checkout@v4
         id: main_version
         run: |
           if [ "$(git show origin/main:crow/__init__.py)" == *"__version__"* ]; then
@@ -85,7 +86,7 @@ jobs:
             MAIN_VERSION="0.0.0"
           fi
           echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
-
+      # Compare
       - name: Check version change
         run: |
           if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
