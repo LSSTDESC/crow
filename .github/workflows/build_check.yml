@@ -109,6 +109,24 @@ jobs:
           NEW_TITLE="${TITLE% [version:*} [version:$CURRENT_VERSION]"
           echo "New title: $NEW_TITLE"
           echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
+      - name: Get PR number
+        id: pr_number
+        run: |
+          # Fetch the pull request number from the GitHub context
+          PR_NUMBER=$(echo $GITHUB_REF | sed 's/refs\/pull\/\([0-9]*\)\/merge/\1/')
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+      - name: Update PR title
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use the GitHub API to update the PR title
+          echo "Updating PR #$PR_NUMBER with new title: $NEW_TITLE"
+
+          curl -X PATCH \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d "{\"title\":\"$NEW_TITLE\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
 
 ###>>  crow-matrix:
 ###>>    name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
