@@ -63,7 +63,8 @@ jobs:
     name: Verify code version update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the code
+        uses: actions/checkout@v4
       - name: Get version from current branch
         id: current_version
         run: |
