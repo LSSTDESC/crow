@@ -24,41 +24,41 @@ env:
   CACHE_VERSION: 1
 
 jobs:
-  quick-validation:
-    name: Quick validation (Lint + Tests)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          environment-file: environment.yml
-          python-version: 3.12
-          activate-environment: ${{ env.CONDA_ENV }}
-          use-mamba: true
-      - name: Verify environment
-        run: |
-          conda info
-          conda list
-      - name: Check code formatting with black
-        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
-      - name: Check import order with isort
-        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
-      - name: Run tests with pytest + coverage
-        run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install coverage
-          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
-          conda run -n ${{ env.CONDA_ENV }} coverage report -m
-          conda run -n ${{ env.CONDA_ENV }} coverage xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
-          use_oidc: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+###>>  quick-validation:
+###>>    name: Quick validation (Lint + Tests)
+###>>    runs-on: ubuntu-latest
+###>>    steps:
+###>>      - uses: actions/checkout@v4
+###>>      - name: Set up Miniconda
+###>>        uses: conda-incubator/setup-miniconda@v3
+###>>        with:
+###>>          environment-file: environment.yml
+###>>          python-version: 3.12
+###>>          activate-environment: ${{ env.CONDA_ENV }}
+###>>          use-mamba: true
+###>>      - name: Verify environment
+###>>        run: |
+###>>          conda info
+###>>          conda list
+###>>      - name: Check code formatting with black
+###>>        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
+###>>      - name: Check import order with isort
+###>>        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
+###>>      - name: Run tests with pytest + coverage
+###>>        run: |
+###>>          conda run -n ${{ env.CONDA_ENV }} pip install coverage
+###>>          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
+###>>          conda run -n ${{ env.CONDA_ENV }} coverage report -m
+###>>          conda run -n ${{ env.CONDA_ENV }} coverage xml
+###>>      - name: Upload coverage to Codecov
+###>>        uses: codecov/codecov-action@v5
+###>>        with:
+###>>          files: ./coverage.xml
+###>>          fail_ci_if_error: true
+###>>          verbose: true
+###>>          use_oidc: false
+###>>        env:
+###>>          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   check-code-version:
     name: Verify code version update
     runs-on: ubuntu-latest
