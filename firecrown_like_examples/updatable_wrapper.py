@@ -86,11 +86,11 @@ class UpdatableClusterObjects(Updatable):
         },
         {
             "recipe_attribute_name": "completeness",
-            "parameters": ["ac_nc", "bc_nc", "ac_rc", "bc_rc"],
+            "parameters": ["a_n", "b_n", "a_logm_piv", "b_logm_piv"],
         },
         {
             "recipe_attribute_name": "purity",
-            "parameters": ["ap_nc", "bp_nc", "ap_rc", "bp_rc"],
+            "parameters": ["a_n", "b_n", "a_logm_piv", "b_logm_piv"],
         },
     )
     """
@@ -107,6 +107,9 @@ class UpdatableClusterObjects(Updatable):
             - recipe_attribute_name: name of the attribute in the recipe.
             - parameters: list name of parameters that should be updatable.
             - has_cosmo (optional, defalut=False): if this attribute has an internal cosmology.
+
+            BinnedCluster has a function that automatically creates the correct
+            list according to the elements in the recipe.
         """
         super().__init__()
         self.cluster_objects_configs = cluster_objects_configs
