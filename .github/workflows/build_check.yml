@@ -73,7 +73,9 @@ jobs:
       - name: Checkout the main branch to get its version
         with:
           ref: main
+
       - name: Get version from main branch
+        uses: actions/checkout@v4
         id: main_version
         run: |
           if [ "$(git show origin/main:crow/__init__.py)" == *"__version__"* ]; then
@@ -83,6 +85,7 @@ jobs:
             MAIN_VERSION="0.0.0"
           fi
           echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
+
       - name: Check version change
         run: |
           if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
