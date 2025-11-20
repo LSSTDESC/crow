@@ -91,9 +91,9 @@ jobs:
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
-          CLEAN_TITLE"${TITLE% [version:*}"
+          NEW_TITLE="${TITLE% [version:*}"
           echo "New title: $NEW_TITLE"
-          echo "CLEAN_TITLE$NEW_TITLE" >> $GITHUB_ENV
+          echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
       - name: Get PR number
         id: pr_number
         run: |
@@ -138,7 +138,7 @@ jobs:
       # Add version number to PR title
       - name : Make new title for PR
         run: |
-          NEW_TITLE="${CLEAN_TITLE} [version:$CURRENT_VERSION]"
+          NEW_TITLE="${NEW_TITLE} [version:$CURRENT_VERSION]"
           echo "New title: $NEW_TITLE"
           echo "NEW_TITLE=$NEW_TITLE" >> $GITHUB_ENV
       - name: Update PR title
