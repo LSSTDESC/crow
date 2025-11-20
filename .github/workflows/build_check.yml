@@ -79,7 +79,7 @@ jobs:
       - name: Get version from main branch
         id: main_version
         run: |
-          if [ "$(git show origin/main:crow/__init__.py)" == *"__version__"* ]; then
+          if [[ "$(git show origin/main:crow/__init__.py)" == *"__version__"* ]]; then
             MAIN_VERSION="$(grep -oP '__version__ = "\K[^"]+' crow/__init__.py)"
           else
             echo "No version found at main, assuming version 0.0.0"
