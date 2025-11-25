@@ -71,15 +71,15 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._hmf_grid:
             # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
+            n_m = len(self.log_mass_grid)
+            n_z = len(z)
             # quantities
             hmf_flat = self.cluster_theory.mass_function(
                 # flatten arrays to vectorize function
-                np.tile(self.log_mass_grid, nz),
-                np.repeat(z, nm),
+                np.tile(self.log_mass_grid, n_z),
+                np.repeat(z, n_m),
             )
-            mass_function_2d = hmf_flat.reshape(nz, nm)
+            mass_function_2d = hmf_flat.reshape(n_z, n_m)
             vol = self.cluster_theory.comoving_volume(z, sky_area)
             # assign
             self._hmf_grid[key] = vol[:, np.newaxis] * mass_function_2d
@@ -93,17 +93,17 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._mass_richness_grid:
             # sizes
-            nz = len(z)
-            nm = len(self.log_mass_grid)
-            nproxy = len(log_proxy)
+            n_z = len(z)
+            n_m = len(self.log_mass_grid)
+            n_p = len(log_proxy)
             # quantities
             grid_3d_flat = self.mass_distribution._distribution_unbinned(
                 # flatten arrays to vectorize function
-                np.tile(np.repeat(self.log_mass_grid, nz), nproxy),
-                np.tile(z, nm * nproxy),
-                np.repeat(log_proxy, nz * nm),
+                np.tile(np.repeat(self.log_mass_grid, n_z), n_p),
+                np.tile(z, n_m * n_p),
+                np.repeat(log_proxy, n_z * n_m),
             )
-            grid_3d_temp = grid_3d_flat.reshape(nproxy, nm, nz)
+            grid_3d_temp = grid_3d_flat.reshape(n_p, n_m, n_z)
             # assign
             self._mass_richness_grid[key] = grid_3d_temp.transpose(0, 2, 1)
 
@@ -114,17 +114,17 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._completeness_grid:
             # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
+            n_m = len(self.log_mass_grid)
+            n_z = len(z)
             # flatten arrays
-            z_flat = np.repeat(z, nm)
-            log_mass_flat = np.tile(self.log_mass_grid, nz)
+            z_flat = np.repeat(z, n_m)
+            log_mass_flat = np.tile(self.log_mass_grid, n_z)
             # quantities
             if self.completeness is None:
-                comp2d = np.ones((nz, nm), dtype=np.float64)
+                comp2d = np.ones((n_z, n_m), dtype=np.float64)
             else:
                 comp2d = self.completeness_distribution(log_mass_flat, z_flat).reshape(
-                    nz, nm
+                    n_z, n_m
                 )
 
             # assign
@@ -139,14 +139,14 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._purity_grid:
             # sizes
-            nz = len(z)
-            nproxy = len(log_proxy)
+            n_z = len(z)
+            n_p = len(log_proxy)
             # flatten arrays
-            z_flat = np.repeat(z, nproxy)
-            log_proxy_flat = np.tile(log_proxy, nz)
+            z_flat = np.repeat(z, n_p)
+            log_proxy_flat = np.tile(log_proxy, n_z)
             # quantities
             if self.mass_distribution.purity is None:
-                pur2d = np.ones((nz, nproxy), dtype=np.float64)
+                pur2d = np.ones((n_p, n_z), dtype=np.float64)
             else:
                 pur2d = self.mass_distribution.purity.distribution(
                     z_flat, log_proxy_flat
@@ -161,17 +161,17 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._shear_grids:
             # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
+            n_m = len(self.log_mass_grid)
+            n_z = len(z)
             # quantities
             grid_2d_flat = self.cluster_theory.compute_shear_profile(
                 # flatten arrays to vectorize function
-                log_mass=np.tile(self.log_mass_grid, nz),
-                z=np.repeat(z, nm),
+                log_mass=np.tile(self.log_mass_grid, n_z),
+                z=np.repeat(z, n_m),
                 radius_center=radius_center,
             )
             # assign
-            self._shear_grids[key] = grid_2d_flat.reshape(nz, nm)
+            self._shear_grids[key] = grid_2d_flat.reshape(n_z, n_m)
 
         return self._shear_grids[key]
 
