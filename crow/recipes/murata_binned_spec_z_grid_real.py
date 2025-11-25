@@ -113,18 +113,11 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         """Compute completeness grid and store in the class."""
 
         if key not in self._completeness_grid:
-            # sizes
-            n_m = len(self.log_mass_grid)
-            n_z = len(z)
-            # flatten arrays
-            z_flat = np.repeat(z, n_m)
-            log_mass_flat = np.tile(self.log_mass_grid, n_z)
-            # quantities
             if self.completeness is None:
-                comp2d = np.ones((n_z, n_m), dtype=np.float64)
+                comp2d = np.ones((z.size, self.log_mass_grid.size), dtype=np.float64)
             else:
-                comp2d = self.completeness_distribution(log_mass_flat, z_flat).reshape(
-                    n_z, n_m
+                comp2d = self.completeness_distribution(
+                    self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
                 )
 
             # assign
