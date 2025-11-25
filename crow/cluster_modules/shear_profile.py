@@ -82,6 +82,11 @@ clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density
     numcosmo_miscentered_mean_surface_density
 )
 
+# To circumvent a bug in CLMM
+clmm.cosmology.ccl.CLMMCosmology.get_a_from_z = (  # pragma: no cover
+    clmm.cosmology.ccl.CLMMCosmology._get_a_from_z  # pragma: no cover
+)
+
 
 class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
@@ -118,6 +123,7 @@ class ClusterShearProfile(ClusterAbundance):
         self.use_beta_s_interp = use_beta_s_interp
         self.miscentering_parameters = None
         self.approx = None
+        self.vertorized = False
 
     @property
     def cluster_concentration(self):
@@ -261,6 +267,11 @@ class ClusterShearProfile(ClusterAbundance):
         # to be investigated
         moo.z_inf = 10.0
 
+        if self.vectorized:
+            moo._set_concentration(self._get_concentration(log_mass, z))
+            moo._set_mass(10**log_mass)
+            return self._one_halo_contribution(moo, radius_center, z)
+
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
@@ -290,7 +301,7 @@ class ClusterShearProfile(ClusterAbundance):
         beta_s_mean = None
         beta_s_square_mean = None
         if self.is_delta_sigma:
-            first_halo_right_centered = clmm_model.eval_excess_surface_density(
+            first_halo_right_centered = clmm_model._eval_excess_surface_density(
                 radius_center, redshift
             )
         else:
