@@ -71,7 +71,6 @@ def _eval_2halo_term_generic_orig(
     lsteps=500,
 ):
     """eval excess surface density from the 2-halo term (original)"""
-    print("orig")
     # pylint: disable=protected-access
     da = self.cosmo.eval_da(z_cl)
     rho_m = self.cosmo._get_rho_m(z_cl)
@@ -107,7 +106,6 @@ def _eval_2halo_term_generic_new(
     lsteps=500,
 ):
     """eval excess surface density from the 2-halo term (updated integration)"""
-    print("new")
     # pylint: disable=protected-access
     da = self.cosmo.eval_da(z_cl)
     rho_m = self.cosmo._get_rho_m(z_cl)
