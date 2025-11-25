@@ -138,19 +138,12 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         """Compute purity grid and store in the class."""
 
         if key not in self._purity_grid:
-            # sizes
-            n_z = len(z)
-            n_p = len(log_proxy)
-            # flatten arrays
-            z_flat = np.repeat(z, n_p)
-            log_proxy_flat = np.tile(log_proxy, n_z)
-            # quantities
             if self.mass_distribution.purity is None:
-                pur2d = np.ones((n_p, n_z), dtype=np.float64)
+                pur2d = np.ones((log_proxy.size, z.size), dtype=np.float64)
             else:
                 pur2d = self.mass_distribution.purity.distribution(
-                    z_flat, log_proxy_flat
-                ).reshape(nz, nproxy)
+                    z[np.newaxis, :], log_proxy[:, np.newaxis]
+                )[0]
             # assign
             self._purity_grid[key] = pur2d
 
@@ -203,7 +196,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         )
         # shape: (n_z, n_mass)
         completeness_grid = self.get_completeness_grid(z_points, comp_key)
-        # shape: (n_z, n_proxy)
+        # shape: (n_proxy, n_z)
         purity_grid = self.get_purity_grid(z_points, log_proxy_points, purity_key)
 
         # output shape: (n_proxy, n_z, n_mass)
@@ -211,7 +204,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
             hmf_grid[np.newaxis, :, :]
             * mass_richness_grid
             * completeness_grid[np.newaxis, :, :]
-            / purity_grid.transpose()[:, :, np.newaxis]
+            / purity_grid[:, :, np.newaxis]
         )
 
     def _integrate_over_mass_z_proxy(
