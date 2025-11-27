@@ -105,7 +105,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "$CURRENT_VERSION" == "$MAIN_VERSION" ]; then
+          if [ "$CURRENT_VERSION" != "$MAIN_VERSION" ]; then
             echo "Version at crow/__init__.py has not been updated!"
             # Use the GitHub API to update the PR title
             echo "Removing version from PR title: $NEW_TITLE"
