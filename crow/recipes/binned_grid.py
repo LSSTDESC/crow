@@ -13,13 +13,13 @@ from crow import completeness as comp
 from crow import kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
-from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from .binned_parent import BinnedClusterRecipe
 
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
 
 
-class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
+class GridBinnedClusterRecipe(BinnedClusterRecipe):
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
     This recipe uses the Murata 2019 binned mass-richness relation and assumes
@@ -39,12 +39,12 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         log_mass_points: int = 30,
     ) -> None:
         super().__init__(
-            cluster_theory,
-            redshift_distribution,
-            mass_distribution,
-            completeness,
-            mass_interval,
-            true_z_interval,
+            cluster_theory=cluster_theory,
+            redshift_distribution=redshift_distribution,
+            mass_distribution=mass_distribution,
+            completeness=completeness,
+            mass_interval=mass_interval,
+            true_z_interval=true_z_interval,
         )
         self.log_proxy_points = log_proxy_points
         self.redshift_points = redshift_points
@@ -58,7 +58,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         self._purity_grid = {}  # (n_z, n_proxy)
         self._shear_grids = {}  # (n_z, n_mass)
 
-    def reset_grids_cache(self) -> None:
+    def setup(self) -> None:
         """Resets all internal dictionaries used for caching computed grids."""
         self._hmf_grid = {}
         self._mass_richness_grid = {}
@@ -248,7 +248,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         integrated_kernel = integral_over_proxy
         return integrated_kernel
 
-    def evaluate_theory_prediction_base(
+    def evaluate_theory_prediction_counts(
         self,
         z_edges,
         mass_proxy_edges,
