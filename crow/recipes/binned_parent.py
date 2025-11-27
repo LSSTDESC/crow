@@ -39,14 +39,6 @@ class BinnedClusterRecipe:
         self.__purity = purity
         self._setup_with_purity()
 
-    def _flat_distribution(
-        self,
-        log_mass: npt.NDArray[np.float64],
-        z: npt.NDArray[np.float64],
-    ):
-        """Returns a null (=1) contribution to the integrand."""
-        return 1.0 + 0 * log_mass * z
-
     def __init__(
         self,
         cluster_theory,
@@ -68,17 +60,11 @@ class BinnedClusterRecipe:
 
     def _setup_with_completeness(self):
         """Additional setup of class with the completeness"""
-        if self.completeness is None:
-            self.completeness_distribution = self._flat_distribution
-        else:
-            self.completeness_distribution = self.completeness.distribution
+        pass
 
     def _setup_with_purity(self):
         """Additional setup of class with the purity"""
-        if self.purity is None:
-            self.purity_distribution = self._flat_distribution
-        else:
-            self.purity_distribution = self.purity.distribution
+        pass
 
     ##############################################
     # Functions to be implemented in child classes

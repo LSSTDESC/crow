@@ -58,6 +58,28 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._purity_grid = {}  # (n_z, n_proxy)
         self._shear_grids = {}  # (n_z, n_mass)
 
+    def _flat_distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ):
+        """Returns a null (=1) contribution to the integrand."""
+        return 1.0 + 0 * log_mass * z
+
+    def _setup_with_completeness(self):
+        """Additional setup of class with the completeness"""
+        if self.completeness is None:
+            self._completeness_distribution = self._flat_distribution
+        else:
+            self._completeness_distribution = self.completeness.distribution
+
+    def _setup_with_purity(self):
+        """Additional setup of class with the purity"""
+        if self.purity is None:
+            self._purity_distribution = self._flat_distribution
+        else:
+            self._purity_distribution = self.purity.distribution
+
     def setup(self) -> None:
         """Resets all internal dictionaries used for caching computed grids."""
         self._hmf_grid = {}
@@ -113,15 +135,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """Compute completeness grid and store in the class."""
 
         if key not in self._completeness_grid:
-            if self.completeness is None:
-                comp2d = np.ones((z.size, self.log_mass_grid.size), dtype=np.float64)
-            else:
-                comp2d = self.completeness_distribution(
-                    self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
-                )
-
-            # assign
-            self._completeness_grid[key] = comp2d
+            self._completeness_grid[key] = self._completeness_distribution(
+                self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
+            )
 
         return self._completeness_grid[key]
 
@@ -131,14 +147,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """Compute purity grid and store in the class."""
 
         if key not in self._purity_grid:
-            if self.mass_distribution.purity is None:
-                pur2d = np.ones((log_proxy.size, z.size), dtype=np.float64)
-            else:
-                pur2d = self.mass_distribution.purity.distribution(
-                    z[np.newaxis, :], log_proxy[:, np.newaxis]
-                )[0]
-            # assign
-            self._purity_grid[key] = pur2d
+            self._purity_grid[key] = self._purity_distribution(
+                log_proxy[np.newaxis, :], z[:, np.newaxis]
+            )
 
         return self._purity_grid[key]
 

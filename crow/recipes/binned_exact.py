@@ -49,6 +49,13 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         self.integrator = NumCosmoIntegrator()
 
+    def _setup_with_completeness(self):
+        """Additional setup of class with the completeness"""
+        if self.completeness is None:
+            self._completeness_distribution = lambda *args: 1
+        else:
+            self._completeness_distribution = self.completeness.distribution
+
     def _setup_with_purity(self):
         """Makes mass distribution use additional integral with completeness"""
         if self.purity is None:
@@ -113,7 +120,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             prediction = (
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
-                * self.completeness_distribution(mass, z)
+                * self._completeness_distribution(mass, z)
                 * self.redshift_distribution.distribution()
                 * self._mass_distribution_distribution(mass, z, mass_proxy_limits)
             )
