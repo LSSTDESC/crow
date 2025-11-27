@@ -13,7 +13,7 @@ from firecrown.models.cluster import ClusterProperty
 # remove this line after crow becomes installable
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow import ClusterShearProfile, kernel, mass_proxy
-from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from crow.recipes.binned_exact import ExactBinnedClusterRecipe
 
 # to be moved to firecrown eventually
 from firecrown_like_examples.binned_cluster_number_counts import (
@@ -49,7 +49,7 @@ def build_likelihood(
         is_delta_sigma=True,
         use_beta_s_interp=True,
     )
-    recipe = MurataBinnedSpecZRecipe(
+    recipe = ExactBinnedClusterRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=redshift_distribution,
         mass_distribution=mass_distribution,
