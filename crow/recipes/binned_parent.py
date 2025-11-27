@@ -81,7 +81,7 @@ class BinnedClusterRecipe:
 
     def setup(self):
         """Sets up recipe before run"""
-        return NotImplementedError(
+        raise NotImplementedError(
             "This function is not implemented in the parent class"
         )
 
@@ -98,7 +98,7 @@ class BinnedClusterRecipe:
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        return NotImplementedError(
+        raise NotImplementedError(
             "This function is not implemented in the parent class"
         )
 
@@ -116,6 +116,6 @@ class BinnedClusterRecipe:
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        return NotImplementedError(
+        raise NotImplementedError(
             "This function is not implemented in the parent class"
         )
