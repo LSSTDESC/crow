@@ -7,10 +7,9 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow import ClusterShearProfile
-from crow import completeness as comp
-from crow import purity as pur
-from crow import kernel
+from crow import ClusterShearProfile, kernel
+from crow.cluster_modules.completeness_models import Completeness
+from crow.cluster_modules.purity_models import Purity
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 
@@ -32,8 +31,8 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: comp.Completeness = None,
-        purity: pur.Purity = None,
+        completeness: Completeness = None,
+        purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:

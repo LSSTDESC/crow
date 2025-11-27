@@ -12,7 +12,7 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow import ClusterAbundance, completeness, kernel, mass_proxy
+from crow import ClusterAbundance, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_parent import BinnedClusterRecipe

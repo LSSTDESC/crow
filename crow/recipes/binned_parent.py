@@ -3,8 +3,8 @@
 import numpy as np
 import numpy.typing as npt
 
-from crow import completeness as comp
-from crow import purity as pur
+from crow.cluster_modules.completeness_models import Completeness
+from crow.cluster_modules.purity_models import Purity
 from crow.properties import ClusterProperty
 
 # To run with firecrown, use this import instead
@@ -18,23 +18,23 @@ class BinnedClusterRecipe:
     """
 
     @property
-    def completeness(self) -> comp.Completeness | None:
+    def completeness(self) -> Completeness | None:
         """The completeness used to predict the cluster number count."""
         return self.__completeness
 
     @completeness.setter
-    def completeness(self, completeness: comp.Completeness) -> None:
+    def completeness(self, completeness: Completeness) -> None:
         """Update the cluster recipe with a new completeness."""
         self.__completeness = completeness
         self._setup_with_completeness()
 
     @property
-    def purity(self) -> pur.Purity | None:
+    def purity(self) -> Purity | None:
         """The purity used to predict the cluster number count."""
         return self.__purity
 
     @purity.setter
-    def purity(self, purity: pur.Purity) -> None:
+    def purity(self, purity: Purity) -> None:
         """Update the cluster recipe calculation with a new purity."""
         self.__purity = purity
         self._setup_with_purity()
@@ -52,8 +52,8 @@ class BinnedClusterRecipe:
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: comp.Completeness = None,
-        purity: pur.Purity = None,
+        completeness: Completeness = None,
+        purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:

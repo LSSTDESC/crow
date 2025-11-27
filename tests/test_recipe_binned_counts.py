@@ -12,7 +12,13 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow import ClusterAbundance, completeness, kernel, mass_proxy, purity
+from crow import (
+    ClusterAbundance,
+    completeness_models,
+    kernel,
+    mass_proxy,
+    purity_models,
+)
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_exact import ExactBinnedClusterRecipe
@@ -227,7 +233,7 @@ def test_evaluates_theory_prediction_with_completeness(
     )
 
     binned_exact_w_comp = get_base_binned_exact(
-        completeness.CompletenessAguena16(), None
+        completeness_models.CompletenessAguena16(), None
     )
     prediction_w_comp = binned_exact_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
@@ -291,7 +297,7 @@ def test_evaluates_theory_mass_distribution_with_purity(
 
     # Test with purity
     binned_exact_w_pur = ExactBinnedClusterRecipe(
-        **_kwargs, purity=purity.PurityAguena16()
+        **_kwargs, purity=purity_models.PurityAguena16()
     )
     probability_w_pur = binned_exact_w_pur._mass_distribution_distribution(
         mass_array, z_array, mass_proxy_limits
