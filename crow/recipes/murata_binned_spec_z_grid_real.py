@@ -238,7 +238,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         integrated_kernel = integral_over_proxy
         return integrated_kernel
 
-    def evaluate_theory_prediction_counts(
+    def evaluate_theory_prediction_base(
         self,
         z_edges,
         mass_proxy_edges,
@@ -267,13 +267,25 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         counts_kernel_grid = self._get_counts_kernel_grid(
             log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
         )
+        prediction = counts_kernel_grid
+        if average_on is None:
+                pass
+        else:
+            for cluster_prop in ClusterProperty:
+                include_prop = cluster_prop & average_on
+                if not include_prop:
+                    continue
+                if cluster_prop == ClusterProperty.MASS:
+                    prediction *= log_mass_points[np.newaxis, np.newaxis, :]
+                if cluster_prop == ClusterProperty.REDSHIFT:
+                    prediction *= z_points[np.newaxis, :, np.newaxis]
 
         ###########
         # integrate
         ###########
 
         counts = self._integrate_over_mass_z_proxy(
-            counts_kernel_grid, log_mass_points, z_points, log_proxy_points
+            prediction, log_mass_points, z_points, log_proxy_points
         )
         return counts
 
@@ -309,7 +321,12 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         counts_kernel_grid = self._get_counts_kernel_grid(
             log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
         )
-        # shape: (n_z, n_mass)
+        if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
+            # Raise a ValueError if the necessary flags are not present
+            raise ValueError(
+                f"Function requires {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR} "
+                f"to be set in 'average_on', but got: {average_on}"
+            )
         shear_grid = self.get_shear_grid(z_points, radius_center, shear_key)
 
         shear_kernel_grid = counts_kernel_grid * shear_grid[np.newaxis, :, :]
