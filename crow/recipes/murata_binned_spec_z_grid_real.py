@@ -71,15 +71,15 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._hmf_grid:
             # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
+            n_m = len(self.log_mass_grid)
+            n_z = len(z)
             # quantities
             hmf_flat = self.cluster_theory.mass_function(
                 # flatten arrays to vectorize function
-                np.tile(self.log_mass_grid, nz),
-                np.repeat(z, nm),
+                np.tile(self.log_mass_grid, n_z),
+                np.repeat(z, n_m),
             )
-            mass_function_2d = hmf_flat.reshape(nz, nm)
+            mass_function_2d = hmf_flat.reshape(n_z, n_m)
             vol = self.cluster_theory.comoving_volume(z, sky_area)
             # assign
             self._hmf_grid[key] = vol[:, np.newaxis] * mass_function_2d
@@ -93,17 +93,17 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._mass_richness_grid:
             # sizes
-            nz = len(z)
-            nm = len(self.log_mass_grid)
-            nproxy = len(log_proxy)
+            n_z = len(z)
+            n_m = len(self.log_mass_grid)
+            n_p = len(log_proxy)
             # quantities
             grid_3d_flat = self.mass_distribution._distribution_unbinned(
                 # flatten arrays to vectorize function
-                np.tile(np.repeat(self.log_mass_grid, nz), nproxy),
-                np.tile(z, nm * nproxy),
-                np.repeat(log_proxy, nz * nm),
+                np.tile(np.repeat(self.log_mass_grid, n_z), n_p),
+                np.tile(z, n_m * n_p),
+                np.repeat(log_proxy, n_z * n_m),
             )
-            grid_3d_temp = grid_3d_flat.reshape(nproxy, nm, nz)
+            grid_3d_temp = grid_3d_flat.reshape(n_p, n_m, n_z)
             # assign
             self._mass_richness_grid[key] = grid_3d_temp.transpose(0, 2, 1)
 
@@ -113,18 +113,11 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         """Compute completeness grid and store in the class."""
 
         if key not in self._completeness_grid:
-            # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
-            # flatten arrays
-            z_flat = np.repeat(z, nm)
-            log_mass_flat = np.tile(self.log_mass_grid, nz)
-            # quantities
             if self.completeness is None:
-                comp2d = np.ones((nz, nm), dtype=np.float64)
+                comp2d = np.ones((z.size, self.log_mass_grid.size), dtype=np.float64)
             else:
-                comp2d = self.completeness_distribution(log_mass_flat, z_flat).reshape(
-                    nz, nm
+                comp2d = self.completeness_distribution(
+                    self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
                 )
 
             # assign
@@ -138,19 +131,12 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         """Compute purity grid and store in the class."""
 
         if key not in self._purity_grid:
-            # sizes
-            nz = len(z)
-            nproxy = len(log_proxy)
-            # flatten arrays
-            z_flat = np.repeat(z, nproxy)
-            log_proxy_flat = np.tile(log_proxy, nz)
-            # quantities
             if self.mass_distribution.purity is None:
-                pur2d = np.ones((nz, nproxy), dtype=np.float64)
+                pur2d = np.ones((log_proxy.size, z.size), dtype=np.float64)
             else:
                 pur2d = self.mass_distribution.purity.distribution(
-                    z_flat, log_proxy_flat
-                ).reshape(nz, nproxy)
+                    z[np.newaxis, :], log_proxy[:, np.newaxis]
+                )[0]
             # assign
             self._purity_grid[key] = pur2d
 
@@ -161,17 +147,41 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
 
         if key not in self._shear_grids:
             # sizes
-            nm = len(self.log_mass_grid)
-            nz = len(z)
+            n_m = len(self.log_mass_grid)
+            n_z = len(z)
             # quantities
             grid_2d_flat = self.cluster_theory.compute_shear_profile(
                 # flatten arrays to vectorize function
-                log_mass=np.tile(self.log_mass_grid, nz),
-                z=np.repeat(z, nm),
+                log_mass=np.tile(self.log_mass_grid, n_z),
+                z=np.repeat(z, n_m),
                 radius_center=radius_center,
             )
             # assign
-            self._shear_grids[key] = grid_2d_flat.reshape(nz, nm)
+            self._shear_grids[key] = grid_2d_flat.reshape(n_z, n_m)
+
+        return self._shear_grids[key]
+
+    def get_shear_grid_vectorized(
+        self, z: npt.NDArray[np.float64], radius_centers, key
+    ):
+        """Compute shear grid for a specific radius and store in the class."""
+
+        if key not in self._shear_grids:
+
+            # save current vectorized config
+            _save_vec_config = self.cluster_theory.vectorized
+            # turn vectorized on
+            self.cluster_theory.vectorized = True
+            # shape (n_m, n_r, n_z)
+            grid_3d = self.cluster_theory.compute_shear_profile(
+                log_mass=self.log_mass_grid[:, None],
+                z=z,
+                radius_center=radius_centers[:, None],
+            )
+            # assign
+            self._shear_grids[key] = grid_3d.transpose(2, 0, 1)
+            # restore saved vectorized config
+            self.cluster_theory.vectorized = _save_vec_config
 
         return self._shear_grids[key]
 
@@ -203,7 +213,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
         )
         # shape: (n_z, n_mass)
         completeness_grid = self.get_completeness_grid(z_points, comp_key)
-        # shape: (n_z, n_proxy)
+        # shape: (n_proxy, n_z)
         purity_grid = self.get_purity_grid(z_points, log_proxy_points, purity_key)
 
         # output shape: (n_proxy, n_z, n_mass)
@@ -211,7 +221,7 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
             hmf_grid[np.newaxis, :, :]
             * mass_richness_grid
             * completeness_grid[np.newaxis, :, :]
-            / purity_grid.transpose()[:, :, np.newaxis]
+            / purity_grid[:, :, np.newaxis]
         )
 
     def _integrate_over_mass_z_proxy(
@@ -328,8 +338,56 @@ class MurataBinnedSpecZRecipeGrid(MurataBinnedSpecZRecipe):
                 f"to be set in 'average_on', but got: {average_on}"
             )
         shear_grid = self.get_shear_grid(z_points, radius_center, shear_key)
-
+        # shape: (n_proxy, n_z, n_mass)
         shear_kernel_grid = counts_kernel_grid * shear_grid[np.newaxis, :, :]
+
+        ###########
+        # integrate
+        ###########
+
+        shear = self._integrate_over_mass_z_proxy(
+            shear_kernel_grid, log_mass_points, z_points, log_proxy_points
+        )
+        return shear
+
+    def evaluate_theory_prediction_shear_profile_vectorized(
+        self,
+        z_edges: tuple[float, float],
+        mass_proxy_edges: tuple[float, float],
+        radius_centers: np.ndarray,
+        sky_area: float,
+        average_on: None | ClusterProperty = None,
+    ) -> float:
+        """Evaluate the theoretical prediction for the average shear profile
+        <DeltaSigma(R)> in the provided bin."""
+
+        ######################
+        # grid arrays and keys
+        ######################
+
+        log_proxy_points = np.linspace(
+            mass_proxy_edges[0], mass_proxy_edges[1], self.log_proxy_points
+        )
+        z_points = np.linspace(z_edges[0], z_edges[1], self.redshift_points)
+        log_mass_points = self.log_mass_grid
+        proxy_key = tuple(mass_proxy_edges)
+        z_key = tuple(z_edges)
+        shear_key = z_key
+
+        ########
+        # kernel
+        ########
+
+        # shape: (n_proxy, n_z, n_mass)
+        counts_kernel_grid = self._get_counts_kernel_grid(
+            log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
+        )
+        # shape: (n_z, n_mass, n_radius)
+        shear_grid = self.get_shear_grid_vectorized(z_points, radius_centers, shear_key)
+        # shape: (n_proxy, n_z, n_mass, n_radius)
+        shear_kernel_grid = (
+            counts_kernel_grid[..., np.newaxis] * shear_grid[np.newaxis, ...]
+        )
 
         ###########
         # integrate
