@@ -15,14 +15,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow import ClusterAbundance, completeness, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
-from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from crow.recipes.binned_exact import ExactBinnedClusterRecipe
 
 # from firecrown.models.cluster import ClusterProperty
 
 
-def get_base_murata_binned_spec_z(completeness) -> MurataBinnedSpecZRecipe:
+def get_base_binned_exact(completeness) -> ExactBinnedClusterRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
-    cluster_recipe = MurataBinnedSpecZRecipe(
+    cluster_recipe = ExactBinnedClusterRecipe(
         cluster_theory=ClusterAbundance(
             cosmo=pyccl.CosmologyVanillaLCDM(),
             halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
@@ -42,38 +42,34 @@ def get_base_murata_binned_spec_z(completeness) -> MurataBinnedSpecZRecipe:
     return cluster_recipe
 
 
-@pytest.fixture(name="murata_binned_spec_z")
-def fixture_murata_binned_spec_z() -> MurataBinnedSpecZRecipe:
-    return get_base_murata_binned_spec_z(None)
+@pytest.fixture(name="binned_exact")
+def fixture_binned_exact() -> ExactBinnedClusterRecipe:
+    return get_base_binned_exact(None)
 
 
-def test_murata_binned_spec_z_init(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+def test_binned_exact_init(
+    binned_exact: ExactBinnedClusterRecipe,
 ):
 
-    assert murata_binned_spec_z.mass_interval[0] == 13.0
-    assert murata_binned_spec_z.mass_interval[1] == 17.0
-    assert murata_binned_spec_z.true_z_interval[0] == 0.0
-    assert murata_binned_spec_z.true_z_interval[1] == 2.0
+    assert binned_exact.mass_interval[0] == 13.0
+    assert binned_exact.mass_interval[1] == 17.0
+    assert binned_exact.true_z_interval[0] == 0.0
+    assert binned_exact.true_z_interval[1] == 2.0
 
-    assert murata_binned_spec_z is not None
-    assert isinstance(murata_binned_spec_z, MurataBinnedSpecZRecipe)
-    assert murata_binned_spec_z.integrator is not None
-    assert isinstance(murata_binned_spec_z.integrator, NumCosmoIntegrator)
-    assert murata_binned_spec_z.redshift_distribution is not None
-    assert isinstance(
-        murata_binned_spec_z.redshift_distribution, kernel.SpectroscopicRedshift
-    )
-    assert murata_binned_spec_z.mass_distribution is not None
-    assert isinstance(murata_binned_spec_z.mass_distribution, mass_proxy.MurataBinned)
+    assert binned_exact is not None
+    assert isinstance(binned_exact, ExactBinnedClusterRecipe)
+    assert binned_exact.integrator is not None
+    assert isinstance(binned_exact.integrator, NumCosmoIntegrator)
+    assert binned_exact.redshift_distribution is not None
+    assert isinstance(binned_exact.redshift_distribution, kernel.SpectroscopicRedshift)
+    assert binned_exact.mass_distribution is not None
+    assert isinstance(binned_exact.mass_distribution, mass_proxy.MurataBinned)
 
 
 def test_get_theory_prediction_returns_value(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
-        ClusterProperty.COUNTS
-    )
+    prediction = binned_exact._get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     assert prediction is not None
     assert callable(prediction)
@@ -102,15 +98,13 @@ def test_get_theory_prediction_returns_value(
     derandomize=False,  # Keep randomization for better coverage
 )
 def test_cluster_prediction_positivity_property(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
     mass: float,
     z: float,
     sky_area: float,
 ):
     """Test that cluster predictions are always positive using hypothesis."""
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
-        ClusterProperty.COUNTS
-    )
+    prediction = binned_exact._get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     mass_array = np.array([mass])
     z_array = np.array([z])
@@ -124,14 +118,14 @@ def test_cluster_prediction_positivity_property(
 
 
 def test_get_theory_prediction_with_average_returns_value(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
     mass = np.linspace(13, 17, 2, dtype=np.float64)
     z = np.linspace(0.1, 1, 2, dtype=np.float64)
     mass_proxy_limits = (0, 5)
     sky_area = 360**2
 
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+    prediction = binned_exact._get_theory_prediction_counts(
         average_on=ClusterProperty.MASS
     )
 
@@ -144,7 +138,7 @@ def test_get_theory_prediction_with_average_returns_value(
     assert len(result) == 2
     assert np.all(result > 0)
 
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+    prediction = binned_exact._get_theory_prediction_counts(
         average_on=ClusterProperty.REDSHIFT
     )
 
@@ -157,7 +151,7 @@ def test_get_theory_prediction_with_average_returns_value(
     assert len(result) == 2
     assert np.all(result > 0)
 
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+    prediction = binned_exact._get_theory_prediction_counts(
         average_on=(ClusterProperty.REDSHIFT | ClusterProperty.MASS)
     )
 
@@ -172,9 +166,9 @@ def test_get_theory_prediction_with_average_returns_value(
 
 
 def test_get_theory_prediction_throws_with_nonimpl_average(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction_counts(
+    prediction = binned_exact._get_theory_prediction_counts(
         average_on=ClusterProperty.SHEAR
     )
 
@@ -183,12 +177,10 @@ def test_get_theory_prediction_throws_with_nonimpl_average(
 
 
 def test_get_function_to_integrate_returns_value(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
-    prediction = murata_binned_spec_z.get_theory_prediction_counts()
-    function_to_integrate = murata_binned_spec_z.get_function_to_integrate_counts(
-        prediction
-    )
+    prediction = binned_exact._get_theory_prediction_counts()
+    function_to_integrate = binned_exact._get_function_to_integrate_counts(prediction)
 
     assert function_to_integrate is not None
     assert callable(function_to_integrate)
@@ -204,18 +196,18 @@ def test_get_function_to_integrate_returns_value(
 
 
 def test_evaluates_theory_prediction_returns_value(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
     sky_area = 360**2
 
-    prediction = murata_binned_spec_z.evaluate_theory_prediction_counts(
+    prediction = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
 
     assert prediction > 0
-    prediction = murata_binned_spec_z.evaluate_theory_prediction_counts(
+    prediction = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area, ClusterProperty.REDSHIFT
     )
 
@@ -223,20 +215,18 @@ def test_evaluates_theory_prediction_returns_value(
 
 
 def test_evaluates_theory_prediction_with_completeness(
-    murata_binned_spec_z: MurataBinnedSpecZRecipe,
+    binned_exact: ExactBinnedClusterRecipe,
 ):
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
     sky_area = 360**2
 
-    prediction = murata_binned_spec_z.evaluate_theory_prediction_counts(
+    prediction = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
 
-    murata_binned_spec_z_w_comp = get_base_murata_binned_spec_z(
-        completeness.CompletenessAguena16()
-    )
-    prediction_w_comp = murata_binned_spec_z_w_comp.evaluate_theory_prediction_counts(
+    binned_exact_w_comp = get_base_binned_exact(completeness.CompletenessAguena16())
+    prediction_w_comp = binned_exact_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
 

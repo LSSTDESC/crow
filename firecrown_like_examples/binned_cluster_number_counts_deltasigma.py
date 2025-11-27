@@ -23,8 +23,8 @@ from firecrown.models.cluster import (
     DeltaSigmaData,
 )
 
-from crow.recipes.murata_binned_spec_z import (
-    MurataBinnedSpecZRecipe,
+from crow.recipes.binned_exact import (
+    ExactBinnedClusterRecipe,
 )
 
 from .binned_cluster import BinnedCluster
@@ -41,7 +41,7 @@ class BinnedClusterShearProfile(BinnedCluster):
         self,
         cluster_properties: ClusterProperty,
         survey_name: str,
-        cluster_recipe: MurataBinnedSpecZRecipe,
+        cluster_recipe: ExactBinnedClusterRecipe,
         systematics: None | list[SourceSystematic] = None,
     ):
         """Initialize this statistic.

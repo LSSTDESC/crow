@@ -1,4 +1,4 @@
-"""Module for defining the classes used in the MurataBinnedSpecZ cluster recipe."""
+"""Module for defining the classes used in the BinnedClusterRecipe cluster recipe."""
 
 # pylint: disable=duplicate-code
 from typing import Callable
@@ -14,35 +14,18 @@ from crow import kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 
+from .binned_parent import BinnedClusterRecipe
+
 # To run with firecrown, use this import instead
 # from firecrown.models.cluster import ClusterProperty
 
 
-class MurataBinnedSpecZRecipe:
+class ExactBinnedClusterRecipe(BinnedClusterRecipe):
     """Cluster recipe with Murata19 mass-richness and spec-zs.
 
     This recipe uses the Murata 2019 binned mass-richness relation and assumes
     perfectly measured spec-zs.
     """
-
-    @property
-    def completeness(self) -> comp.Completeness | None:
-        """The completeness used to predict the cluster number count."""
-        return self.__completeness
-
-    @completeness.setter
-    def completeness(self, completeness: comp.Completeness) -> None:
-        """Update the cluster abundance calculation with a new completeness."""
-        self.__completeness = completeness
-        if completeness is None:
-            self._completeness_distribution = self._complete_distribution
-        else:
-            self._completeness_distribution = self._incomplete_distribution
-
-    @property
-    def purity(self) -> comp.Completeness | None:
-        """The completeness used to predict the cluster number count."""
-        return self.mass_distribution.purity
 
     def __init__(
         self,
@@ -53,40 +36,18 @@ class MurataBinnedSpecZRecipe:
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:
+        super().__init__(
+            cluster_theory=cluster_theory,
+            redshift_distribution=redshift_distribution,
+            mass_distribution=mass_distribution,
+            completeness=completeness,
+            mass_interval=mass_interval,
+            true_z_interval=true_z_interval,
+        )
 
         self.integrator = NumCosmoIntegrator()
 
-        self.cluster_theory = cluster_theory
-        self.redshift_distribution = redshift_distribution
-        self.mass_distribution = mass_distribution
-        self.completeness = completeness
-        self.mass_interval = mass_interval
-        self.true_z_interval = true_z_interval
-
-    def _complete_distribution(
-        self,
-        log_mass: npt.NDArray[np.float64],
-        z: npt.NDArray[np.float64],
-    ):
-        return 1.0
-
-    def _incomplete_distribution(
-        self,
-        log_mass: npt.NDArray[np.float64],
-        z: npt.NDArray[np.float64],
-    ):
-        return self.completeness.distribution(log_mass, z)
-
-    def completeness_distribution(
-        self,
-        log_mass: npt.NDArray[np.float64],
-        z: npt.NDArray[np.float64],
-    ) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the completeness contribution to the integrand."""
-
-        return self._completeness_distribution(log_mass, z)
-
-    def get_theory_prediction_counts(
+    def _get_theory_prediction_counts(
         self,
         average_on: None | ClusterProperty = None,
     ) -> Callable[
@@ -129,7 +90,7 @@ class MurataBinnedSpecZRecipe:
 
         return theory_prediction
 
-    def get_function_to_integrate_counts(
+    def _get_function_to_integrate_counts(
         self,
         prediction: Callable[
             [
@@ -180,50 +141,14 @@ class MurataBinnedSpecZRecipe:
         ]
         self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
 
-        theory_prediction = self.get_theory_prediction_counts(average_on)
-        prediction_wrapper = self.get_function_to_integrate_counts(theory_prediction)
+        theory_prediction = self._get_theory_prediction_counts(average_on)
+        prediction_wrapper = self._get_function_to_integrate_counts(theory_prediction)
 
         counts = self.integrator.integrate(prediction_wrapper)
 
         return counts
 
-    def evaluate_theory_prediction_counts_grid(
-        self,
-        z_edges,
-        mass_proxy_edges,
-        sky_area: float,
-        average_on: None | ClusterProperty = None,
-        mass_p: int = 100,
-        z_p: int = 100,
-    ) -> float:
-        """Evaluate the 2D (mass, z) integral for cluster counts using Simpson integration."""
-
-        # 1. Build the tabulation grids
-        log_mass_interval = np.linspace(self.mass_interval[0], self.mass_interval[1], mass_p)
-        z_interval = np.linspace(z_edges[0], z_edges[1], z_p)
-
-        # 2. Allocate the integrand grid
-        integrand_grid = np.zeros((mass_p, z_p))
-
-        # 3. Get the theory prediction function
-        theory_prediction = self.get_theory_prediction_counts(average_on)
-
-        # 4. Fill the grid
-        for i, log_mass in enumerate(log_mass_interval):
-            for j, z in enumerate(z_interval):
-                integrand_grid[i, j] = theory_prediction(
-                    np.array([log_mass]), np.array([z]),
-                    (mass_proxy_edges[0], mass_proxy_edges[1]), sky_area
-                )
-
-        # 5. Perform 2D Simpson integration
-        # Integrate first along z, then along log_mass
-        integral_z = simpson(integrand_grid, z_interval, axis=1)
-        total_integral = simpson(integral_z, log_mass_interval)
-
-        return total_integral
-
-    def get_theory_prediction_shear_profile(
+    def _get_theory_prediction_shear_profile(
         self,
         average_on: None | ClusterProperty = None,  # pylint: disable=unused-argument
     ) -> Callable[
@@ -273,7 +198,7 @@ class MurataBinnedSpecZRecipe:
 
         return theory_prediction
 
-    def get_function_to_integrate_shear_profile(
+    def _get_function_to_integrate_shear_profile(
         self,
         prediction: Callable[
             [
@@ -332,8 +257,8 @@ class MurataBinnedSpecZRecipe:
         )
         if self.cluster_theory._beta_parameters is not None:
             self.cluster_theory.set_beta_s_interp(*z_edges)
-        theory_prediction = self.get_theory_prediction_shear_profile(average_on)
-        prediction_wrapper = self.get_function_to_integrate_shear_profile(
+        theory_prediction = self._get_theory_prediction_shear_profile(average_on)
+        prediction_wrapper = self._get_function_to_integrate_shear_profile(
             theory_prediction
         )
         deltasigma = self.integrator.integrate(prediction_wrapper)
