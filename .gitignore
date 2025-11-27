@@ -3,7 +3,6 @@
 
 # Building artifacts
 dist/
-crow/_version.py
 desc_crow.egg-info/
 
 # Coverage
