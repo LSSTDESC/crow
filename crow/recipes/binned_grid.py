@@ -88,7 +88,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._purity_grid = {}
         self._shear_grids = {}
 
-    def get_hmf_grid(self, z: npt.NDArray[np.float64], sky_area: float, key):
+    def _get_hmf_grid(self, z: npt.NDArray[np.float64], sky_area: float, key):
         """Compute HMF × comoving volume and store in the class."""
 
         if key not in self._hmf_grid:
@@ -108,7 +108,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._hmf_grid[key]
 
-    def get_mass_richness_grid(
+    def _get_mass_richness_grid(
         self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key
     ):
         """Compute mass-richness grid by vectorizing 1D inputs."""
@@ -131,7 +131,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._mass_richness_grid[key]
 
-    def get_completeness_grid(self, z: npt.NDArray[np.float64], key):
+    def _get_completeness_grid(self, z: npt.NDArray[np.float64], key):
         """Compute completeness grid and store in the class."""
 
         if key not in self._completeness_grid:
@@ -141,7 +141,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._completeness_grid[key]
 
-    def get_purity_grid(
+    def _get_purity_grid(
         self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key
     ):
         """Compute purity grid and store in the class."""
@@ -153,7 +153,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._purity_grid[key]
 
-    def get_shear_grid(self, z: npt.NDArray[np.float64], radius_center: float, key):
+    def _get_shear_grid(self, z: npt.NDArray[np.float64], radius_center: float, key):
         """Compute shear grid for a specific radius and store in the class."""
 
         if key not in self._shear_grids:
@@ -172,7 +172,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._shear_grids[key]
 
-    def get_shear_grid_vectorized(
+    def _get_shear_grid_vectorized(
         self, z: npt.NDArray[np.float64], radius_centers, key
     ):
         """Compute shear grid for a specific radius and store in the class."""
@@ -217,15 +217,15 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         #############
 
         # shape: (n_z, n_mass)
-        hmf_grid = self.get_hmf_grid(z_points, sky_area, hmf_key)
+        hmf_grid = self._get_hmf_grid(z_points, sky_area, hmf_key)
         # shape: (n_proxy, n_z, n_mass)
-        mass_richness_grid = self.get_mass_richness_grid(
+        mass_richness_grid = self._get_mass_richness_grid(
             z_points, log_proxy_points, mass_richness_key
         )
         # shape: (n_z, n_mass)
-        completeness_grid = self.get_completeness_grid(z_points, comp_key)
+        completeness_grid = self._get_completeness_grid(z_points, comp_key)
         # shape: (n_proxy, n_z)
-        purity_grid = self.get_purity_grid(z_points, log_proxy_points, purity_key)
+        purity_grid = self._get_purity_grid(z_points, log_proxy_points, purity_key)
 
         # output shape: (n_proxy, n_z, n_mass)
         return (
@@ -348,7 +348,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 f"Function requires {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR} "
                 f"to be set in 'average_on', but got: {average_on}"
             )
-        shear_grid = self.get_shear_grid(z_points, radius_center, shear_key)
+        shear_grid = self._get_shear_grid(z_points, radius_center, shear_key)
         # shape: (n_proxy, n_z, n_mass)
         shear_kernel_grid = counts_kernel_grid * shear_grid[np.newaxis, :, :]
 
@@ -394,7 +394,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
         )
         # shape: (n_z, n_mass, n_radius)
-        shear_grid = self.get_shear_grid_vectorized(z_points, radius_centers, shear_key)
+        shear_grid = self._get_shear_grid_vectorized(
+            z_points, radius_centers, shear_key
+        )
         # shape: (n_proxy, n_z, n_mass, n_radius)
         shear_kernel_grid = (
             counts_kernel_grid[..., np.newaxis] * shear_grid[np.newaxis, ...]
