@@ -61,9 +61,7 @@ def test_binned_exact_init(
     assert binned_exact.integrator is not None
     assert isinstance(binned_exact.integrator, NumCosmoIntegrator)
     assert binned_exact.redshift_distribution is not None
-    assert isinstance(
-        binned_exact.redshift_distribution, kernel.SpectroscopicRedshift
-    )
+    assert isinstance(binned_exact.redshift_distribution, kernel.SpectroscopicRedshift)
     assert binned_exact.mass_distribution is not None
     assert isinstance(binned_exact.mass_distribution, mass_proxy.MurataBinned)
 
@@ -71,9 +69,7 @@ def test_binned_exact_init(
 def test_get_theory_prediction_returns_value(
     binned_exact: ExactBinnedClusterRecipe,
 ):
-    prediction = binned_exact._get_theory_prediction_counts(
-        ClusterProperty.COUNTS
-    )
+    prediction = binned_exact._get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     assert prediction is not None
     assert callable(prediction)
@@ -108,9 +104,7 @@ def test_cluster_prediction_positivity_property(
     sky_area: float,
 ):
     """Test that cluster predictions are always positive using hypothesis."""
-    prediction = binned_exact._get_theory_prediction_counts(
-        ClusterProperty.COUNTS
-    )
+    prediction = binned_exact._get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     mass_array = np.array([mass])
     z_array = np.array([z])
@@ -186,9 +180,7 @@ def test_get_function_to_integrate_returns_value(
     binned_exact: ExactBinnedClusterRecipe,
 ):
     prediction = binned_exact._get_theory_prediction_counts()
-    function_to_integrate = binned_exact._get_function_to_integrate_counts(
-        prediction
-    )
+    function_to_integrate = binned_exact._get_function_to_integrate_counts(prediction)
 
     assert function_to_integrate is not None
     assert callable(function_to_integrate)
@@ -233,9 +225,7 @@ def test_evaluates_theory_prediction_with_completeness(
         z_edges, mass_proxy_edges, sky_area
     )
 
-    binned_exact_w_comp = get_base_binned_exact(
-        completeness.CompletenessAguena16()
-    )
+    binned_exact_w_comp = get_base_binned_exact(completeness.CompletenessAguena16())
     prediction_w_comp = binned_exact_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )

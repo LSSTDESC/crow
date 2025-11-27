@@ -49,7 +49,6 @@ class BinnedClusterRecipe:
     ):
         return self.completeness.distribution(log_mass, z)
 
-
     def __init__(
         self,
         cluster_theory,
@@ -82,7 +81,9 @@ class BinnedClusterRecipe:
 
     def setup(self):
         """Sets up recipe before run"""
-        return NotImplementedError("This function is not implemented in the parent class")
+        return NotImplementedError(
+            "This function is not implemented in the parent class"
+        )
 
     def evaluate_theory_prediction_counts(
         self,
@@ -97,7 +98,9 @@ class BinnedClusterRecipe:
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        return NotImplementedError("This function is not implemented in the parent class")
+        return NotImplementedError(
+            "This function is not implemented in the parent class"
+        )
 
     def evaluate_theory_prediction_shear_profile(
         self,
@@ -113,4 +116,6 @@ class BinnedClusterRecipe:
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        return NotImplementedError("This function is not implemented in the parent class")
+        return NotImplementedError(
+            "This function is not implemented in the parent class"
+        )

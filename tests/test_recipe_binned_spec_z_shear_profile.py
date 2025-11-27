@@ -66,10 +66,8 @@ def test_binned_exact_deltasigma_init(
 def test_get_theory_prediction_returns_value(
     binned_exact_deltasigma: ExactBinnedClusterRecipe,
 ):
-    prediction_none = (
-        binned_exact_deltasigma._get_theory_prediction_shear_profile(
-            average_on=None
-        )
+    prediction_none = binned_exact_deltasigma._get_theory_prediction_shear_profile(
+        average_on=None
     )
     prediction = binned_exact_deltasigma._get_theory_prediction_shear_profile(
         ClusterProperty.DELTASIGMA
@@ -113,9 +111,7 @@ def test_get_function_to_integrate_returns_value(
         ClusterProperty.DELTASIGMA
     )
     function_to_integrate = (
-        binned_exact_deltasigma._get_function_to_integrate_shear_profile(
-            prediction
-        )
+        binned_exact_deltasigma._get_function_to_integrate_shear_profile(prediction)
     )
 
     assert function_to_integrate is not None
@@ -132,8 +128,8 @@ def test_get_function_to_integrate_returns_value(
     assert np.all(result > 0)
 
     prediction_c = binned_exact_deltasigma._get_theory_prediction_counts()
-    function_to_integrate = (
-        binned_exact_deltasigma._get_function_to_integrate_counts(prediction_c)
+    function_to_integrate = binned_exact_deltasigma._get_function_to_integrate_counts(
+        prediction_c
     )
 
     assert function_to_integrate is not None
@@ -158,10 +154,8 @@ def test_evaluates_theory_prediction_returns_value(
     radius_center = 1.5
     average_on = ClusterProperty.DELTASIGMA
 
-    prediction = (
-        binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
-            z_edges, mass_proxy_edges, radius_center, 360**2, average_on
-        )
+    prediction = binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
+        z_edges, mass_proxy_edges, radius_center, 360**2, average_on
     )
     prediction_c = binned_exact_deltasigma.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, 360**2

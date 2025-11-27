@@ -26,7 +26,6 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
     perfectly measured spec-zs.
     """
 
-
     def __init__(
         self,
         cluster_theory,
