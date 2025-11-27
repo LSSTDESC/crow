@@ -29,6 +29,7 @@ def test_binned_init():
     redshift_distribution = kernel.SpectroscopicRedshift()
     mass_distribution = mass_proxy.MurataBinned(pivot_mass, pivot_redshift)
     completeness = None
+    purity = None
     mass_interval = (13, 17)
     true_z_interval = (0, 2)
 
@@ -37,6 +38,7 @@ def test_binned_init():
         redshift_distribution=redshift_distribution,
         mass_distribution=mass_distribution,
         completeness=completeness,
+        purity=purity,
         mass_interval=mass_interval,
         true_z_interval=true_z_interval,
     )
@@ -45,9 +47,9 @@ def test_binned_init():
     assert binned_class.redshift_distribution == redshift_distribution
     assert binned_class.mass_distribution == mass_distribution
     assert binned_class.completeness == completeness
+    assert binned_class.purity == purity
     assert binned_class.mass_interval == mass_interval
     assert binned_class.true_z_interval == true_z_interval
-    assert binned_class.purity == mass_distribution.purity
 
     np.testing.assert_raises(NotImplementedError, binned_class.setup)
     np.testing.assert_raises(

@@ -12,7 +12,7 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow import ClusterAbundance, completeness, kernel, mass_proxy
+from crow import ClusterAbundance, completeness, kernel, mass_proxy, purity
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_exact import ExactBinnedClusterRecipe
@@ -20,7 +20,7 @@ from crow.recipes.binned_exact import ExactBinnedClusterRecipe
 # from firecrown.models.cluster import ClusterProperty
 
 
-def get_base_binned_exact(completeness) -> ExactBinnedClusterRecipe:
+def get_base_binned_exact(completeness, purity) -> ExactBinnedClusterRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     cluster_recipe = ExactBinnedClusterRecipe(
         cluster_theory=ClusterAbundance(
@@ -30,6 +30,7 @@ def get_base_binned_exact(completeness) -> ExactBinnedClusterRecipe:
         redshift_distribution=kernel.SpectroscopicRedshift(),
         mass_distribution=mass_proxy.MurataBinned(pivot_mass, pivot_redshift),
         completeness=completeness,
+        purity=purity,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
     )
@@ -44,7 +45,7 @@ def get_base_binned_exact(completeness) -> ExactBinnedClusterRecipe:
 
 @pytest.fixture(name="binned_exact")
 def fixture_binned_exact() -> ExactBinnedClusterRecipe:
-    return get_base_binned_exact(None)
+    return get_base_binned_exact(None, None)
 
 
 def test_binned_exact_init(
@@ -225,9 +226,75 @@ def test_evaluates_theory_prediction_with_completeness(
         z_edges, mass_proxy_edges, sky_area
     )
 
-    binned_exact_w_comp = get_base_binned_exact(completeness.CompletenessAguena16())
+    binned_exact_w_comp = get_base_binned_exact(
+        completeness.CompletenessAguena16(), None
+    )
     prediction_w_comp = binned_exact_w_comp.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
 
     assert prediction >= prediction_w_comp
+
+
+def test_evaluates_theory_prediction_with_purity(
+    binned_exact: ExactBinnedClusterRecipe,
+):
+    ######################################
+    # Henrique, also set up the tests here
+    ######################################
+    pass
+
+
+@given(
+    z=floats(min_value=1e-15, max_value=2.0), mass=floats(min_value=7.0, max_value=26.0)
+)
+def test_evaluates_theory_mass_distribution_with_purity(
+    z: float,
+    mass: float,
+):
+
+    mass_array = np.atleast_1d(mass)
+    z_array = np.atleast_1d(z)
+    mass_proxy_limits = (1.0, 5.0)
+
+    # sets recipes
+
+    PIVOT_Z = 0.6
+    PIVOT_MASS = 14.625862906
+
+    murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
+    murata_binned_relation.parameters["mu0"] = 3.00
+    murata_binned_relation.parameters["mu1"] = 0.086
+    murata_binned_relation.parameters["mu2"] = 0.01
+    murata_binned_relation.parameters["sigma0"] = 3.0
+    murata_binned_relation.parameters["sigma1"] = 0.07
+    murata_binned_relation.parameters["sigma2"] = 0.01
+
+    _kwargs = dict(
+        cluster_theory=ClusterAbundance(
+            cosmo=pyccl.CosmologyVanillaLCDM(),
+            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        ),
+        redshift_distribution=kernel.SpectroscopicRedshift(),
+        mass_distribution=murata_binned_relation,
+        completeness=None,
+        mass_interval=(13, 17),
+        true_z_interval=(0, 2),
+    )
+
+    # Test non-negativity property
+    binned_exact = ExactBinnedClusterRecipe(**_kwargs, purity=None)
+    probability = binned_exact._mass_distribution_distribution(
+        mass_array, z_array, mass_proxy_limits
+    )
+    assert probability >= 0, f"Probability must be non-negative, got {probability}"
+
+    # Test with purity
+    binned_exact_w_pur = ExactBinnedClusterRecipe(
+        **_kwargs, purity=purity.PurityAguena16()
+    )
+    probability_w_pur = binned_exact_w_pur._mass_distribution_distribution(
+        mass_array, z_array, mass_proxy_limits
+    )
+
+    assert (probability < probability_w_pur).all()
