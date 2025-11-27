@@ -94,9 +94,7 @@ class MurataBinned(MurataModel, MassRichnessGaussian):
         log_mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_integrated_gaussian(
-            log_mass, z, log_mass_proxy_limits
-        )
+        return self.integrated_gaussian(log_mass, z, log_mass_proxy_limits)
 
 
 class MurataUnbinned(MurataModel, MassRichnessGaussian):
@@ -109,4 +107,4 @@ class MurataUnbinned(MurataModel, MassRichnessGaussian):
         log_mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution_gaussian(log_mass, z, log_mass_proxy)
+        return self.gaussian_kernel(log_mass, z, log_mass_proxy)

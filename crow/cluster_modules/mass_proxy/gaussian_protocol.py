@@ -28,7 +28,7 @@ class MassRichnessGaussian:
     ) -> npt.NDArray[np.float64]:
         """Return observed scatter corrected by redshift and mass."""
 
-    def _distribution_integrated_gaussian(
+    def integrated_gaussian(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
@@ -59,7 +59,7 @@ class MassRichnessGaussian:
         assert isinstance(return_vals, np.ndarray)
         return return_vals
 
-    def _distribution_gaussian(
+    def gaussian_kernel(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
