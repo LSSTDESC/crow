@@ -12,13 +12,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from crow import ClusterShearProfile, kernel, mass_proxy
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
-from crow.recipes.murata_binned_spec_z import MurataBinnedSpecZRecipe
+from crow.recipes.binned_exact import ExactBinnedClusterRecipe
 
 # from firecrown.models.cluster import ClusterProperty
 
 
-@pytest.fixture(name="murata_binned_spec_z_deltasigma")
-def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
+@pytest.fixture(name="binned_exact_deltasigma")
+def fixture_binned_exact_deltasigma() -> ExactBinnedClusterRecipe:
     pivot_mass, pivot_redshift = 14.625862906, 0.6
     cluster_theory = ClusterShearProfile(
         cosmo=pyccl.CosmologyVanillaLCDM(),
@@ -27,7 +27,7 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
         is_delta_sigma=True,
     )
     cluster_theory.set_beta_parameters(10.0)
-    cluster_recipe = MurataBinnedSpecZRecipe(
+    cluster_recipe = ExactBinnedClusterRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=kernel.SpectroscopicRedshift(),
         mass_distribution=mass_proxy.MurataBinned(pivot_mass, pivot_redshift),
@@ -44,37 +44,35 @@ def fixture_murata_binned_spec_z_deltasigma() -> MurataBinnedSpecZRecipe:
     return cluster_recipe
 
 
-def test_murata_binned_spec_z_deltasigma_init(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
+def test_binned_exact_deltasigma_init(
+    binned_exact_deltasigma: ExactBinnedClusterRecipe,
 ):
 
-    assert murata_binned_spec_z_deltasigma is not None
-    assert isinstance(murata_binned_spec_z_deltasigma, MurataBinnedSpecZRecipe)
-    assert murata_binned_spec_z_deltasigma.integrator is not None
-    assert isinstance(murata_binned_spec_z_deltasigma.integrator, NumCosmoIntegrator)
-    assert murata_binned_spec_z_deltasigma.redshift_distribution is not None
+    assert binned_exact_deltasigma is not None
+    assert isinstance(binned_exact_deltasigma, ExactBinnedClusterRecipe)
+    assert binned_exact_deltasigma.integrator is not None
+    assert isinstance(binned_exact_deltasigma.integrator, NumCosmoIntegrator)
+    assert binned_exact_deltasigma.redshift_distribution is not None
     assert isinstance(
-        murata_binned_spec_z_deltasigma.redshift_distribution,
+        binned_exact_deltasigma.redshift_distribution,
         kernel.SpectroscopicRedshift,
     )
-    assert murata_binned_spec_z_deltasigma.mass_distribution is not None
+    assert binned_exact_deltasigma.mass_distribution is not None
     assert isinstance(
-        murata_binned_spec_z_deltasigma.mass_distribution, mass_proxy.MurataBinned
+        binned_exact_deltasigma.mass_distribution, mass_proxy.MurataBinned
     )
 
 
 def test_get_theory_prediction_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
+    binned_exact_deltasigma: ExactBinnedClusterRecipe,
 ):
-    prediction_none = (
-        murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
-            average_on=None
-        )
+    prediction_none = binned_exact_deltasigma._get_theory_prediction_shear_profile(
+        average_on=None
     )
-    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
+    prediction = binned_exact_deltasigma._get_theory_prediction_shear_profile(
         ClusterProperty.DELTASIGMA
     )
-    prediction_c = murata_binned_spec_z_deltasigma.get_theory_prediction_counts()
+    prediction_c = binned_exact_deltasigma._get_theory_prediction_counts()
 
     assert prediction is not None
     assert prediction_c is not None
@@ -86,7 +84,7 @@ def test_get_theory_prediction_returns_value(
     mass_proxy_limits = (0.0, 5.0)
     sky_area = 360**2
     radius_center = 1.5
-    murata_binned_spec_z_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
+    binned_exact_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
     with pytest.raises(
         ValueError,
         match=f"The property should be" f" {ClusterProperty.DELTASIGMA}.",
@@ -107,15 +105,13 @@ def test_get_theory_prediction_returns_value(
 
 
 def test_get_function_to_integrate_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
+    binned_exact_deltasigma: ExactBinnedClusterRecipe,
 ):
-    prediction = murata_binned_spec_z_deltasigma.get_theory_prediction_shear_profile(
+    prediction = binned_exact_deltasigma._get_theory_prediction_shear_profile(
         ClusterProperty.DELTASIGMA
     )
     function_to_integrate = (
-        murata_binned_spec_z_deltasigma.get_function_to_integrate_shear_profile(
-            prediction
-        )
+        binned_exact_deltasigma._get_function_to_integrate_shear_profile(prediction)
     )
 
     assert function_to_integrate is not None
@@ -123,7 +119,7 @@ def test_get_function_to_integrate_returns_value(
 
     int_args = np.array([[13.0, 0.1], [17.0, 1.0]])
     extra_args = np.array([0, 5, 360**2, 1.5])
-    murata_binned_spec_z_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
+    binned_exact_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
 
     result = function_to_integrate(int_args, extra_args)
     assert isinstance(result, np.ndarray)
@@ -131,9 +127,9 @@ def test_get_function_to_integrate_returns_value(
     assert len(result) == 2
     assert np.all(result > 0)
 
-    prediction_c = murata_binned_spec_z_deltasigma.get_theory_prediction_counts()
-    function_to_integrate = (
-        murata_binned_spec_z_deltasigma.get_function_to_integrate_counts(prediction_c)
+    prediction_c = binned_exact_deltasigma._get_theory_prediction_counts()
+    function_to_integrate = binned_exact_deltasigma._get_function_to_integrate_counts(
+        prediction_c
     )
 
     assert function_to_integrate is not None
@@ -150,7 +146,7 @@ def test_get_function_to_integrate_returns_value(
 
 
 def test_evaluates_theory_prediction_returns_value(
-    murata_binned_spec_z_deltasigma: MurataBinnedSpecZRecipe,
+    binned_exact_deltasigma: ExactBinnedClusterRecipe,
 ):
 
     mass_proxy_edges = (2, 5)
@@ -158,12 +154,10 @@ def test_evaluates_theory_prediction_returns_value(
     radius_center = 1.5
     average_on = ClusterProperty.DELTASIGMA
 
-    prediction = (
-        murata_binned_spec_z_deltasigma.evaluate_theory_prediction_shear_profile(
-            z_edges, mass_proxy_edges, radius_center, 360**2, average_on
-        )
+    prediction = binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
+        z_edges, mass_proxy_edges, radius_center, 360**2, average_on
     )
-    prediction_c = murata_binned_spec_z_deltasigma.evaluate_theory_prediction_counts(
+    prediction_c = binned_exact_deltasigma.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, 360**2
     )
     assert prediction > 0
