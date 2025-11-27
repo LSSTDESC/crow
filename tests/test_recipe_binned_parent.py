@@ -12,7 +12,7 @@ from hypothesis.strategies import floats
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from crow import ClusterAbundance, kernel, mass_proxy
+from crow import ClusterAbundance, kernel, mass_proxy, purity_models
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_parent import BinnedClusterRecipe
@@ -60,3 +60,17 @@ def test_binned_init():
         binned_class.evaluate_theory_prediction_shear_profile,
         *[None] * 5,
     )
+
+    # test with purity
+    purity = purity_models.PurityAguena16()
+    binned_class = BinnedClusterRecipe(
+        cluster_theory=cluster_theory,
+        redshift_distribution=redshift_distribution,
+        mass_distribution=mass_distribution,
+        completeness=completeness,
+        purity=purity,
+        mass_interval=mass_interval,
+        true_z_interval=true_z_interval,
+    )
+
+    assert binned_class.purity == purity
