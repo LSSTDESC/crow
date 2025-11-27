@@ -78,7 +78,7 @@ class ClusterShearProfile(ClusterAbundance):
         self.use_beta_s_interp = use_beta_s_interp
         self.miscentering_parameters = None
         self.approx = None
-        self.vertorized = False
+        self.vectorized = False
 
     @property
     def cluster_concentration(self):
