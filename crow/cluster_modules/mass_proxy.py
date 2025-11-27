@@ -14,7 +14,6 @@ from scipy import special
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 from .parameters import Parameters
-from .purity import Purity
 
 
 class MassRichnessGaussian:
@@ -121,7 +120,6 @@ class MurataBinned(MassRichnessGaussian):
         self,
         pivot_log_mass: float,
         pivot_redshift: float,
-        purity: Purity = None,
     ):
         super().__init__()
         self.pivot_redshift = pivot_redshift
@@ -130,21 +128,7 @@ class MurataBinned(MassRichnessGaussian):
 
         self.parameters = Parameters({**MURATA_DEFAULT_PARAMETERS})
 
-        self.purity = purity
-
         # Verify this gets called last or first
-
-    @property
-    def purity(self):
-        return self.__purity
-
-    @purity.setter
-    def purity(self, value):
-        if value is None:
-            self._distribution = self._distribution_binned
-        else:
-            self._distribution = self._distribution_binned_inpure
-        self.__purity = value
 
     def get_ln_mass_proxy_mean(
         self,
@@ -178,34 +162,6 @@ class MurataBinned(MassRichnessGaussian):
             self.log1p_pivot_redshift,
         )
 
-    def _distribution_binned_inpure(self, log_mass, z, log_mass_proxy_limits):
-        integrator = NumCosmoIntegrator(
-            relative_tolerance=1e-6,
-            absolute_tolerance=1e-12,
-        )
-
-        def integration_func(int_args, extra_args):
-            ln_mass_proxy = int_args[:, 0]
-            log_mass_proxy = ln_mass_proxy / np.log(10.0)
-            return np.array(
-                [
-                    self._distribution_unbinned(
-                        log_mass, z, np.array([_log_mass_proxy])
-                    )
-                    / self.purity.distribution(z, np.array([_log_mass_proxy]))
-                    for _log_mass_proxy in log_mass_proxy
-                ]
-            )
-
-        integrator.integral_bounds = [
-            (
-                np.log(10.0) * log_mass_proxy_limits[0],
-                np.log(10.0) * log_mass_proxy_limits[1],
-            )
-        ]
-
-        return integrator.integrate(integration_func)
-
     def distribution(
         self,
         log_mass: npt.NDArray[np.float64],
@@ -213,7 +169,7 @@ class MurataBinned(MassRichnessGaussian):
         log_mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the mass-richness contribution to the integrand."""
-        return self._distribution(log_mass, z, log_mass_proxy_limits)
+        return self._distribution_binned(log_mass, z, log_mass_proxy_limits)
 
 
 class MurataUnbinned(MassRichnessGaussian):

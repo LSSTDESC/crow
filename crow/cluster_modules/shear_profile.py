@@ -22,7 +22,6 @@ from scipy.stats import gamma
 from crow import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-from .completeness import Completeness
 from .parameters import Parameters
 from . import _clmm_patches
 
