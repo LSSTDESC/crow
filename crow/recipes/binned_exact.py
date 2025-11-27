@@ -326,7 +326,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
     ) -> float:
         """Evaluate the theoretical shear profile using tabulated 2D Simpson integration."""
 
-        log_mass_interval = np.linspace(self.mass_interval[0], self.mass_interval[1], mass_p)
+        log_mass_interval = np.linspace(
+            self.mass_interval[0], self.mass_interval[1], mass_p
+        )
         z_interval = np.linspace(z_edges[0], z_edges[1], z_p)
 
         integrand_grid = np.zeros((mass_p, z_p))

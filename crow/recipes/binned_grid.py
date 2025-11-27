@@ -290,7 +290,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         )
         prediction = counts_kernel_grid
         if average_on is None:
-                pass
+            pass
         else:
             for cluster_prop in ClusterProperty:
                 include_prop = cluster_prop & average_on
