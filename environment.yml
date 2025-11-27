@@ -1,4 +1,4 @@
-name: crow_env
+name: crow_dev
 channels:
   - conda-forge
 dependencies:
@@ -11,5 +11,7 @@ dependencies:
   - pip >= 20.1
   - pyccl >= 2.8.0
   - pytest
+  - pytest-cov
   - python >= 3.11
+  - python-build
   - scipy >= 1.12

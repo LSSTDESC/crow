@@ -4,4 +4,7 @@ from .cluster_modules import completeness, kernel, mass_proxy, purity
 from .cluster_modules.abundance import ClusterAbundance
 from .cluster_modules.shear_profile import ClusterShearProfile
 
-__version__ = "0.1.0"
+try:
+    from ._version import version as __version__
+except ImportError:
+    __version__ = "0.0.0+unknown"
