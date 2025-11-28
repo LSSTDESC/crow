@@ -188,7 +188,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._shear_grids[key]
 
-    def _get_integ_arrs(
+    def _get_integ_arrays(
         self,
         z_edges: tuple[float, float],
         mass_proxy_edges: tuple[float, float],
@@ -211,7 +211,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def _evaluate_theory_prediction_generic(
         self,
         probe_kernel,  # must be (n_proxy, n_z, n_mass, ...)
-        integ_arrs,
+        integ_arrays,
         sky_area: float,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe using triple Simpson integration."""
@@ -220,9 +220,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ----------
         kernel : numpy.ndarray
             , shape : (n_proxy, n_z, n_mass)
-        integ_arrs["log_mass"]["points"] : numpy.ndarray
+        integ_arrays["log_mass"]["points"] : numpy.ndarray
         z_point : numpy.ndarray
-        integ_arrs["log_proxy"]["points"] : numpy.ndarray
+        integ_arrays["log_proxy"]["points"] : numpy.ndarray
 
         Returns
         -------
@@ -234,38 +234,40 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ##############################
 
         # grid keys
-        hmf_key = integ_arrs["redshift"]["key"]
-        comp_key = integ_arrs["redshift"]["key"]
-        purity_key = (integ_arrs["redshift"]["key"], integ_arrs["log_proxy"]["key"])
+        hmf_key = integ_arrays["redshift"]["key"]
+        comp_key = integ_arrays["redshift"]["key"]
+        purity_key = (integ_arrays["redshift"]["key"], integ_arrays["log_proxy"]["key"])
         mass_richness_key = (
-            integ_arrs["redshift"]["key"],
-            integ_arrs["log_proxy"]["key"],
+            integ_arrays["redshift"]["key"],
+            integ_arrays["log_proxy"]["key"],
         )
 
         # get grids #
 
         # shape: (n_z, n_mass)
         hmf_grid = self._get_hmf_grid(
-            integ_arrs["redshift"]["points"],
-            integ_arrs["log_mass"]["points"],
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_mass"]["points"],
             sky_area,
             hmf_key,
         )
         # shape: (n_proxy, n_z, n_mass)
         mass_richness_grid = self._get_mass_richness_grid(
-            integ_arrs["redshift"]["points"],
-            integ_arrs["log_mass"]["points"],
-            integ_arrs["log_proxy"]["points"],
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_mass"]["points"],
+            integ_arrays["log_proxy"]["points"],
             mass_richness_key,
         )
         # shape: (n_z, n_mass)
         completeness_grid = self._get_completeness_grid(
-            integ_arrs["redshift"]["points"], integ_arrs["log_mass"]["points"], comp_key
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_mass"]["points"],
+            comp_key,
         )
         # shape: (n_proxy, n_z)
         purity_grid = self._get_purity_grid(
-            integ_arrs["redshift"]["points"],
-            integ_arrs["log_proxy"]["points"],
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_proxy"]["points"],
             purity_key,
         )
 
@@ -294,14 +296,14 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ###########
 
         integral_over_mass = simpson(
-            y=final_kernel, x=integ_arrs["log_mass"]["points"], axis=2
+            y=final_kernel, x=integ_arrays["log_mass"]["points"], axis=2
         )
         integral_over_z = simpson(
-            y=integral_over_mass, x=integ_arrs["redshift"]["points"], axis=1
+            y=integral_over_mass, x=integ_arrays["redshift"]["points"], axis=1
         )
         integral_over_proxy = simpson(
             y=integral_over_z,
-            x=integ_arrs["log_proxy"]["points"] * np.log(10.0),
+            x=integ_arrays["log_proxy"]["points"] * np.log(10.0),
             axis=0,
         )
         integrated_probe = integral_over_proxy
@@ -320,7 +322,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # grid arrays and keys
         ######################
 
-        integ_arrs = self._get_integ_arrs(z_edges, mass_proxy_edges)
+        integ_arrays = self._get_integ_arrays(z_edges, mass_proxy_edges)
 
         ########
         # kernel
@@ -329,9 +331,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # shape: (n_proxy, n_z, n_mass)
         probe_kernel = np.ones(
             (
-                integ_arrs["log_proxy"]["points"].size,
-                integ_arrs["redshift"]["points"].size,
-                integ_arrs["log_mass"]["points"].size,
+                integ_arrays["log_proxy"]["points"].size,
+                integ_arrays["redshift"]["points"].size,
+                integ_arrays["log_mass"]["points"].size,
             )
         )
         if average_on is None:
@@ -342,11 +344,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 if not include_prop:
                     continue
                 if cluster_prop == ClusterProperty.MASS:
-                    probe_kernel *= integ_arrs["log_mass"]["points"][
+                    probe_kernel *= integ_arrays["log_mass"]["points"][
                         np.newaxis, np.newaxis, :
                     ]
                 if cluster_prop == ClusterProperty.REDSHIFT:
-                    probe_kernel *= integ_arrs["redshift"]["points"][
+                    probe_kernel *= integ_arrays["redshift"]["points"][
                         np.newaxis, :, np.newaxis
                     ]
 
@@ -356,7 +358,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         counts = self._evaluate_theory_prediction_generic(
             probe_kernel,
-            integ_arrs,
+            integ_arrays,
             sky_area,
         )
         return counts
@@ -383,8 +385,8 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # grid arrays and keys
         ######################
 
-        integ_arrs = self._get_integ_arrs(z_edges, mass_proxy_edges)
-        shear_key = integ_arrs["redshift"]["key"]
+        integ_arrays = self._get_integ_arrays(z_edges, mass_proxy_edges)
+        shear_key = integ_arrays["redshift"]["key"]
 
         ########
         # kernel
@@ -392,8 +394,8 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         # shape: (n_z, n_mass, n_radius)
         shear_grid = self._get_shear_grid(
-            integ_arrs["redshift"]["points"],
-            integ_arrs["log_mass"]["points"],
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_mass"]["points"],
             radius_centers,
             shear_key,
         )
@@ -406,7 +408,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         shear = self._evaluate_theory_prediction_generic(
             probe_kernel,
-            integ_arrs,
+            integ_arrays,
             sky_area,
         )
         return shear
