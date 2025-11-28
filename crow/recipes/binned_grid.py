@@ -122,7 +122,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             n_m = len(self.log_mass_grid)
             n_p = len(log_proxy)
             # quantities
-            grid_3d_flat = self.mass_distribution._distribution_unbinned(
+            grid_3d_flat = self.mass_distribution.distribution(
                 # flatten arrays to vectorize function
                 np.tile(np.repeat(self.log_mass_grid, n_z), n_p),
                 np.tile(z, n_m * n_p),

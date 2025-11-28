@@ -68,7 +68,7 @@ def get_base_binned_grid(
     cluster_recipe = GridBinnedClusterRecipe(
         cluster_theory=cluster_theory,
         redshift_distribution=kernel.SpectroscopicRedshift(),
-        mass_distribution=mass_proxy.MurataBinned(pivot_mass, pivot_redshift),
+        mass_distribution=mass_proxy.MurataUnbinned(pivot_mass, pivot_redshift),
         completeness=completeness,
         purity=purity,
         mass_interval=(13, 17),
@@ -137,7 +137,9 @@ def test_binned_grid_deltasigma_init(
         kernel.SpectroscopicRedshift,
     )
     assert binned_grid_deltasigma.mass_distribution is not None
-    assert isinstance(binned_grid_deltasigma.mass_distribution, mass_proxy.MurataBinned)
+    assert isinstance(
+        binned_grid_deltasigma.mass_distribution, mass_proxy.MurataUnbinned
+    )
 
 
 def test_get_theory_prediction_returns_value(
