@@ -40,10 +40,7 @@ clmm.Modeling._eval_2halo_term_generic = (  # pragma: no cover
 clmm.cosmology.ccl.CLMMCosmology.get_a_from_z = (  # pragma: no cover
     clmm.cosmology.ccl.CLMMCosmology._get_a_from_z
 )
-
-clmm.Modeling._eval_reduced_tangential_shear = (  # pragma: no cover
-    _clmm_patches._eval_reduced_tangential_shear
-)
+##############################
 
 class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
@@ -219,7 +216,7 @@ class ClusterShearProfile(ClusterAbundance):
             halo_profile_model="nfw",
         )
         moo.set_cosmo(self._clmm_cosmo)
-
+        moo.validate_input = False
         # NOTE: value set up not to break use in pyccl with firecronw
         # to be investigated
         moo.z_inf = 10.0
@@ -257,10 +254,10 @@ class ClusterShearProfile(ClusterAbundance):
             halo_profile_model="nfw",
         )
         moo.set_cosmo(self._clmm_cosmo)
-
+        moo.validate_input = False
         # NOTE: value set up not to break use in pyccl with firecronw
         # to be investigated
-        moo.z_inf = 10.0
+        moo.z_inf = np.full_like(z, 10.0)
         moo._set_concentration(self._get_concentration(log_mass, z))
         moo._set_mass(10**log_mass)
         return_vals = self._one_halo_contribution(moo, radius_center, z)
@@ -288,7 +285,7 @@ class ClusterShearProfile(ClusterAbundance):
         else:
             beta_s_mean = self.eval_beta_s_mean(redshift)
             beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
-            first_halo_right_centered = clmm_model._eval_reduced_tangential_shear(
+            first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
                 radius_center,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),

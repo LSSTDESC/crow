@@ -79,7 +79,7 @@ class PurityAguena16(Purity):
             _log_mass_proxy = (log_mass_proxy_limits[0] + log_mass_proxy_limits[1]) / 2
 
         rich_norm_pow = (
-            np.array([10**_log_mass_proxy], dtype=np.float64) / self._mpiv(z)
+            10**_log_mass_proxy / self._mpiv(z)
         ) ** self._nc(z)
 
         purity = rich_norm_pow / (rich_norm_pow + 1.0)
