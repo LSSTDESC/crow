@@ -8,10 +8,8 @@ import numpy.typing as npt
 import pyccl as ccl
 from scipy.integrate import simpson
 
-from crow import ClusterShearProfile, kernel
 from crow.cluster_modules.completeness_models import Completeness
 from crow.cluster_modules.purity_models import Purity
-from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 
 from .binned_parent import BinnedClusterRecipe
