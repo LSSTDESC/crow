@@ -151,7 +151,7 @@ def test_evaluates_theory_prediction_returns_value(
 
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
-    radius_center = 1.5
+    radius_center = np.atleast_1d(1.5)
     average_on = ClusterProperty.DELTASIGMA
 
     prediction = binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
