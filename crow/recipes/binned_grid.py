@@ -9,7 +9,8 @@ import pyccl as ccl
 from scipy.integrate import simpson
 
 from crow import ClusterShearProfile
-from crow import completeness as comp
+from crow.cluster_modules.completeness_models import Completeness
+from crow.cluster_modules.purity_models import Purity
 from crow import kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
@@ -31,7 +32,8 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: comp.Completeness = None,
+        completeness: Completeness = None,
+        purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
         log_proxy_points: int = 30,
@@ -43,6 +45,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             redshift_distribution=redshift_distribution,
             mass_distribution=mass_distribution,
             completeness=completeness,
+            purity=purity,
             mass_interval=mass_interval,
             true_z_interval=true_z_interval,
         )
@@ -147,9 +150,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """Compute purity grid and store in the class."""
 
         if key not in self._purity_grid:
-            self._purity_grid[key] = self._purity_distribution(
+            purity_yx = self._purity_distribution(
                 log_proxy[np.newaxis, :], z[:, np.newaxis]
             )
+            self._purity_grid[key] = purity_yx.T
 
         return self._purity_grid[key]
 

@@ -229,6 +229,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
+                * self._completeness_distribution(mass, z)
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
             if average_on is None:
