@@ -22,8 +22,8 @@ from scipy.stats import gamma
 from crow import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-from .parameters import Parameters
 from . import _clmm_patches
+from .parameters import Parameters
 
 ##############################
 # Monkeypatch CLMM functions #
@@ -36,6 +36,7 @@ clmm.Modeling._eval_2halo_term_generic = (  # pragma: no cover
     # _clmm_patches._eval_2halo_term_generic_new
     _clmm_patches._eval_2halo_term_generic_vec
 )
+
 
 class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
@@ -164,13 +165,33 @@ class ClusterShearProfile(ClusterAbundance):
         self.approx = approx.lower()
 
     def _beta_s_mean_exact(self, z_cl):
-        return clmm.utils.compute_beta_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+        z_cl = np.asarray(z_cl)
+        if z_cl.ndim == 0:
+            return compute_beta_s_mean_from_distribution(
+                z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+            )
+        return np.array(
+            [
+                compute_beta_s_mean_from_distribution(
+                    float(z), cosmo=self._clmm_cosmo, **self._beta_parameters
+                )
+                for z in z_cl
+            ]
         )
 
     def _beta_s_square_mean_exact(self, z_cl):
-        return clmm.utils.compute_beta_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+        z_cl = np.asarray(z_cl)
+        if z_cl.ndim == 0:
+            return compute_beta_s_square_mean_from_distribution(
+                z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+            )
+        return np.array(
+            [
+                compute_beta_s_square_mean_from_distribution(
+                    float(z), cosmo=self._clmm_cosmo, **self._beta_parameters
+                )
+                for z in z_cl
+            ]
         )
 
     def set_beta_s_interp(self, z_min, z_max, n_intep=3):

@@ -8,12 +8,12 @@ import numpy.typing as npt
 import pyccl as ccl
 from scipy.integrate import simpson
 
-from crow import ClusterShearProfile
+from crow import ClusterShearProfile, kernel
 from crow.cluster_modules.completeness_models import Completeness
 from crow.cluster_modules.purity_models import Purity
-from crow import kernel
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
+
 from .binned_parent import BinnedClusterRecipe
 
 # To run with firecrown, use this import instead
@@ -157,9 +157,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._purity_grid[key]
 
-    def _get_shear_grid(
-        self, z: npt.NDArray[np.float64], radius_centers, key
-    ):
+    def _get_shear_grid(self, z: npt.NDArray[np.float64], radius_centers, key):
         """Compute shear grid for a specific radius and store in the class."""
 
         if key not in self._shear_grids:
@@ -327,9 +325,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 f"to be set in 'average_on', but got: {average_on}"
             )
         # shape: (n_z, n_mass, n_radius)
-        shear_grid = self._get_shear_grid(
-            z_points, radius_centers, shear_key
-        )
+        shear_grid = self._get_shear_grid(z_points, radius_centers, shear_key)
         # shape: (n_proxy, n_z, n_mass, n_radius)
         shear_kernel_grid = (
             counts_kernel_grid[..., np.newaxis] * shear_grid[np.newaxis, ...]

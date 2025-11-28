@@ -1,8 +1,7 @@
 import numpy as np
-
+from scipy.integrate import quad, simpson
 from scipy.interpolate import splev, splrep
 from scipy.special import gamma, gammainc, jv
-from scipy.integrate import quad, simpson
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
