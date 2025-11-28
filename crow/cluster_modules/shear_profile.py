@@ -36,14 +36,6 @@ clmm.Modeling._eval_2halo_term_generic = (  # pragma: no cover
     # _clmm_patches._eval_2halo_term_generic_new
     _clmm_patches._eval_2halo_term_generic_vec
 )
-# To circumvent a bug in CLMM
-clmm.cosmology.ccl.CLMMCosmology.get_a_from_z = (  # pragma: no cover
-    clmm.cosmology.ccl.CLMMCosmology._get_a_from_z
-)
-
-clmm.Modeling._eval_reduced_tangential_shear = (  # pragma: no cover
-    _clmm_patches._eval_reduced_tangential_shear
-)
 
 class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
@@ -71,7 +63,7 @@ class ClusterShearProfile(ClusterAbundance):
         self.two_halo_term = two_halo_term
         self.boost_factor = boost_factor
 
-        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo)
+        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo, validate_input=False)
 
         self._beta_parameters = None
         self._beta_s_mean_interp = None
@@ -217,6 +209,7 @@ class ClusterShearProfile(ClusterAbundance):
             massdef=mass_type,
             delta_mdef=mass_def.Delta,
             halo_profile_model="nfw",
+            validate_input=False,
         )
         moo.set_cosmo(self._clmm_cosmo)
 
@@ -255,6 +248,7 @@ class ClusterShearProfile(ClusterAbundance):
             massdef=mass_type,
             delta_mdef=mass_def.Delta,
             halo_profile_model="nfw",
+            validate_input=False,
         )
         moo.set_cosmo(self._clmm_cosmo)
 
@@ -282,13 +276,13 @@ class ClusterShearProfile(ClusterAbundance):
         beta_s_mean = None
         beta_s_square_mean = None
         if self.is_delta_sigma:
-            first_halo_right_centered = clmm_model._eval_excess_surface_density(
+            first_halo_right_centered = clmm_model.eval_excess_surface_density(
                 radius_center, redshift
             )
         else:
             beta_s_mean = self.eval_beta_s_mean(redshift)
             beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
-            first_halo_right_centered = clmm_model._eval_reduced_tangential_shear(
+            first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
                 radius_center,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),
@@ -314,7 +308,7 @@ class ClusterShearProfile(ClusterAbundance):
         if self.is_delta_sigma == False:
             raise Exception("Two halo contribution for gt is not suported yet.")
 
-        second_halo_right_centered = clmm_model._eval_excess_surface_density_2h(
+        second_halo_right_centered = clmm_model.eval_excess_surface_density_2h(
             np.atleast_1d(radius_center), redshift
         )
 
