@@ -58,7 +58,7 @@ def numcosmo_miscentered_mean_surface_density(  # pragma: no cover
     return mean_surface_density
 
 
-def _eval_2halo_term_generic_orig(
+def _eval_2halo_term_generic_orig(  # pragma: no cover
     self,
     sph_harm_ord,
     r_proj,
@@ -89,7 +89,7 @@ def _eval_2halo_term_generic_orig(
     return halobias * kernel * rho_m / (2 * np.pi * (1 + z_cl) ** 3 * da**2)
 
 
-def _eval_2halo_term_generic_new(
+def _eval_2halo_term_generic_new(  # pragma: no cover
     ####################################################################################
     # NOTE: This function is just a small optimization of the one implemented on CLMM  #
     # here just to benchmark the difference due the restructuration of the integration #
@@ -129,7 +129,7 @@ def _eval_2halo_term_generic_new(
     return [halobias * kernel * rho_m / (2 * np.pi * (1 + z_cl) ** 3 * da**2)]
 
 
-def _eval_2halo_term_generic_vec(
+def _eval_2halo_term_generic_vec(  # pragma: no cover
     self,
     sph_harm_ord,
     r_proj,

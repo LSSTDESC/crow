@@ -241,3 +241,43 @@ def test_shear_profile_miscentering(
         miscentering_frac,
         pdf=gaussian_pdf,
     )
+
+
+def test_shear_profile_vectorized_with_twoh_boost(cluster_deltasigma_profile):
+    """Test the vectorized shear profile including two-halo term and boost factor."""
+    cosmo = pyccl.CosmologyVanillaLCDM()
+    cluster = cluster_deltasigma_profile
+    cluster.cosmo = cosmo
+
+    # Set up mass and redshift arrays
+    radii = np.linspace(0.1, 2.0, 3, dtype=np.float64)[:, None]  # shape (3,1)
+    log_mass = np.linspace(14, 16, 5, dtype=np.float64)[:, None]  # shape (5,1)
+    redshifts = np.linspace(0.2, 0.8, 4, dtype=np.float64)  # shape (5,)
+
+    # Evaluate vectorized profile
+    # shape (n_m, n_r, n_z)
+    shear_vec = cluster.compute_shear_profile_vectorized(log_mass, redshifts, radii)
+
+    # Enable two-halo term
+    cluster.two_halo_term = True
+
+    shear_vec_2h = cluster.compute_shear_profile_vectorized(log_mass, redshifts, radii)
+
+    # Enable two-halo term and boost factor
+    cluster.two_halo_term = False
+    cluster.use_boost_factor = True
+
+    shear_vec_boost = cluster.compute_shear_profile_vectorized(
+        log_mass, redshifts, radii
+    )
+
+    # Sanity checks
+    assert isinstance(shear_vec, np.ndarray)
+    assert shear_vec.shape == (
+        5,
+        3,
+        4,
+    )  # one row per mass/redshift, one column per radius
+    assert np.all(shear_vec >= 0)  # positivity
+    assert np.all(shear_vec_2h >= shear_vec)
+    assert np.all(shear_vec_boost >= shear_vec)
