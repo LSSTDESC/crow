@@ -6,7 +6,6 @@ import numpy.typing as npt
 from ..parameters import Parameters
 from .gaussian_protocol import MassRichnessGaussian
 
-
 MURATA_DEFAULT_PARAMETERS = {
     "mu0": 3.0,
     "mu1": 0.8,
