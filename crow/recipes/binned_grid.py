@@ -157,46 +157,20 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._purity_grid[key]
 
-    def _get_shear_grid(self, z: npt.NDArray[np.float64], radius_center: float, key):
-        """Compute shear grid for a specific radius and store in the class."""
-
-        if key not in self._shear_grids:
-            # sizes
-            n_m = len(self.log_mass_grid)
-            n_z = len(z)
-            # quantities
-            grid_2d_flat = self.cluster_theory.compute_shear_profile(
-                # flatten arrays to vectorize function
-                log_mass=np.tile(self.log_mass_grid, n_z),
-                z=np.repeat(z, n_m),
-                radius_center=radius_center,
-            )
-            # assign
-            self._shear_grids[key] = grid_2d_flat.reshape(n_z, n_m)
-
-        return self._shear_grids[key]
-
-    def _get_shear_grid_vectorized(
+    def _get_shear_grid(
         self, z: npt.NDArray[np.float64], radius_centers, key
     ):
         """Compute shear grid for a specific radius and store in the class."""
 
         if key not in self._shear_grids:
-
-            # save current vectorized config
-            _save_vec_config = self.cluster_theory.vectorized
-            # turn vectorized on
-            self.cluster_theory.vectorized = True
             # shape (n_m, n_r, n_z)
-            grid_3d = self.cluster_theory.compute_shear_profile(
+            grid_3d = self.cluster_theory.compute_shear_profile_vectorized(
                 log_mass=self.log_mass_grid[:, None],
                 z=z,
                 radius_center=radius_centers[:, None],
             )
             # assign
             self._shear_grids[key] = grid_3d.transpose(2, 0, 1)
-            # restore saved vectorized config
-            self.cluster_theory.vectorized = _save_vec_config
 
         return self._shear_grids[key]
 
@@ -318,57 +292,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z_edges: tuple[float, float],
         mass_proxy_edges: tuple[float, float],
-        radius_center: float,
-        sky_area: float,
-        average_on: None | ClusterProperty = None,
-    ) -> float:
-        """Evaluate the theoretical prediction for the average shear profile
-        <DeltaSigma(R)> in the provided bin."""
-
-        ######################
-        # grid arrays and keys
-        ######################
-
-        log_proxy_points = np.linspace(
-            mass_proxy_edges[0], mass_proxy_edges[1], self.log_proxy_points
-        )
-        z_points = np.linspace(z_edges[0], z_edges[1], self.redshift_points)
-        log_mass_points = self.log_mass_grid
-        proxy_key = tuple(mass_proxy_edges)
-        z_key = tuple(z_edges)
-        shear_key = (z_key, radius_center)
-
-        ########
-        # kernel
-        ########
-
-        # shape: (n_proxy, n_z, n_mass)
-        counts_kernel_grid = self._get_counts_kernel_grid(
-            log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
-        )
-        if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
-            # Raise a ValueError if the necessary flags are not present
-            raise ValueError(
-                f"Function requires {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR} "
-                f"to be set in 'average_on', but got: {average_on}"
-            )
-        shear_grid = self._get_shear_grid(z_points, radius_center, shear_key)
-        # shape: (n_proxy, n_z, n_mass)
-        shear_kernel_grid = counts_kernel_grid * shear_grid[np.newaxis, :, :]
-
-        ###########
-        # integrate
-        ###########
-
-        shear = self._integrate_over_mass_z_proxy(
-            shear_kernel_grid, log_mass_points, z_points, log_proxy_points
-        )
-        return shear
-
-    def evaluate_theory_prediction_shear_profile_vectorized(
-        self,
-        z_edges: tuple[float, float],
-        mass_proxy_edges: tuple[float, float],
         radius_centers: np.ndarray,
         sky_area: float,
         average_on: None | ClusterProperty = None,
@@ -397,8 +320,14 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         counts_kernel_grid = self._get_counts_kernel_grid(
             log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
         )
+        if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
+            # Raise a ValueError if the necessary flags are not present
+            raise ValueError(
+                f"Function requires {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR} "
+                f"to be set in 'average_on', but got: {average_on}"
+            )
         # shape: (n_z, n_mass, n_radius)
-        shear_grid = self._get_shear_grid_vectorized(
+        shear_grid = self._get_shear_grid(
             z_points, radius_centers, shear_key
         )
         # shape: (n_proxy, n_z, n_mass, n_radius)

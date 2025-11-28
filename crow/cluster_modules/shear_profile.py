@@ -41,6 +41,9 @@ clmm.cosmology.ccl.CLMMCosmology.get_a_from_z = (  # pragma: no cover
     clmm.cosmology.ccl.CLMMCosmology._get_a_from_z
 )
 
+clmm.Modeling._eval_reduced_tangential_shear = (  # pragma: no cover
+    _clmm_patches._eval_reduced_tangential_shear
+)
 
 class ClusterShearProfile(ClusterAbundance):
     """The class that calculates the predicted delta sigma of galaxy clusters.
@@ -220,17 +223,6 @@ class ClusterShearProfile(ClusterAbundance):
         # NOTE: value set up not to break use in pyccl with firecronw
         # to be investigated
         moo.z_inf = 10.0
-
-        if self.vectorized:
-            moo._set_concentration(self._get_concentration(log_mass, z))
-            moo._set_mass(10**log_mass)
-            return_vals = self._one_halo_contribution(moo, radius_center, z)
-            if self.two_halo_term:
-                return_vals += moo._eval_excess_surface_density_2h(radius_center, z)
-            if self.boost_factor:
-                return_vals = self._correct_with_boost_nfw(return_vals, radius_center)
-            return return_vals
-
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
@@ -248,6 +240,36 @@ class ClusterShearProfile(ClusterAbundance):
             return_vals.append(val)
         return np.asarray(return_vals, dtype=np.float64)
 
+    def compute_shear_profile_vectorized(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+        radius_center: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Delta sigma for cprint(new_pred)lusters."""
+        mass_def = self.halo_mass_function.mass_def
+        mass_type = mass_def.rho_type
+        if mass_type == "matter":
+            mass_type = "mean"
+        moo = clmm.Modeling(
+            massdef=mass_type,
+            delta_mdef=mass_def.Delta,
+            halo_profile_model="nfw",
+        )
+        moo.set_cosmo(self._clmm_cosmo)
+
+        # NOTE: value set up not to break use in pyccl with firecronw
+        # to be investigated
+        moo.z_inf = 10.0
+        moo._set_concentration(self._get_concentration(log_mass, z))
+        moo._set_mass(10**log_mass)
+        return_vals = self._one_halo_contribution(moo, radius_center, z)
+        if self.two_halo_term:
+            return_vals += moo._eval_excess_surface_density_2h(radius_center, z)
+        if self.boost_factor:
+            return_vals = self._correct_with_boost_nfw(return_vals, radius_center)
+        return return_vals
+
     def _one_halo_contribution(
         self,
         clmm_model: clmm.Modeling,
@@ -264,9 +286,9 @@ class ClusterShearProfile(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = float(self.eval_beta_s_mean(redshift))
-            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
-            first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
+            beta_s_mean = self.eval_beta_s_mean(redshift)
+            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
+            first_halo_right_centered = clmm_model._eval_reduced_tangential_shear(
                 radius_center,
                 redshift,
                 (beta_s_mean, beta_s_square_mean),

@@ -97,7 +97,7 @@ class BinnedClusterRecipe:
         self,
         z_edges,
         mass_proxy_edges,
-        radius_center,
+        radius_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:

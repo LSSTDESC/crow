@@ -173,3 +173,62 @@ def _eval_2halo_term_generic_vec(
 
     # (n_r, n_z)
     return out.T
+
+def _eval_reduced_tangential_shear(
+    self,
+    r_proj,
+    z_cl,
+    z_src,
+    z_src_info="discrete",
+    approx=None,
+    integ_kwargs=None,
+    verbose=False,
+):
+    if self.halo_profile_model == "einasto" and verbose:
+        print(f"Einasto alpha = {self._get_einasto_alpha(z_cl=z_cl)}")
+
+    # functions _validate_z_src, _validate_approx_z_src_info already safekeeps from this error:
+    # pylint: disable=possibly-used-before-assignment
+
+    if approx is None:
+        if z_src_info == "distribution":
+            gt = self._pdz_weighted_avg(
+                lambda gammat, kappa: gammat / (1 - kappa),
+                z_src,
+                r_proj,
+                z_cl,
+                integ_kwargs=integ_kwargs,
+            )
+        elif z_src_info == "discrete":
+            warning_msg = (
+                "\nSome source redshifts are lower than the cluster redshift."
+                + "\nReduced_shear = 0 for those galaxies."
+            )
+            gt = compute_for_good_redshifts(
+                self._eval_reduced_tangential_shear_core,
+                z_cl,
+                z_src,
+                0.0,
+                warning_msg,
+                "z_cl",
+                "z_src",
+                r_proj,
+            )
+    elif approx in ("order1", "order2"):
+        beta_s_mean = z_src[0]
+        z_inf_array = np.full_like(z_cl, self.z_inf)
+        gammat_inf = self._eval_tangential_shear_core(r_proj, z_cl, z_src=z_inf_array)
+        kappa_inf = self._eval_convergence_core(r_proj, z_cl, z_src=z_inf_array)
+
+        gt = beta_s_mean * gammat_inf / (1.0 - beta_s_mean * kappa_inf)
+
+        if approx == "order2":
+            beta_s_square_mean = z_src[1]
+            gt *= (
+                1.0
+                + (beta_s_square_mean / (beta_s_mean * beta_s_mean) - 1.0)
+                * beta_s_mean
+                * kappa_inf
+            )
+
+    return gt
