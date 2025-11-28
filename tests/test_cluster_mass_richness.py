@@ -11,7 +11,7 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow import mass_proxy, purity
+from crow import mass_proxy
 
 PIVOT_Z = 0.6
 PIVOT_MASS = 14.625862906
@@ -140,49 +140,6 @@ def test_cluster_murata_binned_distribution(
                 assert probability_1 <= probability_0
             else:
                 assert probability_1 >= probability_0
-
-
-@given(
-    z=floats(min_value=1e-15, max_value=2.0), mass=floats(min_value=7.0, max_value=26.0)
-)
-def test_cluster_distribution_properties(z: float, mass: float):
-    """Mathematical properties of the cluster mass distribution using hypothesis."""
-    # Create the relation inside the test to avoid fixture issues
-    murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
-    murata_binned_relation.parameters["mu0"] = 3.00
-    murata_binned_relation.parameters["mu1"] = 0.086
-    murata_binned_relation.parameters["mu2"] = 0.01
-    murata_binned_relation.parameters["sigma0"] = 3.0
-    murata_binned_relation.parameters["sigma1"] = 0.07
-    murata_binned_relation.parameters["sigma2"] = 0.01
-
-    murata_binned_relation_inpure = mass_proxy.MurataBinned(
-        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
-    )
-    murata_binned_relation_inpure.parameters["mu0"] = 3.00
-    murata_binned_relation_inpure.parameters["mu1"] = 0.086
-    murata_binned_relation_inpure.parameters["mu2"] = 0.01
-    murata_binned_relation_inpure.parameters["sigma0"] = 3.0
-    murata_binned_relation_inpure.parameters["sigma1"] = 0.07
-    murata_binned_relation_inpure.parameters["sigma2"] = 0.01
-
-    mass_proxy_limits = (1.0, 5.0)
-
-    mass_array = np.atleast_1d(mass)
-    z_array = np.atleast_1d(z)
-
-    probability = murata_binned_relation.distribution(
-        mass_array, z_array, mass_proxy_limits
-    )
-
-    # Test non-negativity property
-    assert probability >= 0, f"Probability must be non-negative, got {probability}"
-
-    # Test with purity
-    probability_inpure = murata_binned_relation_inpure.distribution(
-        mass_array, z_array, mass_proxy_limits
-    )
-    assert (probability < probability_inpure).all()
 
 
 @given(

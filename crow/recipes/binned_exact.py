@@ -7,9 +7,9 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 
-from crow import ClusterShearProfile
-from crow import completeness as comp
-from crow import kernel
+from crow import ClusterShearProfile, kernel
+from crow.cluster_modules.completeness_models import Completeness
+from crow.cluster_modules.purity_models import Purity
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 
@@ -31,7 +31,8 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         cluster_theory,
         redshift_distribution,
         mass_distribution,
-        completeness: comp.Completeness = None,
+        completeness: Completeness = None,
+        purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:
@@ -40,11 +41,53 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             redshift_distribution=redshift_distribution,
             mass_distribution=mass_distribution,
             completeness=completeness,
+            purity=purity,
             mass_interval=mass_interval,
             true_z_interval=true_z_interval,
         )
 
         self.integrator = NumCosmoIntegrator()
+
+    def _setup_with_purity(self):
+        """Makes mass distribution use additional integral with completeness"""
+        if self.purity is None:
+            self._mass_distribution_distribution = self.mass_distribution.distribution
+        else:
+            self._mass_distribution_distribution = self._impure_mass_distribution
+
+    def _impure_mass_distribution(self, log_mass, z, log_mass_proxy_limits):
+
+        ##############################
+        # Fix this function, Henrique
+        # Good luck!
+        ##############################
+
+        integrator = NumCosmoIntegrator(
+            relative_tolerance=1e-6,
+            absolute_tolerance=1e-12,
+        )
+
+        def integration_func(int_args, extra_args):
+            ln_mass_proxy = int_args[:, 0]
+            log_mass_proxy = ln_mass_proxy / np.log(10.0)
+            return np.array(
+                [
+                    self.mass_distribution._distribution_unbinned(
+                        log_mass, z, np.array([_log_mass_proxy])
+                    )
+                    / self.purity.distribution(z, np.array([_log_mass_proxy]))
+                    for _log_mass_proxy in log_mass_proxy
+                ]
+            )
+
+        integrator.integral_bounds = [
+            (
+                np.log(10.0) * log_mass_proxy_limits[0],
+                np.log(10.0) * log_mass_proxy_limits[1],
+            )
+        ]
+
+        return integrator.integrate(integration_func)
 
     def _get_theory_prediction_counts(
         self,
@@ -71,7 +114,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 * self.cluster_theory.mass_function(mass, z)
                 * self.completeness_distribution(mass, z)
                 * self.redshift_distribution.distribution()
-                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
+                * self._mass_distribution_distribution(mass, z, mass_proxy_limits)
             )
 
             if average_on is None:

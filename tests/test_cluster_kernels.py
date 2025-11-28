@@ -8,7 +8,7 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow import completeness, kernel, purity
+from crow import completeness_models, kernel, purity_models
 
 
 def test_create_spectroscopic_redshift_kernel():
@@ -22,7 +22,7 @@ def test_create_mass_kernel():
 
 
 def test_create_completeness_kernel():
-    ck = completeness.CompletenessAguena16()
+    ck = completeness_models.CompletenessAguena16()
     ck.parameters["a_logm_piv"] = 13.31
     ck.parameters["b_logm_piv"] = 0.2025
     ck.parameters["a_n"] = 0.38
@@ -35,7 +35,7 @@ def test_create_completeness_kernel():
 
 
 def test_create_purity_kernel():
-    pk = purity.PurityAguena16()
+    pk = purity_models.PurityAguena16()
     pk.parameters["a_n"] = 3.9193
     pk.parameters["b_n"] = -0.3323
     pk.parameters["a_logm_piv"] = 1.1839
@@ -59,7 +59,7 @@ def test_true_mass_distribution():
 
 @pytest.mark.precision_sensitive
 def test_purity_distribution():
-    pk = purity.PurityAguena16()
+    pk = purity_models.PurityAguena16()
     pk.parameters["a_n"] = 3.9193
     pk.parameters["b_n"] = -0.3323
     pk.parameters["a_logm_piv"] = 1.1839
@@ -93,7 +93,7 @@ def test_purity_distribution():
 
 @pytest.mark.precision_sensitive
 def test_purity_distribution_uses_mean():
-    pk = purity.PurityAguena16()
+    pk = purity_models.PurityAguena16()
     pk.parameters["a_n"] = 3.9193
     pk.parameters["b_n"] = -0.3323
     pk.parameters["a_logm_piv"] = 1.1839
@@ -125,7 +125,7 @@ def test_purity_distribution_uses_mean():
 
 @pytest.mark.precision_sensitive
 def test_completeness_distribution():
-    ck = completeness.CompletenessAguena16()
+    ck = completeness_models.CompletenessAguena16()
     ck.parameters["a_logm_piv"] = 13.31
     ck.parameters["b_logm_piv"] = 0.2025
     ck.parameters["a_n"] = 0.38
@@ -155,7 +155,7 @@ def test_completeness_distribution():
 
 
 def test_purity_distribution_raises_without_limits():
-    pk = purity.PurityAguena16()
+    pk = purity_models.PurityAguena16()
     z = np.array([0.5], dtype=np.float64)
     log_mass_proxy = np.array([-1.0], dtype=np.float64)
 
