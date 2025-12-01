@@ -195,7 +195,14 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         z_edges: tuple[float, float],
         log_proxy_edges: tuple[float, float],
     ) -> float:
-        """grid arrays and keys"""
+        """Grid arrays and keys
+
+        Returns
+        -------
+        integ_arrays: dict
+            Dictionary with information on `"redshift"` and `"log_proxy"` for integration.
+            Each entry is of the type ``{"points":np.ndarray, "key":tuple}``
+        """
         return {
             "log_proxy": {
                 "points": np.linspace(
@@ -219,10 +226,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """
         Parameters
         ----------
-        kernel : numpy.ndarray
-            , shape : (n_proxy, n_z, n_mass)
-        z_point : numpy.ndarray
-        integ_arrays["log_proxy"]["points"] : numpy.ndarray
+        probe_kernel : numpy.ndarray
+            Kernel to be integrated in mass (w HMF) and redshift (w/ volume). Shape : (n_proxy, n_z, n_mass, ...)
+        integ_arrays: dict
+            Dictionary with information on `"redshift"` and `"log_proxy"` for integration.
+            Each entry must be of the type ``{"points":np.ndarray, "key":tuple}``
 
         Returns
         -------
