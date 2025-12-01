@@ -8,6 +8,7 @@ import pyccl
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
+from scipy.integrate import dblquad, simpson
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -353,11 +354,29 @@ def test_evaluates_theory_prediction_with_completeness(
 
 def test_evaluates_theory_prediction_with_purity(
     binned_exact: ExactBinnedClusterRecipe,
+    binned_grid: GridBinnedClusterRecipe,
 ):
+    mass_proxy_edges = (2, 5)
+    z_edges = (0.5, 1)
+    sky_area = 360**2
     ######################################
     # Henrique, also set up the tests here
     ######################################
-    pass
+    binned_grid_w_pur = get_base_binned_grid(  # Create grid recipe with purity
+        None, purity_models.PurityAguena16()
+    )
+    prediction_grid = (
+        binned_grid.evaluate_theory_prediction_counts(  # Grid without purity
+            z_edges, mass_proxy_edges, sky_area
+        )
+    )
+    prediction_grid_w_pur = (
+        binned_grid_w_pur.evaluate_theory_prediction_counts(  # Grid with purity
+            z_edges, mass_proxy_edges, sky_area
+        )
+    )
+
+    assert prediction_grid <= prediction_grid_w_pur
 
 
 @given(
@@ -528,8 +547,7 @@ def test_get_completeness_grid(binned_grid: GridBinnedClusterRecipe):
 
 
 def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
-    """Test purity grid shape and bounds (0 <= P <= 1)."""
-    # Create a recipe with purity for a meaningful test
+    """Test purity grid shape, bounds, caching, and integration correctness."""
     binned_grid_w_pur = get_base_binned_grid(None, purity_models.PurityAguena16())
     binned_grid_w_pur.setup()
 
@@ -541,12 +559,49 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
     n_p = len(log_proxy_points)
     n_z = len(z_points)
 
+    # Shape and bounds
     assert pur_grid.shape == (n_p, n_z)
     assert np.all(pur_grid >= 0.0)
     assert np.all(pur_grid <= 1.0)
-    assert pur_grid is binned_grid_w_pur._purity_grid[key]  # Check caching
 
-    binned_grid.setup()  # use original fixture
+    # Check caching
+    assert pur_grid is binned_grid_w_pur._purity_grid[key]
+
+    binned_grid.setup()  # reset original fixture
     flat_pur_grid = binned_grid._get_purity_grid(z_points, log_proxy_points, key)
     assert flat_pur_grid.shape == (n_p, n_z)
     assert np.allclose(flat_pur_grid, 1.0)
+
+    def integrand(ln_proxy_scalar, z_scalar):
+        log_proxy_scalar = ln_proxy_scalar / np.log(10.0)
+        z_array = np.array([z_scalar])
+        log_proxy_array = np.array([log_proxy_scalar])
+        return binned_grid_w_pur._purity_distribution(z_array, log_proxy_array)
+
+    z_bin = (z_points[0], z_points[-1])
+    proxy_bin = (log_proxy_points[0], log_proxy_points[-1])
+
+    integral_exact, _ = dblquad(
+        func=integrand,
+        a=z_bin[0],
+        b=z_bin[1],
+        gfun=lambda z: proxy_bin[0] * np.log(10.0),
+        hfun=lambda z: proxy_bin[1] * np.log(10.0),
+    )
+
+    integral_over_proxy = simpson(
+        y=pur_grid,
+        x=log_proxy_points * np.log(10.0),
+        axis=0,
+    )
+    simpson_integral = simpson(
+        y=integral_over_proxy,
+        x=z_points,
+        axis=0,
+    )
+
+    abs_err = abs(simpson_integral - integral_exact)
+    rel_err = abs(1.0 - simpson_integral / integral_exact)
+
+    assert rel_err < 5e-3  # 0.5% relative tolerance
+    assert abs_err < 5e-3  # absolute small error tolerance

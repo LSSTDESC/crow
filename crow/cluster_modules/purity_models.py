@@ -71,7 +71,7 @@ class PurityAguena16(Purity):
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
         _log_mass_proxy = log_mass_proxy
-        if all(log_mass_proxy == -1.0):
+        if np.all(log_mass_proxy == -1.0):
             if log_mass_proxy_limits is None:
                 raise ValueError(
                     "log_mass_proxy_limits must be provided when log_mass_proxy == -1"
