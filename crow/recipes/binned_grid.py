@@ -34,9 +34,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
-        log_proxy_points: int = 30,
-        redshift_points: int = 30,
-        log_mass_points: int = 30,
+        proxy_grid_size: int = 30,
+        redshift_grid_size: int = 30,
+        mass_grid_size: int = 30,
     ) -> None:
         super().__init__(
             cluster_theory=cluster_theory,
@@ -47,11 +47,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             mass_interval=mass_interval,
             true_z_interval=true_z_interval,
         )
-        self.log_proxy_points = log_proxy_points
-        self.redshift_points = redshift_points
-        self.log_mass_points = log_mass_points
+        self.proxy_grid_size = proxy_grid_size
+        self.redshift_grid_size = redshift_grid_size
+        self.mass_grid_size = mass_grid_size
         self.log_mass_grid = np.linspace(
-            mass_interval[0], mass_interval[1], self.log_mass_points
+            mass_interval[0], mass_interval[1], self.mass_grid_size
         )
         self._hmf_grid = {}  # (n_z, n_mass)
         self._mass_richness_grid = {}  # (n_proxy, n_z, n_mass)
@@ -98,7 +98,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._purity_grid = {}
         self._shear_grids = {}
 
-    def _get_hmf_grid(self, z: npt.NDArray[np.float64], sky_area: float, key):
+    def _get_hmf_grid(
+        self,
+        z: npt.NDArray[np.float64],
+        sky_area: float,
+        key,
+    ):
         """Compute HMF × comoving volume and store in the class."""
 
         if key not in self._hmf_grid:
@@ -119,7 +124,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         return self._hmf_grid[key]
 
     def _get_mass_richness_grid(
-        self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key
+        self,
+        z: npt.NDArray[np.float64],
+        log_proxy: npt.NDArray[np.float64],
+        key,
     ):
         """Compute mass-richness grid by vectorizing 1D inputs."""
 
@@ -162,7 +170,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             )
         return self._purity_grid[key]
 
-    def _get_shear_grid(self, z: npt.NDArray[np.float64], radius_centers, key):
+    def _get_shear_grid(
+        self,
+        z: npt.NDArray[np.float64],
+        radius_centers,
+        key,
+    ):
         """Compute shear grid for a specific radius and store in the class."""
 
         if key not in self._shear_grids:
@@ -177,72 +190,132 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._shear_grids[key]
 
-    def _get_counts_kernel_grid(
-        self, log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
-    ):
-        """
+    def _get_integ_arrays(
+        self,
+        z_edges: tuple[float, float],
+        log_proxy_edges: tuple[float, float],
+    ) -> float:
+        """Grid arrays and keys
+
         Returns
         -------
-        counts_kernel_grid: numpy.ndarray
-            Shape: (n_proxy, n_z, n_mass)
+        integ_arrays: dict
+            Dictionary with information on `"redshift"` and `"log_proxy"` for integration.
+            Each entry is of the type ``{"points":np.ndarray, "key":tuple}``
+        """
+        return {
+            "log_proxy": {
+                "points": np.linspace(
+                    log_proxy_edges[0], log_proxy_edges[1], self.proxy_grid_size
+                ),
+                "key": tuple(log_proxy_edges),
+            },
+            "redshift": {
+                "points": np.linspace(z_edges[0], z_edges[1], self.redshift_grid_size),
+                "key": tuple(z_edges),
+            },
+        }
+
+    def _evaluate_theory_prediction_generic(
+        self,
+        probe_kernel,  # must be (n_proxy, n_z, n_mass, ...)
+        integ_arrays,
+        sky_area: float,
+    ) -> float:
+        """Evaluate the theory prediction for this cluster recipe using triple Simpson integration."""
+        """
+        Parameters
+        ----------
+        probe_kernel : numpy.ndarray
+            Kernel to be integrated in mass (w HMF) and redshift (w/ volume). Shape : (n_proxy, n_z, n_mass, ...)
+        integ_arrays: dict
+            Dictionary with information on `"redshift"` and `"log_proxy"` for integration.
+            Each entry must be of the type ``{"points":np.ndarray, "key":tuple}``
+
+        Returns
+        -------
+        integrated_kernel : numpy.ndarray
         """
 
-        # grid keys
-        hmf_key = z_key
-        comp_key = z_key
-        purity_key = (z_key, proxy_key)
-        mass_richness_key = (z_key, proxy_key)
+        ##############################
+        # get basic kernel and combine
+        ##############################
 
-        #############
+        # grid keys
+        hmf_key = integ_arrays["redshift"]["key"]
+        comp_key = integ_arrays["redshift"]["key"]
+        purity_key = (integ_arrays["redshift"]["key"], integ_arrays["log_proxy"]["key"])
+        mass_richness_key = (
+            integ_arrays["redshift"]["key"],
+            integ_arrays["log_proxy"]["key"],
+        )
+
         # get grids #
-        #############
 
         # shape: (n_z, n_mass)
-        hmf_grid = self._get_hmf_grid(z_points, sky_area, hmf_key)
+        hmf_grid = self._get_hmf_grid(
+            integ_arrays["redshift"]["points"],
+            sky_area,
+            hmf_key,
+        )
         # shape: (n_proxy, n_z, n_mass)
         mass_richness_grid = self._get_mass_richness_grid(
-            z_points, log_proxy_points, mass_richness_key
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_proxy"]["points"],
+            mass_richness_key,
         )
         # shape: (n_z, n_mass)
-        completeness_grid = self._get_completeness_grid(z_points, comp_key)
+        completeness_grid = self._get_completeness_grid(
+            integ_arrays["redshift"]["points"],
+            comp_key,
+        )
         # shape: (n_proxy, n_z)
-        purity_grid = self._get_purity_grid(z_points, log_proxy_points, purity_key)
-        # output shape: (n_proxy, n_z, n_mass)
-        return (
+        purity_grid = self._get_purity_grid(
+            integ_arrays["redshift"]["points"],
+            integ_arrays["log_proxy"]["points"],
+            purity_key,
+        )
+
+        # main kernel: (n_proxy, n_z, n_mass)
+        main_kernel_grid = (
             hmf_grid[np.newaxis, :, :]
             * mass_richness_grid
             * completeness_grid[np.newaxis, :, :]
             / purity_grid[:, :, np.newaxis]
         )
 
-    def _integrate_over_mass_z_proxy(
-        self, kernel, log_mass_points, z_points, log_proxy_points
-    ):
-        """
-        Parameters
-        ----------
-        kernel : numpy.ndarray
-            , shape : (n_proxy, n_z, n_mass)
-        log_mass_points : numpy.ndarray
-        z_point : numpy.ndarray
-        log_proxy_points : numpy.ndarray
+        # reshape it to match probe_kernel
+        # shape: (n_proxy, n_z, n_mass, ...)
+        n_dims_probe_kernel = len(probe_kernel.shape)
+        if n_dims_probe_kernel > 3:
+            main_kernel_grid = np.expand_dims(
+                main_kernel_grid, axis=tuple(range(3, n_dims_probe_kernel))
+            )
 
-        Returns
-        -------
-        integrated_kernel : numpy.ndarray
-        """
-        integral_over_mass = simpson(y=kernel, x=log_mass_points, axis=2)
-        integral_over_z = simpson(y=integral_over_mass, x=z_points, axis=1)
-        integral_over_proxy = simpson(
-            y=integral_over_z, x=log_proxy_points * np.log(10.0), axis=0
+        # Final kernel
+        # shape: (n_proxy, n_z, n_mass, n_radius)
+        final_kernel = main_kernel_grid * probe_kernel
+
+        ###########
+        # integrate
+        ###########
+
+        integral_over_mass = simpson(y=final_kernel, x=self.log_mass_grid, axis=2)
+        integral_over_z = simpson(
+            y=integral_over_mass, x=integ_arrays["redshift"]["points"], axis=1
         )
-        integrated_kernel = integral_over_proxy
-        return integrated_kernel
+        integral_over_proxy = simpson(
+            y=integral_over_z,
+            x=integ_arrays["log_proxy"]["points"] * np.log(10.0),
+            axis=0,
+        )
+        integrated_probe = integral_over_proxy
+        return integrated_probe
 
     def evaluate_theory_prediction_counts(
         self,
         z_edges,
-        mass_proxy_edges,
+        log_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -252,23 +325,20 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # grid arrays and keys
         ######################
 
-        log_proxy_points = np.linspace(
-            mass_proxy_edges[0], mass_proxy_edges[1], self.log_proxy_points
-        )
-        z_points = np.linspace(z_edges[0], z_edges[1], self.redshift_points)
-        log_mass_points = self.log_mass_grid
-        proxy_key = tuple(mass_proxy_edges)
-        z_key = tuple(z_edges)
+        integ_arrays = self._get_integ_arrays(z_edges, log_proxy_edges)
 
         ########
         # kernel
         ########
 
         # shape: (n_proxy, n_z, n_mass)
-        counts_kernel_grid = self._get_counts_kernel_grid(
-            log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
+        probe_kernel = np.ones(
+            (
+                integ_arrays["log_proxy"]["points"].size,
+                integ_arrays["redshift"]["points"].size,
+                self.log_mass_grid.size,
+            )
         )
-        prediction = counts_kernel_grid
         if average_on is None:
             pass
         else:
@@ -277,69 +347,69 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 if not include_prop:
                     continue
                 if cluster_prop == ClusterProperty.MASS:
-                    prediction *= log_mass_points[np.newaxis, np.newaxis, :]
+                    probe_kernel *= self.log_mass_grid[np.newaxis, np.newaxis, :]
                 if cluster_prop == ClusterProperty.REDSHIFT:
-                    prediction *= z_points[np.newaxis, :, np.newaxis]
+                    probe_kernel *= integ_arrays["redshift"]["points"][
+                        np.newaxis, :, np.newaxis
+                    ]
 
         ###########
         # integrate
         ###########
 
-        counts = self._integrate_over_mass_z_proxy(
-            prediction, log_mass_points, z_points, log_proxy_points
+        counts = self._evaluate_theory_prediction_generic(
+            probe_kernel,
+            integ_arrays,
+            sky_area,
         )
         return counts
 
-    def evaluate_theory_prediction_shear_profile(
+    def evaluate_theory_prediction_lensing_profile(
         self,
         z_edges: tuple[float, float],
-        mass_proxy_edges: tuple[float, float],
+        log_proxy_edges: tuple[float, float],
         radius_centers: np.ndarray,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        """Evaluate the theoretical prediction for the average shear profile
-        <DeltaSigma(R)> in the provided bin."""
+        r"""Evaluate the theoretical prediction for the average lensing profile
+        (..:math:`\langle\Delta\Sigma(R)\rangle` or ..:math:`\langle g_t(R)\rangle`)
+        in the provided bin."""
 
-        ######################
-        # grid arrays and keys
-        ######################
-
-        log_proxy_points = np.linspace(
-            mass_proxy_edges[0], mass_proxy_edges[1], self.log_proxy_points
-        )
-        z_points = np.linspace(z_edges[0], z_edges[1], self.redshift_points)
-        log_mass_points = self.log_mass_grid
-        proxy_key = tuple(mass_proxy_edges)
-        z_key = tuple(z_edges)
-        shear_key = z_key
-
-        ########
-        # kernel
-        ########
-
-        # shape: (n_proxy, n_z, n_mass)
-        counts_kernel_grid = self._get_counts_kernel_grid(
-            log_proxy_points, z_points, log_mass_points, proxy_key, z_key, sky_area
-        )
         if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
             # Raise a ValueError if the necessary flags are not present
             raise ValueError(
                 f"Function requires {ClusterProperty.DELTASIGMA} or {ClusterProperty.SHEAR} "
                 f"to be set in 'average_on', but got: {average_on}"
             )
+
+        ######################
+        # grid arrays and keys
+        ######################
+
+        integ_arrays = self._get_integ_arrays(z_edges, log_proxy_edges)
+        shear_key = integ_arrays["redshift"]["key"]
+
+        ########
+        # kernel
+        ########
+
         # shape: (n_z, n_mass, n_radius)
-        shear_grid = self._get_shear_grid(z_points, radius_centers, shear_key)
-        # shape: (n_proxy, n_z, n_mass, n_radius)
-        shear_kernel_grid = (
-            counts_kernel_grid[..., np.newaxis] * shear_grid[np.newaxis, ...]
+        shear_grid = self._get_shear_grid(
+            integ_arrays["redshift"]["points"],
+            radius_centers,
+            shear_key,
         )
+        # re-shape it: (1, n_z, n_mass, n_radius)
+        probe_kernel = shear_grid[np.newaxis, ...]
 
         ###########
         # integrate
         ###########
 
-        shear = self._integrate_over_mass_z_proxy(
-            shear_kernel_grid, log_mass_points, z_points, log_proxy_points
+        shear = self._evaluate_theory_prediction_generic(
+            probe_kernel,
+            integ_arrays,
+            sky_area,
         )
         return shear
