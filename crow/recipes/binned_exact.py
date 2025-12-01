@@ -175,7 +175,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
     def evaluate_theory_prediction_counts(
         self,
         z_edges,
-        mass_proxy_edges,
+        log_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -189,7 +189,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             self.mass_interval,
             z_edges,
         ]
-        self.integrator.extra_args = np.array([*mass_proxy_edges, sky_area])
+        self.integrator.extra_args = np.array([*log_proxy_edges, sky_area])
 
         theory_prediction = self._get_theory_prediction_counts(average_on)
         prediction_wrapper = self._get_function_to_integrate_counts(theory_prediction)
@@ -287,7 +287,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
     def evaluate_theory_prediction_lensing_profile(
         self,
         z_edges,
-        mass_proxy_edges,
+        log_proxy_edges,
         radius_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
@@ -305,7 +305,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         deltasigma_list = []
         for radius_center in radius_centers:
             self.integrator.extra_args = np.array(
-                [*mass_proxy_edges, sky_area, radius_center]
+                [*log_proxy_edges, sky_area, radius_center]
             )
             if self.cluster_theory._beta_parameters is not None:
                 self.cluster_theory.set_beta_s_interp(*z_edges)
