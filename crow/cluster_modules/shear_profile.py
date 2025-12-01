@@ -278,7 +278,7 @@ class ClusterShearProfile(ClusterAbundance):
         moo.set_mass(10**log_mass)
         return_vals = self._one_halo_contribution(moo, radius_center, z)
         if self.two_halo_term:
-            return_vals += moo._eval_excess_surface_density_2h(radius_center, z)
+            return_vals += moo.eval_excess_surface_density_2h(radius_center, z)
         if self.boost_factor:
             return_vals = self._correct_with_boost_nfw(return_vals, radius_center)
         return return_vals
