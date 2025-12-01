@@ -305,17 +305,14 @@ def test_shear_grid_shape_and_cache_behavior(
     """Test shape of internal shear grid and that caching is used."""
     binned_grid_deltasigma.setup()  # clear caches
     z_points = np.linspace(0.1, 1.0, 5)
-    log_mass_poits = np.array([14.0, 15.0])
     radius_centers = np.atleast_1d(1.0)
     shear_key = tuple(z_points)
 
     # call _get_shear_grid to populate cache
-    grid = binned_grid_deltasigma._get_shear_grid(
-        z_points, log_mass_poits, radius_centers, shear_key
-    )
+    grid = binned_grid_deltasigma._get_shear_grid(z_points, radius_centers, shear_key)
     # per implementation: shape is (n_z, n_mass, n_radius)
     n_z = len(z_points)
-    n_m = len(log_mass_poits)
+    n_m = len(binned_grid_deltasigma.log_mass_grid)
     n_r = len(radius_centers)
     assert grid.shape == (n_z, n_m, n_r)
     assert shear_key in binned_grid_deltasigma._shear_grids
@@ -323,7 +320,7 @@ def test_shear_grid_shape_and_cache_behavior(
     # Overwrite cache and ensure retrieval uses stored value (cache hit)
     binned_grid_deltasigma._shear_grids[shear_key] = np.zeros_like(grid)
     recalled = binned_grid_deltasigma._get_shear_grid(
-        z_points, log_mass_poits, radius_centers, shear_key
+        z_points, radius_centers, shear_key
     )
     assert np.all(recalled == 0.0)
 

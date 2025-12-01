@@ -101,7 +101,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def _get_hmf_grid(
         self,
         z: npt.NDArray[np.float64],
-        log_mass: npt.NDArray[np.float64],
         sky_area: float,
         key,
     ):
@@ -109,12 +108,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         if key not in self._hmf_grid:
             # sizes
-            n_m = len(log_mass)
+            n_m = len(self.log_mass_grid)
             n_z = len(z)
             # quantities
             hmf_flat = self.cluster_theory.mass_function(
                 # flatten arrays to vectorize function
-                np.tile(log_mass, n_z),
+                np.tile(self.log_mass_grid, n_z),
                 np.repeat(z, n_m),
             )
             mass_function_2d = hmf_flat.reshape(n_z, n_m)
@@ -127,7 +126,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def _get_mass_richness_grid(
         self,
         z: npt.NDArray[np.float64],
-        log_mass: npt.NDArray[np.float64],
         log_proxy: npt.NDArray[np.float64],
         key,
     ):
@@ -136,12 +134,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         if key not in self._mass_richness_grid:
             # sizes
             n_z = len(z)
-            n_m = len(log_mass)
+            n_m = len(self.log_mass_grid)
             n_p = len(log_proxy)
             # quantities
             grid_3d_flat = self.mass_distribution.distribution(
                 # flatten arrays to vectorize function
-                np.tile(np.repeat(log_mass, n_z), n_p),
+                np.tile(np.repeat(self.log_mass_grid, n_z), n_p),
                 np.tile(z, n_m * n_p),
                 np.repeat(log_proxy, n_z * n_m),
             )
@@ -151,14 +149,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         return self._mass_richness_grid[key]
 
-    def _get_completeness_grid(
-        self, z: npt.NDArray[np.float64], log_mass: npt.NDArray[np.float64], key
-    ):
+    def _get_completeness_grid(self, z: npt.NDArray[np.float64], key):
         """Compute completeness grid and store in the class."""
 
         if key not in self._completeness_grid:
             self._completeness_grid[key] = self._completeness_distribution(
-                log_mass=log_mass[np.newaxis, :], z=z[:, np.newaxis]
+                log_mass=self.log_mass_grid[np.newaxis, :], z=z[:, np.newaxis]
             )
 
         return self._completeness_grid[key]
@@ -177,7 +173,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def _get_shear_grid(
         self,
         z: npt.NDArray[np.float64],
-        log_mass: npt.NDArray[np.float64],
         radius_centers,
         key,
     ):
@@ -186,7 +181,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         if key not in self._shear_grids:
             # shape (n_m, n_r, n_z)
             grid_3d = self.cluster_theory.compute_shear_profile_vectorized(
-                log_mass=log_mass[:, None],
+                log_mass=self.log_mass_grid[:, None],
                 z=z,
                 radius_center=radius_centers[:, None],
             )
@@ -212,7 +207,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 "points": np.linspace(z_edges[0], z_edges[1], self.redshift_points),
                 "key": tuple(z_edges),
             },
-            "log_mass": {"points": self.log_mass_grid, "key": None},
         }
 
     def _evaluate_theory_prediction_generic(
@@ -227,7 +221,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ----------
         kernel : numpy.ndarray
             , shape : (n_proxy, n_z, n_mass)
-        integ_arrays["log_mass"]["points"] : numpy.ndarray
         z_point : numpy.ndarray
         integ_arrays["log_proxy"]["points"] : numpy.ndarray
 
@@ -254,21 +247,18 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # shape: (n_z, n_mass)
         hmf_grid = self._get_hmf_grid(
             integ_arrays["redshift"]["points"],
-            integ_arrays["log_mass"]["points"],
             sky_area,
             hmf_key,
         )
         # shape: (n_proxy, n_z, n_mass)
         mass_richness_grid = self._get_mass_richness_grid(
             integ_arrays["redshift"]["points"],
-            integ_arrays["log_mass"]["points"],
             integ_arrays["log_proxy"]["points"],
             mass_richness_key,
         )
         # shape: (n_z, n_mass)
         completeness_grid = self._get_completeness_grid(
             integ_arrays["redshift"]["points"],
-            integ_arrays["log_mass"]["points"],
             comp_key,
         )
         # shape: (n_proxy, n_z)
@@ -302,9 +292,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # integrate
         ###########
 
-        integral_over_mass = simpson(
-            y=final_kernel, x=integ_arrays["log_mass"]["points"], axis=2
-        )
+        integral_over_mass = simpson(y=final_kernel, x=self.log_mass_grid, axis=2)
         integral_over_z = simpson(
             y=integral_over_mass, x=integ_arrays["redshift"]["points"], axis=1
         )
@@ -340,7 +328,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             (
                 integ_arrays["log_proxy"]["points"].size,
                 integ_arrays["redshift"]["points"].size,
-                integ_arrays["log_mass"]["points"].size,
+                self.log_mass_grid.size,
             )
         )
         if average_on is None:
@@ -351,9 +339,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
                 if not include_prop:
                     continue
                 if cluster_prop == ClusterProperty.MASS:
-                    probe_kernel *= integ_arrays["log_mass"]["points"][
-                        np.newaxis, np.newaxis, :
-                    ]
+                    probe_kernel *= self.log_mass_grid[np.newaxis, np.newaxis, :]
                 if cluster_prop == ClusterProperty.REDSHIFT:
                     probe_kernel *= integ_arrays["redshift"]["points"][
                         np.newaxis, :, np.newaxis
@@ -403,7 +389,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # shape: (n_z, n_mass, n_radius)
         shear_grid = self._get_shear_grid(
             integ_arrays["redshift"]["points"],
-            integ_arrays["log_mass"]["points"],
             radius_centers,
             shear_key,
         )

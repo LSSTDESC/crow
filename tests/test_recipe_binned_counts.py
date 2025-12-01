@@ -438,17 +438,16 @@ def test_setup_clears_caches(binned_grid: GridBinnedClusterRecipe):
     """Test that the setup function successfully clears all internal caches."""
     z_test = np.array([0.5, 1.0])
     log_proxy_test = np.array([1.5, 2.0])
-    log_mass_test = np.array([14.0, 15.0])
 
     sky_area = 100.0
 
     # Fill HMF cache
-    binned_grid._get_hmf_grid(z_test, log_mass_test, sky_area, tuple(z_test))
+    binned_grid._get_hmf_grid(z_test, sky_area, tuple(z_test))
     assert binned_grid._hmf_grid
 
     # Fill Mass Richness cache
     binned_grid._get_mass_richness_grid(
-        z_test, log_mass_test, log_proxy_test, (tuple(z_test), tuple(log_proxy_test))
+        z_test, log_proxy_test, (tuple(z_test), tuple(log_proxy_test))
     )
     assert binned_grid._mass_richness_grid
 
@@ -467,14 +466,13 @@ def test_get_hmf_grid(binned_grid: GridBinnedClusterRecipe):
     binned_grid.setup()
 
     z_points = np.linspace(0.1, 1.0, 5)
-    log_mass_poits = np.array([14.0, 15.0])
     sky_area = 1000.0
     hmf_key = tuple(z_points)
 
-    hmf_grid = binned_grid._get_hmf_grid(z_points, log_mass_poits, sky_area, hmf_key)
+    hmf_grid = binned_grid._get_hmf_grid(z_points, sky_area, hmf_key)
 
     n_z = len(z_points)
-    n_m = len(log_mass_poits)
+    n_m = len(binned_grid.log_mass_grid)
 
     assert hmf_grid.shape == (n_z, n_m)
     assert np.all(hmf_grid >= 0.0)
@@ -482,9 +480,7 @@ def test_get_hmf_grid(binned_grid: GridBinnedClusterRecipe):
 
     # Test 2: Ensure computation is skipped on second call (cache hit)
     binned_grid._hmf_grid[hmf_key] = np.zeros_like(hmf_grid)  # Overwrite cache
-    recalled_hmf_grid = binned_grid._get_hmf_grid(
-        z_points, log_mass_poits, sky_area, hmf_key
-    )
+    recalled_hmf_grid = binned_grid._get_hmf_grid(z_points, sky_area, hmf_key)
     assert np.all(recalled_hmf_grid == 0.0)
 
 
@@ -493,17 +489,14 @@ def test_get_mass_richness_grid(binned_grid: GridBinnedClusterRecipe):
     binned_grid.setup()
 
     z_points = np.linspace(0.1, 1.0, 5)
-    log_mass_poits = np.array([14.0, 15.0])
     log_proxy_points = np.linspace(1.5, 3.0, 4)
     key = (tuple(z_points), tuple(log_proxy_points))
 
-    mr_grid = binned_grid._get_mass_richness_grid(
-        z_points, log_mass_poits, log_proxy_points, key
-    )
+    mr_grid = binned_grid._get_mass_richness_grid(z_points, log_proxy_points, key)
 
     n_p = len(log_proxy_points)
     n_z = len(z_points)
-    n_m = len(log_mass_poits)
+    n_m = len(binned_grid.log_mass_grid)
 
     assert mr_grid.shape == (n_p, n_z, n_m)
     assert np.all(mr_grid >= 0.0)
@@ -511,7 +504,7 @@ def test_get_mass_richness_grid(binned_grid: GridBinnedClusterRecipe):
 
     binned_grid._mass_richness_grid[key] = np.zeros_like(mr_grid)
     recalled_mr_grid = binned_grid._get_mass_richness_grid(
-        z_points, log_mass_poits, log_proxy_points, key
+        z_points, log_proxy_points, key
     )
     assert np.all(recalled_mr_grid == 0.0)
 
@@ -524,24 +517,19 @@ def test_get_completeness_grid(binned_grid: GridBinnedClusterRecipe):
     binned_grid_w_comp.setup()
 
     z_points = np.linspace(0.1, 1.0, 5)
-    log_mass_poits = np.array([14.0, 15.0])
     comp_key = tuple(z_points)
 
-    comp_grid = binned_grid_w_comp._get_completeness_grid(
-        z_points, log_mass_poits, comp_key
-    )
+    comp_grid = binned_grid_w_comp._get_completeness_grid(z_points, comp_key)
 
     n_z = len(z_points)
-    n_m = len(log_mass_poits)
+    n_m = len(binned_grid.log_mass_grid)
 
     assert comp_grid.shape == (n_z, n_m)
     assert np.all(comp_grid >= 0.0)
     assert np.all(comp_grid <= 1.0)
     assert comp_grid is binned_grid_w_comp._completeness_grid[comp_key]  # Check caching
     binned_grid.setup()  # use original fixture
-    flat_comp_grid = binned_grid._get_completeness_grid(
-        z_points, log_mass_poits, comp_key
-    )
+    flat_comp_grid = binned_grid._get_completeness_grid(z_points, comp_key)
     assert flat_comp_grid.shape == (n_z, n_m)
     assert np.allclose(flat_comp_grid, 1.0)
 
