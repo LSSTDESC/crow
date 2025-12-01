@@ -56,16 +56,25 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._hmf_grid = {}  # (n_z, n_mass)
         self._mass_richness_grid = {}  # (n_proxy, n_z, n_mass)
         self._completeness_grid = {}  # (n_z, n_mass)
-        self._purity_grid = {}  # (n_z, n_proxy)
+        self._purity_grid = {}  # (n_proxy, n_z)
         self._shear_grids = {}  # (n_z, n_mass)
 
     def _flat_distribution(
         self,
-        log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
+        log_mass: npt.NDArray[np.float64] = None,
+        log_mass_proxy: npt.NDArray[np.float64] = None,
     ):
         """Returns a null (=1) contribution to the integrand."""
-        return 1.0 + 0 * log_mass * z
+        if log_mass is None and log_mass_proxy is None:
+            raise ValueError(
+                "Either log_mass or log_mass_proxy should be provided should be provided."
+            )
+        if log_mass_proxy is None:
+            return 1.0 + 0 * log_mass * z
+        if log_mass is None:
+            return 1.0 + 0 * log_mass_proxy * z
+        raise ValueError("Only one of log_mass or log_mass_proxy must be provided.")
 
     def _setup_with_completeness(self):
         """Additional setup of class with the completeness"""
@@ -137,7 +146,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         if key not in self._completeness_grid:
             self._completeness_grid[key] = self._completeness_distribution(
-                self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
+                log_mass=self.log_mass_grid[np.newaxis, :], z=z[:, np.newaxis]
             )
 
         return self._completeness_grid[key]
@@ -148,11 +157,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """Compute purity grid and store in the class."""
 
         if key not in self._purity_grid:
-            purity_yx = self._purity_distribution(
-                log_proxy[np.newaxis, :], z[:, np.newaxis]
+            self._purity_grid[key] = self._purity_distribution(
+                z=z[np.newaxis, :], log_mass_proxy=log_proxy[:, np.newaxis]
             )
-            self._purity_grid[key] = purity_yx.T
-
         return self._purity_grid[key]
 
     def _get_shear_grid(self, z: npt.NDArray[np.float64], radius_centers, key):
@@ -200,7 +207,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         completeness_grid = self._get_completeness_grid(z_points, comp_key)
         # shape: (n_proxy, n_z)
         purity_grid = self._get_purity_grid(z_points, log_proxy_points, purity_key)
-
         # output shape: (n_proxy, n_z, n_mass)
         return (
             hmf_grid[np.newaxis, :, :]
