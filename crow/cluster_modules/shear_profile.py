@@ -221,7 +221,7 @@ class ClusterShearProfile(ClusterAbundance):
         z: npt.NDArray[np.float64],
         radius_center: np.float64,
     ) -> npt.NDArray[np.float64]:
-        """Delta sigma for cprint(new_pred)lusters."""
+        """Delta sigma for clusters."""
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
