@@ -221,7 +221,7 @@ class ClusterShearProfile(ClusterAbundance):
         z: npt.NDArray[np.float64],
         radius_center: np.float64,
     ) -> npt.NDArray[np.float64]:
-        """Delta sigma for cprint(new_pred)lusters."""
+        """Delta sigma for clusters."""
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
@@ -278,7 +278,7 @@ class ClusterShearProfile(ClusterAbundance):
         moo.set_mass(10**log_mass)
         return_vals = self._one_halo_contribution(moo, radius_center, z)
         if self.two_halo_term:
-            return_vals += moo._eval_excess_surface_density_2h(radius_center, z)
+            return_vals += moo.eval_excess_surface_density_2h(radius_center, z)
         if self.boost_factor:
             return_vals = self._correct_with_boost_nfw(return_vals, radius_center)
         return return_vals
