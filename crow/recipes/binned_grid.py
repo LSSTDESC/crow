@@ -198,15 +198,15 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def _get_integ_arrays(
         self,
         z_edges: tuple[float, float],
-        mass_proxy_edges: tuple[float, float],
+        log_proxy_edges: tuple[float, float],
     ) -> float:
         """grid arrays and keys"""
         return {
             "log_proxy": {
                 "points": np.linspace(
-                    mass_proxy_edges[0], mass_proxy_edges[1], self.log_proxy_points
+                    log_proxy_edges[0], log_proxy_edges[1], self.log_proxy_points
                 ),
-                "key": tuple(mass_proxy_edges),
+                "key": tuple(log_proxy_edges),
             },
             "redshift": {
                 "points": np.linspace(z_edges[0], z_edges[1], self.redshift_points),
@@ -319,7 +319,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def evaluate_theory_prediction_counts(
         self,
         z_edges,
-        mass_proxy_edges,
+        log_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -329,7 +329,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # grid arrays and keys
         ######################
 
-        integ_arrays = self._get_integ_arrays(z_edges, mass_proxy_edges)
+        integ_arrays = self._get_integ_arrays(z_edges, log_proxy_edges)
 
         ########
         # kernel
@@ -373,7 +373,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     def evaluate_theory_prediction_shear_profile(
         self,
         z_edges: tuple[float, float],
-        mass_proxy_edges: tuple[float, float],
+        log_proxy_edges: tuple[float, float],
         radius_centers: np.ndarray,
         sky_area: float,
         average_on: None | ClusterProperty = None,
@@ -392,7 +392,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # grid arrays and keys
         ######################
 
-        integ_arrays = self._get_integ_arrays(z_edges, mass_proxy_edges)
+        integ_arrays = self._get_integ_arrays(z_edges, log_proxy_edges)
         shear_key = integ_arrays["redshift"]["key"]
 
         ########
