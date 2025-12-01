@@ -73,9 +73,9 @@ def get_base_binned_grid(
         purity=purity,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
-        n_redshift_points=20,
-        n_mass_points=60,
-        n_proxy_points=20,
+        redshift_grid_size=20,
+        mass_grid_size=60,
+        proxy_grid_size=20,
     )
     cluster_recipe.mass_distribution.parameters["mu0"] = 3.0
     cluster_recipe.mass_distribution.parameters["mu1"] = 0.86
