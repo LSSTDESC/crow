@@ -34,9 +34,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         purity: Purity = None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
-        log_proxy_points: int = 30,
-        redshift_points: int = 30,
-        log_mass_points: int = 30,
+        n_proxy_points: int = 30,
+        n_redshift_points: int = 30,
+        n_mass_points: int = 30,
     ) -> None:
         super().__init__(
             cluster_theory=cluster_theory,
@@ -47,11 +47,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             mass_interval=mass_interval,
             true_z_interval=true_z_interval,
         )
-        self.log_proxy_points = log_proxy_points
-        self.redshift_points = redshift_points
-        self.log_mass_points = log_mass_points
+        self.n_proxy_points = n_proxy_points
+        self.n_redshift_points = n_redshift_points
+        self.n_mass_points = n_mass_points
         self.log_mass_grid = np.linspace(
-            mass_interval[0], mass_interval[1], self.log_mass_points
+            mass_interval[0], mass_interval[1], self.n_mass_points
         )
         self._hmf_grid = {}  # (n_z, n_mass)
         self._mass_richness_grid = {}  # (n_proxy, n_z, n_mass)
@@ -199,12 +199,12 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         return {
             "log_proxy": {
                 "points": np.linspace(
-                    log_proxy_edges[0], log_proxy_edges[1], self.log_proxy_points
+                    log_proxy_edges[0], log_proxy_edges[1], self.n_proxy_points
                 ),
                 "key": tuple(log_proxy_edges),
             },
             "redshift": {
-                "points": np.linspace(z_edges[0], z_edges[1], self.redshift_points),
+                "points": np.linspace(z_edges[0], z_edges[1], self.n_redshift_points),
                 "key": tuple(z_edges),
             },
         }

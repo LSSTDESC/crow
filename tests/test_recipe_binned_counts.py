@@ -64,9 +64,9 @@ def get_base_binned_grid(completeness, purity) -> GridBinnedClusterRecipe:
         purity=purity,
         mass_interval=(13, 17),
         true_z_interval=(0, 2),
-        redshift_points=20,
-        log_mass_points=50,
-        log_proxy_points=20,
+        n_redshift_points=20,
+        n_mass_points=50,
+        n_proxy_points=20,
     )
     cluster_recipe.mass_distribution.parameters["mu0"] = 3.0
     cluster_recipe.mass_distribution.parameters["mu1"] = 0.86
@@ -114,9 +114,9 @@ def test_binned_grid_init(
     assert binned_grid.true_z_interval[0] == 0.0
     assert binned_grid.true_z_interval[1] == 2.0
 
-    assert binned_grid.log_mass_points == 50
-    assert binned_grid.log_proxy_points == 20
-    assert binned_grid.redshift_points == 20
+    assert binned_grid.n_mass_points == 50
+    assert binned_grid.n_proxy_points == 20
+    assert binned_grid.n_redshift_points == 20
 
     assert binned_grid is not None
     assert isinstance(binned_grid, GridBinnedClusterRecipe)
@@ -489,12 +489,12 @@ def test_get_mass_richness_grid(binned_grid: GridBinnedClusterRecipe):
     binned_grid.setup()
 
     z_points = np.linspace(0.1, 1.0, 5)
-    log_proxy_points = np.linspace(1.5, 3.0, 4)
-    key = (tuple(z_points), tuple(log_proxy_points))
+    n_proxy_points = np.linspace(1.5, 3.0, 4)
+    key = (tuple(z_points), tuple(n_proxy_points))
 
-    mr_grid = binned_grid._get_mass_richness_grid(z_points, log_proxy_points, key)
+    mr_grid = binned_grid._get_mass_richness_grid(z_points, n_proxy_points, key)
 
-    n_p = len(log_proxy_points)
+    n_p = len(n_proxy_points)
     n_z = len(z_points)
     n_m = len(binned_grid.log_mass_grid)
 
@@ -504,7 +504,7 @@ def test_get_mass_richness_grid(binned_grid: GridBinnedClusterRecipe):
 
     binned_grid._mass_richness_grid[key] = np.zeros_like(mr_grid)
     recalled_mr_grid = binned_grid._get_mass_richness_grid(
-        z_points, log_proxy_points, key
+        z_points, n_proxy_points, key
     )
     assert np.all(recalled_mr_grid == 0.0)
 
@@ -540,11 +540,11 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
     binned_grid_w_pur.setup()
 
     z_points = np.linspace(0.1, 1.0, 5)
-    log_proxy_points = np.linspace(1.5, 3.0, 4)
-    key = (tuple(z_points), tuple(log_proxy_points))
+    n_proxy_points = np.linspace(1.5, 3.0, 4)
+    key = (tuple(z_points), tuple(n_proxy_points))
 
-    pur_grid = binned_grid_w_pur._get_purity_grid(z_points, log_proxy_points, key)
-    n_p = len(log_proxy_points)
+    pur_grid = binned_grid_w_pur._get_purity_grid(z_points, n_proxy_points, key)
+    n_p = len(n_proxy_points)
     n_z = len(z_points)
 
     # Shape and bounds
@@ -556,7 +556,7 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
     assert pur_grid is binned_grid_w_pur._purity_grid[key]
 
     binned_grid.setup()  # reset original fixture
-    flat_pur_grid = binned_grid._get_purity_grid(z_points, log_proxy_points, key)
+    flat_pur_grid = binned_grid._get_purity_grid(z_points, n_proxy_points, key)
     assert flat_pur_grid.shape == (n_p, n_z)
     assert np.allclose(flat_pur_grid, 1.0)
 
@@ -567,7 +567,7 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
         return binned_grid_w_pur._purity_distribution(z_array, log_proxy_array)
 
     z_bin = (z_points[0], z_points[-1])
-    proxy_bin = (log_proxy_points[0], log_proxy_points[-1])
+    proxy_bin = (n_proxy_points[0], n_proxy_points[-1])
 
     integral_exact, _ = dblquad(
         func=integrand,
@@ -579,7 +579,7 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
 
     integral_over_proxy = simpson(
         y=pur_grid,
-        x=log_proxy_points * np.log(10.0),
+        x=n_proxy_points * np.log(10.0),
         axis=0,
     )
     simpson_integral = simpson(
