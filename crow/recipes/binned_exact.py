@@ -6,6 +6,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
+from scipy.integrate import simpson
 
 from crow import ClusterShearProfile, kernel
 from crow.cluster_modules.completeness_models import Completeness
@@ -47,6 +48,13 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         )
 
         self.integrator = NumCosmoIntegrator()
+
+    def _setup_with_completeness(self):
+        """Additional setup of class with the completeness"""
+        if self.completeness is None:
+            self._completeness_distribution = lambda *args: 1
+        else:
+            self._completeness_distribution = self.completeness.distribution
 
     def _setup_with_purity(self):
         """Makes mass distribution use additional integral with completeness"""
@@ -112,7 +120,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             prediction = (
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
-                * self.completeness_distribution(mass, z)
+                * self._completeness_distribution(mass, z)
                 * self.redshift_distribution.distribution()
                 * self._mass_distribution_distribution(mass, z, mass_proxy_limits)
             )
@@ -221,6 +229,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 self.cluster_theory.comoving_volume(z, sky_area)
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
+                * self._completeness_distribution(mass, z)
                 * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
             if average_on is None:
@@ -279,7 +288,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z_edges,
         mass_proxy_edges,
-        radius_center,
+        radius_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
@@ -293,15 +302,17 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             self.mass_interval,
             z_edges,
         ]
-        radius_center = radius_center
-        self.integrator.extra_args = np.array(
-            [*mass_proxy_edges, sky_area, radius_center]
-        )
-        if self.cluster_theory._beta_parameters is not None:
-            self.cluster_theory.set_beta_s_interp(*z_edges)
-        theory_prediction = self._get_theory_prediction_shear_profile(average_on)
-        prediction_wrapper = self._get_function_to_integrate_shear_profile(
-            theory_prediction
-        )
-        deltasigma = self.integrator.integrate(prediction_wrapper)
-        return deltasigma
+        deltasigma_list = []
+        for radius_center in radius_centers:
+            self.integrator.extra_args = np.array(
+                [*mass_proxy_edges, sky_area, radius_center]
+            )
+            if self.cluster_theory._beta_parameters is not None:
+                self.cluster_theory.set_beta_s_interp(*z_edges)
+            theory_prediction = self._get_theory_prediction_shear_profile(average_on)
+            prediction_wrapper = self._get_function_to_integrate_shear_profile(
+                theory_prediction
+            )
+            deltasigma = self.integrator.integrate(prediction_wrapper)
+            deltasigma_list.append(deltasigma)
+        return np.array(deltasigma_list).flatten()

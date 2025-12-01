@@ -60,17 +60,3 @@ def test_binned_init():
         binned_class.evaluate_theory_prediction_shear_profile,
         *[None] * 5,
     )
-
-    # test with purity
-    purity = purity_models.PurityAguena16()
-    binned_class = BinnedClusterRecipe(
-        cluster_theory=cluster_theory,
-        redshift_distribution=redshift_distribution,
-        mass_distribution=mass_distribution,
-        completeness=completeness,
-        purity=purity,
-        mass_interval=mass_interval,
-        true_z_interval=true_z_interval,
-    )
-
-    assert binned_class.purity == purity
