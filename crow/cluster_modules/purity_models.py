@@ -65,8 +65,8 @@ class PurityAguena16(Purity):
 
     def distribution(
         self,
-        z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
         log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""

@@ -83,7 +83,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                     self.mass_distribution.gaussian_kernel(
                         log_mass, z, np.array([_log_mass_proxy])
                     )
-                    / self.purity.distribution(z, np.array([_log_mass_proxy]))
+                    / self.purity.distribution(np.array([_log_mass_proxy]), z)
                     for _log_mass_proxy in log_mass_proxy
                 ]
             )

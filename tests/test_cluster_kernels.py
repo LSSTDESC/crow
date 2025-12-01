@@ -85,7 +85,7 @@ def test_purity_distribution():
         dtype=np.float64,
     )
 
-    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
+    purity_values = pk.distribution(log_mass_proxy, z, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-5, abs=0.0)
@@ -117,7 +117,7 @@ def test_purity_distribution_uses_mean():
         ],
         dtype=np.float64,
     )
-    purity_values = pk.distribution(z, log_mass_proxy, log_mass_proxy_limits).flatten()
+    purity_values = pk.distribution(log_mass_proxy, z, log_mass_proxy_limits).flatten()
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-7, abs=0.0)
