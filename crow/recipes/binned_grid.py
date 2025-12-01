@@ -370,7 +370,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         )
         return counts
 
-    def evaluate_theory_prediction_shear_profile(
+    def evaluate_theory_prediction_lensing_profile(
         self,
         z_edges: tuple[float, float],
         log_proxy_edges: tuple[float, float],
@@ -378,8 +378,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        """Evaluate the theoretical prediction for the average shear profile
-        <DeltaSigma(R)> in the provided bin."""
+        r"""Evaluate the theoretical prediction for the average lensing profile
+        (..:math:`\langle\Delta\Sigma(R)\rangle` or ..:math:`\langle g_t(R)\rangle`)
+        in the provided bin."""
 
         if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
             # Raise a ValueError if the necessary flags are not present

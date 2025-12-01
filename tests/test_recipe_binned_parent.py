@@ -57,6 +57,6 @@ def test_binned_init():
     )
     np.testing.assert_raises(
         NotImplementedError,
-        binned_class.evaluate_theory_prediction_shear_profile,
+        binned_class.evaluate_theory_prediction_lensing_profile,
         *[None] * 5,
     )

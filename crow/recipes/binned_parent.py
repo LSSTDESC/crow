@@ -93,7 +93,7 @@ class BinnedClusterRecipe:
             "This function is not implemented in the parent class"
         )
 
-    def evaluate_theory_prediction_shear_profile(
+    def evaluate_theory_prediction_lensing_profile(
         self,
         z_edges,
         mass_proxy_edges,

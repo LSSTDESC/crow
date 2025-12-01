@@ -233,7 +233,7 @@ def test_evaluates_theory_prediction_returns_value(
     radius_center = np.atleast_1d(1.5)
     average_on = ClusterProperty.DELTASIGMA
 
-    prediction = binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
+    prediction = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radius_center, 360**2, average_on
     )
     prediction_c = binned_exact_deltasigma.evaluate_theory_prediction_counts(
@@ -254,10 +254,10 @@ def test_grid_shear_matches_exact_within_tolerance(
     sky_area = 360**2
     average_on = ClusterProperty.DELTASIGMA
 
-    pred_exact = binned_exact_deltasigma.evaluate_theory_prediction_shear_profile(
+    pred_exact = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
-    pred_grid = binned_grid_deltasigma.evaluate_theory_prediction_shear_profile(
+    pred_grid = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
@@ -284,10 +284,10 @@ def test_grid_reduced_shear_matches_exact_within_tolerance(
     binned_exact_gt.cluster_theory.set_beta_s_interp(0.1, 1)
     binned_grid_gt.cluster_theory.set_beta_s_interp(0.1, 1)
 
-    pred_exact = binned_exact_gt.evaluate_theory_prediction_shear_profile(
+    pred_exact = binned_exact_gt.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
-    pred_grid = binned_grid_gt.evaluate_theory_prediction_shear_profile(
+    pred_grid = binned_grid_gt.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
@@ -340,7 +340,7 @@ def test_shear_positivity_and_monotonicity_with_radius(
 
     # set beta interpolation for both recipes if needed
     binned_grid_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
-    shear_vals = binned_grid_deltasigma.evaluate_theory_prediction_shear_profile(
+    shear_vals = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
@@ -364,7 +364,7 @@ def test_integration_vectorization_multiple_radii(
     average_on = ClusterProperty.DELTASIGMA
 
     binned_grid_deltasigma.cluster_theory.set_beta_s_interp(0.1, 1)
-    shear_vals = binned_grid_deltasigma.evaluate_theory_prediction_shear_profile(
+    shear_vals = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
@@ -391,13 +391,13 @@ def test_shear_respects_completeness_and_purity_effects(
     sky_area = 360**2
     average_on = ClusterProperty.DELTASIGMA
 
-    base_val = base.evaluate_theory_prediction_shear_profile(
+    base_val = base.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
-    comp_val = with_comp.evaluate_theory_prediction_shear_profile(
+    comp_val = with_comp.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
-    pur_val = with_pur.evaluate_theory_prediction_shear_profile(
+    pur_val = with_pur.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
