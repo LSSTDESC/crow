@@ -158,7 +158,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         if key not in self._completeness_grid:
             self._completeness_grid[key] = self._completeness_distribution(
-                log_mass=self.log_mass_grid[np.newaxis, :], z=z[:, np.newaxis]
+                log_mass=log_mass[np.newaxis, :], z=z[:, np.newaxis]
             )
 
         return self._completeness_grid[key]
