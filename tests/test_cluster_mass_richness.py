@@ -11,7 +11,8 @@ from scipy.integrate import quad
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from crow import mass_proxy, purity
+from crow import mass_proxy
+from crow.cluster_modules.mass_proxy.murata import MurataModel
 
 PIVOT_Z = 0.6
 PIVOT_MASS = 14.625862906
@@ -79,9 +80,7 @@ def test_cluster_observed_z_mathematical_property(z: float):
     """Test mathematical identity: f(z) = ln(1+z) using hypothesis."""
     zarray = np.atleast_1d(z)
     mass = np.atleast_1d(0)
-    f_z = mass_proxy.MassRichnessGaussian.observed_value(
-        (0.0, 0.0, 1.0), mass, zarray, 0, 0
-    )
+    f_z = MurataModel.observed_value((0.0, 0.0, 1.0), mass, zarray, 0, 0)
     expected = np.log1p(zarray)
     assert f_z == pytest.approx(
         expected, rel=1.0e-7, abs=0.0
@@ -93,9 +92,7 @@ def test_cluster_observed_mass_mathematical_property(mass: float):
     """Test mathematical identity: f(mass) = mass * ln(10) using hypothesis."""
     z = np.atleast_1d(0)
     massarray = np.atleast_1d(mass)
-    f_logM = mass_proxy.MassRichnessGaussian.observed_value(
-        (0.0, 1.0, 0.0), massarray, z, 0, 0
-    )
+    f_logM = MurataModel.observed_value((0.0, 1.0, 0.0), massarray, z, 0, 0)
     expected = mass * np.log(10.0)
     assert f_logM == pytest.approx(
         expected, rel=1.0e-7, abs=0.0
@@ -143,49 +140,6 @@ def test_cluster_murata_binned_distribution(
 
 
 @given(
-    z=floats(min_value=1e-15, max_value=2.0), mass=floats(min_value=7.0, max_value=26.0)
-)
-def test_cluster_distribution_properties(z: float, mass: float):
-    """Mathematical properties of the cluster mass distribution using hypothesis."""
-    # Create the relation inside the test to avoid fixture issues
-    murata_binned_relation = mass_proxy.MurataBinned(PIVOT_MASS, PIVOT_Z)
-    murata_binned_relation.parameters["mu0"] = 3.00
-    murata_binned_relation.parameters["mu1"] = 0.086
-    murata_binned_relation.parameters["mu2"] = 0.01
-    murata_binned_relation.parameters["sigma0"] = 3.0
-    murata_binned_relation.parameters["sigma1"] = 0.07
-    murata_binned_relation.parameters["sigma2"] = 0.01
-
-    murata_binned_relation_inpure = mass_proxy.MurataBinned(
-        PIVOT_MASS, PIVOT_Z, purity.PurityAguena16()
-    )
-    murata_binned_relation_inpure.parameters["mu0"] = 3.00
-    murata_binned_relation_inpure.parameters["mu1"] = 0.086
-    murata_binned_relation_inpure.parameters["mu2"] = 0.01
-    murata_binned_relation_inpure.parameters["sigma0"] = 3.0
-    murata_binned_relation_inpure.parameters["sigma1"] = 0.07
-    murata_binned_relation_inpure.parameters["sigma2"] = 0.01
-
-    mass_proxy_limits = (1.0, 5.0)
-
-    mass_array = np.atleast_1d(mass)
-    z_array = np.atleast_1d(z)
-
-    probability = murata_binned_relation.distribution(
-        mass_array, z_array, mass_proxy_limits
-    )
-
-    # Test non-negativity property
-    assert probability >= 0, f"Probability must be non-negative, got {probability}"
-
-    # Test with purity
-    probability_inpure = murata_binned_relation_inpure.distribution(
-        mass_array, z_array, mass_proxy_limits
-    )
-    assert (probability < probability_inpure).all()
-
-
-@given(
     z=floats(min_value=1e-15, max_value=2.0),
     mass1=floats(min_value=7.0, max_value=25.0),
     mass_delta=floats(min_value=0.1, max_value=1.0),
@@ -228,7 +182,7 @@ def test_cluster_murata_binned_mean(murata_binned_relation: mass_proxy.MurataBin
             zarray = np.atleast_1d(z)
             test = murata_binned_relation.get_ln_mass_proxy_mean(massarray, zarray)
 
-            true = mass_proxy.MassRichnessGaussian.observed_value(
+            true = MurataModel.observed_value(
                 (3.00, 0.086, 0.01),
                 massarray,
                 zarray,
@@ -248,7 +202,7 @@ def test_cluster_murata_binned_variance(
             zarray = np.atleast_1d(z)
             test = murata_binned_relation.get_ln_mass_proxy_sigma(massarray, zarray)
 
-            true = mass_proxy.MassRichnessGaussian.observed_value(
+            true = MurataModel.observed_value(
                 (3.00, 0.07, 0.01),
                 massarray,
                 zarray,

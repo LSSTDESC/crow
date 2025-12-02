@@ -22,64 +22,19 @@ from scipy.stats import gamma
 from crow import ClusterAbundance
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
-from .completeness import Completeness
+from . import _clmm_patches
 from .parameters import Parameters
 
-
-def numcosmo_miscentered_mean_surface_density(  # pragma: no cover
-    r_proj, r_mis, integrand, norm, aux_args, extra_integral
-):
-    """
-    NumCosmo replacement for `integrate_azimuthially_miscentered_mean_surface_density`.
-
-    Integrates azimuthally and radially for the mean surface mass density kernel.
-    """
-    integrator = NumCosmoIntegrator(
-        relative_tolerance=1e-6,
-        absolute_tolerance=1e-3,
-    )
-    integrand = np.vectorize(integrand)
-    r_proj = np.atleast_1d(r_proj)
-    r_lower = np.full_like(r_proj, 1e-6)
-    r_lower[1:] = r_proj[:-1]
-
-    results = []
-    args = (r_mis, *aux_args)
-    integrator.extra_args = np.array(args)
-    for r_low, r_high in zip(r_lower, r_proj):
-        if extra_integral:
-            integrator.integral_bounds = [
-                (r_low, r_high),
-                (1.0e-6, np.pi),
-                (0.0, np.inf),
-            ]
-
-            def integrand_numcosmo(int_args, extra_args):
-                r_local = int_args[:, 0]
-                theta = int_args[:, 1]
-                extra = int_args[:, 2]
-                return integrand(theta, r_local, extra, *extra_args)
-
-        else:
-            integrator.integral_bounds = [(r_low, r_high), (1.0e-6, np.pi)]
-
-            def integrand_numcosmo(int_args, extra_args):
-                r_local = int_args[:, 0]
-                theta = int_args[:, 1]
-                return integrand(theta, r_local, *extra_args)
-
-        res = integrator.integrate(integrand_numcosmo)
-        results.append(res)
-
-    results = np.array(results)
-    mean_surface_density = np.cumsum(results) * norm * 2 / np.pi / r_proj**2
-    if not np.iterable(r_proj):
-        return res[0] * norm * 2 / np.pi / r_proj**2
-    return mean_surface_density
-
-
+##############################
+# Monkeypatch CLMM functions #
+##############################
 clmm.theory.miscentering.integrate_azimuthially_miscentered_mean_surface_density = (  # pragma: no cover
-    numcosmo_miscentered_mean_surface_density
+    _clmm_patches.numcosmo_miscentered_mean_surface_density
+)
+clmm.Modeling._eval_2halo_term_generic = (  # pragma: no cover
+    # _clmm_patches._eval_2halo_term_generic_orig
+    # _clmm_patches._eval_2halo_term_generic_new
+    _clmm_patches._eval_2halo_term_generic_vec
 )
 
 
@@ -109,7 +64,7 @@ class ClusterShearProfile(ClusterAbundance):
         self.two_halo_term = two_halo_term
         self.boost_factor = boost_factor
 
-        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo)
+        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo, validate_input=False)
 
         self._beta_parameters = None
         self._beta_s_mean_interp = None
@@ -118,6 +73,7 @@ class ClusterShearProfile(ClusterAbundance):
         self.use_beta_s_interp = use_beta_s_interp
         self.miscentering_parameters = None
         self.approx = None
+        self.vectorized = False
 
     @property
     def cluster_concentration(self):
@@ -209,13 +165,33 @@ class ClusterShearProfile(ClusterAbundance):
         self.approx = approx.lower()
 
     def _beta_s_mean_exact(self, z_cl):
-        return clmm.utils.compute_beta_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+        z_cl = np.asarray(z_cl)
+        if z_cl.ndim == 0:
+            return compute_beta_s_mean_from_distribution(
+                z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+            )
+        return np.array(
+            [
+                compute_beta_s_mean_from_distribution(
+                    float(z), cosmo=self._clmm_cosmo, **self._beta_parameters
+                )
+                for z in z_cl
+            ]
         )
 
     def _beta_s_square_mean_exact(self, z_cl):
-        return clmm.utils.compute_beta_s_mean_from_distribution(
-            z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+        z_cl = np.asarray(z_cl)
+        if z_cl.ndim == 0:
+            return compute_beta_s_square_mean_from_distribution(
+                z_cl, cosmo=self._clmm_cosmo, **self._beta_parameters
+            )
+        return np.array(
+            [
+                compute_beta_s_square_mean_from_distribution(
+                    float(z), cosmo=self._clmm_cosmo, **self._beta_parameters
+                )
+                for z in z_cl
+            ]
         )
 
     def set_beta_s_interp(self, z_min, z_max, n_intep=3):
@@ -245,7 +221,7 @@ class ClusterShearProfile(ClusterAbundance):
         z: npt.NDArray[np.float64],
         radius_center: np.float64,
     ) -> npt.NDArray[np.float64]:
-        """Delta sigma for cprint(new_pred)lusters."""
+        """Delta sigma for clusters."""
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
@@ -254,13 +230,12 @@ class ClusterShearProfile(ClusterAbundance):
             massdef=mass_type,
             delta_mdef=mass_def.Delta,
             halo_profile_model="nfw",
+            validate_input=False,
         )
         moo.set_cosmo(self._clmm_cosmo)
-
         # NOTE: value set up not to break use in pyccl with firecronw
         # to be investigated
         moo.z_inf = 10.0
-
         return_vals = []
         for log_m, redshift in zip(log_mass, z):
             # pylint: disable=protected-access
@@ -278,6 +253,36 @@ class ClusterShearProfile(ClusterAbundance):
             return_vals.append(val)
         return np.asarray(return_vals, dtype=np.float64)
 
+    def compute_shear_profile_vectorized(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+        radius_center: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Delta sigma for clusters."""
+        mass_def = self.halo_mass_function.mass_def
+        mass_type = mass_def.rho_type
+        if mass_type == "matter":
+            mass_type = "mean"
+        moo = clmm.Modeling(
+            massdef=mass_type,
+            delta_mdef=mass_def.Delta,
+            halo_profile_model="nfw",
+            validate_input=False,
+        )
+        moo.set_cosmo(self._clmm_cosmo)
+        # NOTE: value set up not to break use in pyccl with firecronw
+        # to be investigated
+        moo.z_inf = np.full_like(z, 10.0)
+        moo.set_concentration(self._get_concentration(log_mass, z))
+        moo.set_mass(10**log_mass)
+        return_vals = self._one_halo_contribution(moo, radius_center, z)
+        if self.two_halo_term:
+            return_vals += moo.eval_excess_surface_density_2h(radius_center, z)
+        if self.boost_factor:
+            return_vals = self._correct_with_boost_nfw(return_vals, radius_center)
+        return return_vals
+
     def _one_halo_contribution(
         self,
         clmm_model: clmm.Modeling,
@@ -294,8 +299,8 @@ class ClusterShearProfile(ClusterAbundance):
                 radius_center, redshift
             )
         else:
-            beta_s_mean = float(self.eval_beta_s_mean(redshift))
-            beta_s_square_mean = float(self.eval_beta_s_square_mean(redshift))
+            beta_s_mean = self.eval_beta_s_mean(redshift)
+            beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
             first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
                 radius_center,
                 redshift,
@@ -323,7 +328,7 @@ class ClusterShearProfile(ClusterAbundance):
             raise Exception("Two halo contribution for gt is not suported yet.")
 
         second_halo_right_centered = clmm_model.eval_excess_surface_density_2h(
-            np.array([radius_center]), redshift
+            np.atleast_1d(radius_center), redshift
         )
 
         return second_halo_right_centered[0]
@@ -442,5 +447,4 @@ class ClusterShearProfile(ClusterAbundance):
         integrator.integral_bounds = [(0.0, integration_max)]
         integrator.extra_args = np.array([sigma])
         miscentering_integral = integrator.integrate(integration_func)
-
         return miscentering_integral, miscentering_frac

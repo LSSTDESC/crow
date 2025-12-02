@@ -105,7 +105,7 @@ class BinnedClusterShearProfile(BinnedCluster):
                     self.sky_area,
                 )
             total_observable = (
-                self.cluster_recipe.evaluate_theory_prediction_shear_profile(
+                self.cluster_recipe.evaluate_theory_prediction_lensing_profile(
                     this_bin.z_edges,
                     this_bin.mass_proxy_edges,
                     this_bin.radius_center,

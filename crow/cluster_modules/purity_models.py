@@ -26,7 +26,6 @@ class Purity:
         self,
         z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
-        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
         raise NotImplementedError
@@ -65,22 +64,12 @@ class PurityAguena16(Purity):
 
     def distribution(
         self,
-        z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
-        log_mass_proxy_limits: Optional[tuple[float, float]] = None,
+        z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the purity contribution to the integrand."""
-        _log_mass_proxy = log_mass_proxy
-        if all(log_mass_proxy == -1.0):
-            if log_mass_proxy_limits is None:
-                raise ValueError(
-                    "log_mass_proxy_limits must be provided when log_mass_proxy == -1"
-                )
-            _log_mass_proxy = (log_mass_proxy_limits[0] + log_mass_proxy_limits[1]) / 2
 
-        rich_norm_pow = (
-            np.array([10**_log_mass_proxy], dtype=np.float64) / self._mpiv(z)
-        ) ** self._nc(z)
+        rich_norm_pow = (10**log_mass_proxy / self._mpiv(z)) ** self._nc(z)
 
         purity = rich_norm_pow / (rich_norm_pow + 1.0)
         assert isinstance(purity, np.ndarray)
