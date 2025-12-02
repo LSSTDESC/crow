@@ -335,7 +335,7 @@ class ClusterShearProfile(ClusterAbundance):
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
         """Determine the concentration for a halo."""
-        if self.cluster_concentration is not None:
+        if self.cluster_concentration is not None and self.cluster_concentration >= 0:
             return self.cluster_concentration
 
         conc_model = pyccl.halos.concentration.ConcentrationBhattacharya13(

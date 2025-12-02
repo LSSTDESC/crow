@@ -281,3 +281,22 @@ def test_shear_profile_vectorized_with_twoh_boost(cluster_deltasigma_profile):
     assert np.all(shear_vec >= 0)  # positivity
     assert np.all(shear_vec_2h >= shear_vec)
     assert np.all(shear_vec_boost >= shear_vec)
+
+
+def test_cluster_concentration_negative_values():
+    """Test passing a negative cluster_concentration to the ClusterShearProfile."""
+    cosmo = _TEST_COSMO
+    hmf = pyccl.halos.MassFuncBocquet16()
+    log_m = 14.0
+    z = 1.0
+    negative_concentration = -2.5
+    cluster = ClusterShearProfile(
+        cosmo,
+        hmf,
+        cluster_concentration=negative_concentration,
+        is_delta_sigma=True,
+    )
+
+    assert cluster.cluster_concentration == negative_concentration
+    # It should NOT be the default 4
+    assert np.all(cluster._get_concentration(log_m, z) != 4.0)
