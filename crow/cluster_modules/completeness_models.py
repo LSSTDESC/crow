@@ -67,9 +67,8 @@ class CompletenessAguena16(Completeness):
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
         """Evaluates and returns the completeness contribution to the integrand."""
-        mass = 10.0**log_mass
 
-        mass_norm_pow = (mass / self._mpiv(z)) ** self._nc(z)
+        mass_norm_pow = (10.0**log_mass / self._mpiv(z)) ** self._nc(z)
 
         completeness = mass_norm_pow / (mass_norm_pow + 1.0)
         assert isinstance(completeness, np.ndarray)

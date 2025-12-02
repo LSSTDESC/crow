@@ -61,20 +61,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
     def _flat_distribution(
         self,
+        log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
-        log_mass: npt.NDArray[np.float64] = None,
-        log_mass_proxy: npt.NDArray[np.float64] = None,
     ):
         """Returns a null (=1) contribution to the integrand."""
-        if log_mass is None and log_mass_proxy is None:
-            raise ValueError(
-                "Either log_mass or log_mass_proxy should be provided should be provided."
-            )
-        if log_mass_proxy is None:
-            return 1.0 + 0 * log_mass * z
-        if log_mass is None:
-            return 1.0 + 0 * log_mass_proxy * z
-        raise ValueError("Only one of log_mass or log_mass_proxy must be provided.")
+        return 1.0 + 0 * log_mass * z
 
     def _setup_with_completeness(self):
         """Additional setup of class with the completeness"""
@@ -154,7 +145,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         if key not in self._completeness_grid:
             self._completeness_grid[key] = self._completeness_distribution(
-                log_mass=self.log_mass_grid[np.newaxis, :], z=z[:, np.newaxis]
+                self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
             )
 
         return self._completeness_grid[key]
@@ -166,7 +157,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
         if key not in self._purity_grid:
             self._purity_grid[key] = self._purity_distribution(
-                z=z[np.newaxis, :], log_mass_proxy=log_proxy[:, np.newaxis]
+                log_proxy[:, np.newaxis], z[np.newaxis, :]
             )
         return self._purity_grid[key]
 

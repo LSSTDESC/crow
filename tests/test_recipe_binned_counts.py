@@ -565,7 +565,7 @@ def test_get_purity_grid(binned_grid: GridBinnedClusterRecipe):
         log_proxy_scalar = ln_proxy_scalar / np.log(10.0)
         z_array = np.array([z_scalar])
         log_proxy_array = np.array([log_proxy_scalar])
-        return binned_grid_w_pur._purity_distribution(z_array, log_proxy_array)
+        return binned_grid_w_pur._purity_distribution(log_proxy_array, z_array)
 
     z_bin = (z_points[0], z_points[-1])
     proxy_bin = (proxy_grid_size[0], proxy_grid_size[-1])
