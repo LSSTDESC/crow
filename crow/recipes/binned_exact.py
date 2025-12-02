@@ -49,6 +49,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         self.integrator = NumCosmoIntegrator()
 
+    def setup(self):
+        pass
+
     def _setup_with_completeness(self):
         """Additional setup of class with the completeness"""
         if self.completeness is None:
