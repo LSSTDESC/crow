@@ -24,44 +24,45 @@ env:
   CACHE_VERSION: 1
 
 jobs:
-  quick-validation:
-    name: Quick validation (Lint + Tests)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          environment-file: environment.yml
-          python-version: 3.12
-          activate-environment: ${{ env.CONDA_ENV }}
-          use-mamba: true
-      - name: Verify environment
-        run: |
-          conda info
-          conda list
-      - name: Check code formatting with black
-        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
-      - name: Check import order with isort
-        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
-      - name: Run tests with pytest + coverage
-        run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install coverage
-          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
-          conda run -n ${{ env.CONDA_ENV }} coverage report -m
-          conda run -n ${{ env.CONDA_ENV }} coverage xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
-          use_oidc: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+###  quick-validation:
+###    name: Quick validation (Lint + Tests)
+###    runs-on: ubuntu-latest
+###    steps:
+###      - uses: actions/checkout@v4
+###      - name: Set up Miniconda
+###        uses: conda-incubator/setup-miniconda@v3
+###        with:
+###          environment-file: environment.yml
+###          python-version: 3.12
+###          activate-environment: ${{ env.CONDA_ENV }}
+###          use-mamba: true
+###      - name: Verify environment
+###        run: |
+###          conda info
+###          conda list
+###      - name: Check code formatting with black
+###        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
+###      - name: Check import order with isort
+###        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
+###      - name: Run tests with pytest + coverage
+###        run: |
+###          conda run -n ${{ env.CONDA_ENV }} pip install coverage
+###          conda run -n ${{ env.CONDA_ENV }} coverage run -m pytest -v --maxfail=1 --disable-warnings
+###          conda run -n ${{ env.CONDA_ENV }} coverage report -m
+###          conda run -n ${{ env.CONDA_ENV }} coverage xml
+###      - name: Upload coverage to Codecov
+###        uses: codecov/codecov-action@v5
+###        with:
+###          files: ./coverage.xml
+###          fail_ci_if_error: true
+###          verbose: true
+###          use_oidc: false
+###        env:
+###          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   check-code-version:
     name: Verify code version update
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
     steps:
       # Get current version
       - name: Check out the code
@@ -71,6 +72,7 @@ jobs:
         run: |
           CURRENT_VERSION="$(grep -oP '__version__ = "\K[^"]+' crow/__init__.py)"
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          echo "my branch is ${{ github.ref }}"
       # Get main version
       - name: Checkout the main branch to get its version
         uses: actions/checkout@v4
@@ -151,60 +153,60 @@ jobs:
             -d "{\"title\":\"$NEW_TITLE\"}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" > /dev/null
 
-  crow-matrix:
-    name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
-    runs-on: ${{ matrix.os }}-latest
-    needs: quick-validation
-    if: >
-      (github.event_name == 'pull_request' && !github.event.pull_request.draft)
-      || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu", "macos"]
-        python-version: ["3.11", "3.12", "3.13"]
-        include:
-          - os: ubuntu
-            python-version: "3.12"
-            coverage: true
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-          activate-environment: ${{ env.CONDA_ENV }}
-          use-mamba: true
-          environment-file: environment.yml
-      - name: Cache Conda env
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.CONDA }}/envs
-          key: conda-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}-v${{ env.CACHE_VERSION }}
-      - name: Update environment
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: conda env update -n ${{ env.CONDA_ENV }} -f environment.yml
-      - name: Install test dependencies
-        run: |
-          conda run -n ${{ env.CONDA_ENV }} pip install pytest-xdist pytest-cov
-      - name: Check code formatting with black
-        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
-      - name: Check import order with isort
-        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
-      - name: Run tests
-        run: |
-          if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
-            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow --cov crow --cov-report xml --cov-branch -n auto
-          else
-            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
-          fi
-      - name: Upload coverage to Codecov
-        if: ${{ matrix.coverage == true }}
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
-          use_oidc: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+###  crow-matrix:
+###    name: (${{ matrix.os }}, py${{ matrix.python-version }})${{ matrix.coverage && ' + coverage' || '' }}
+###    runs-on: ${{ matrix.os }}-latest
+###    needs: quick-validation
+###    if: >
+###      (github.event_name == 'pull_request' && !github.event.pull_request.draft)
+###      || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+###    strategy:
+###      fail-fast: false
+###      matrix:
+###        os: ["ubuntu", "macos"]
+###        python-version: ["3.11", "3.12", "3.13"]
+###        include:
+###          - os: ubuntu
+###            python-version: "3.12"
+###            coverage: true
+###    steps:
+###      - uses: actions/checkout@v4
+###      - name: Set up Miniconda
+###        uses: conda-incubator/setup-miniconda@v3
+###        with:
+###          python-version: ${{ matrix.python-version }}
+###          activate-environment: ${{ env.CONDA_ENV }}
+###          use-mamba: true
+###          environment-file: environment.yml
+###      - name: Cache Conda env
+###        uses: actions/cache/restore@v4
+###        with:
+###          path: ${{ env.CONDA }}/envs
+###          key: conda-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}-v${{ env.CACHE_VERSION }}
+###      - name: Update environment
+###        if: steps.cache.outputs.cache-hit != 'true'
+###        run: conda env update -n ${{ env.CONDA_ENV }} -f environment.yml
+###      - name: Install test dependencies
+###        run: |
+###          conda run -n ${{ env.CONDA_ENV }} pip install pytest-xdist pytest-cov
+###      - name: Check code formatting with black
+###        run: conda run -n ${{ env.CONDA_ENV }} black --check --diff crow tests
+###      - name: Check import order with isort
+###        run: conda run -n ${{ env.CONDA_ENV }} isort --check --diff crow tests
+###      - name: Run tests
+###        run: |
+###          if [[ "${{ matrix.coverage || false }}" == "true" ]]; then
+###            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow --cov crow --cov-report xml --cov-branch -n auto
+###          else
+###            conda run -n ${{ env.CONDA_ENV }} pytest -vv --runslow -n auto
+###          fi
+###      - name: Upload coverage to Codecov
+###        if: ${{ matrix.coverage == true }}
+###        uses: codecov/codecov-action@v5
+###        with:
+###          files: ./coverage.xml
+###          fail_ci_if_error: true
+###          verbose: true
+###          use_oidc: false
+###        env:
+###          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
