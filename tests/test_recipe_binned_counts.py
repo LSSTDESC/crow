@@ -104,10 +104,7 @@ def test_binned_exact_init(
     assert isinstance(binned_exact.redshift_distribution, kernel.SpectroscopicRedshift)
     assert binned_exact.mass_distribution is not None
     assert isinstance(binned_exact.mass_distribution, mass_proxy.MurataBinned)
-    try:
-        binned_exact.setup()
-    except Exception as e:
-        pytest.fail(f"ExactBinnedClusterRecipe.setup() raised an exception: {e}")
+    binned_exact.setup()
 
 
 def test_binned_grid_init(
