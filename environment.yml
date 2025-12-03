@@ -1,4 +1,4 @@
-name: crow_dev
+name: crow
 channels:
   - conda-forge
 dependencies:

@@ -20,7 +20,7 @@ on:
       - ready_for_review
 
 env:
-  CONDA_ENV: crow-env
+  CONDA_ENV: crow
   CACHE_VERSION: 1
 
 jobs:
