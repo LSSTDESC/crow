@@ -8,4 +8,4 @@ from .recipes.binned_exact import ExactBinnedClusterRecipe
 from .recipes.binned_grid import GridBinnedClusterRecipe
 from .recipes.binned_parent import BinnedClusterRecipe
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"
