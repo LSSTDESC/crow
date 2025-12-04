@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "desc-crow"
-version = "0.5.2"
+dynamic = ["version"]
 description = "Cluster Reconstruction of Observables Workbench"
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -47,3 +47,6 @@ target-version = ['py310']
 
 [tool.isort]
 profile = "black"
+
+[tool.setuptools.dynamic]
+version = {attr = "crow.__version__"}
