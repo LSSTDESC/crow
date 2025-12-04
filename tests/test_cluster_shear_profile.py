@@ -8,7 +8,6 @@ import pyccl
 import pytest
 from scipy.stats import norm
 
-
 from crow import ClusterShearProfile
 
 _TEST_COSMO = pyccl.CosmologyVanillaLCDM()

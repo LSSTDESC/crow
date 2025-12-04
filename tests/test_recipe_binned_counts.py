@@ -10,7 +10,6 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 from scipy.integrate import dblquad, simpson
 
-
 from crow import (
     ClusterAbundance,
     completeness_models,

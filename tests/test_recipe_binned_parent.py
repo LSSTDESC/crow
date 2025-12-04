@@ -9,7 +9,6 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 
-
 from crow import ClusterAbundance, kernel, mass_proxy, purity_models
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty

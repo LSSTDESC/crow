@@ -9,7 +9,6 @@ from hypothesis import assume, given
 from hypothesis.strategies import floats
 from scipy.integrate import quad
 
-
 from crow import mass_proxy
 from crow.cluster_modules.mass_proxy.murata import MurataModel
 

@@ -6,7 +6,6 @@ import sys
 import numpy as np
 import pytest
 
-
 from crow.cluster_modules.parameters import Parameters
 
 

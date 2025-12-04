@@ -7,7 +7,6 @@ import numpy as np
 import pyccl
 import pytest
 
-
 from crow import (
     ClusterAbundance,
     ClusterShearProfile,

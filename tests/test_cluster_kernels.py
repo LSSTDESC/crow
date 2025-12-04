@@ -6,7 +6,6 @@ import sys
 import numpy as np
 import pytest
 
-
 from crow import completeness_models, kernel, purity_models
 
 
