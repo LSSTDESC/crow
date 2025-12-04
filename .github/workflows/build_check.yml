@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'docs/**/*.md'
-      - '*.md'
+      - "docs/**/*.md"
+      - "*.md"
   pull_request:
     branches:
-      - '*'
+      - "*"
     paths-ignore:
-      - 'docs/**/*.md'
-      - '*.md'
+      - "docs/**/*.md"
+      - "*.md"
     types:
       - opened
       - synchronize
@@ -20,7 +20,7 @@ on:
       - ready_for_review
 
 env:
-  CONDA_ENV: crow-env
+  CONDA_ENV: crow
   CACHE_VERSION: 1
 
 jobs:
@@ -89,7 +89,7 @@ jobs:
           fi
           echo "MAIN_VERSION=$MAIN_VERSION" >> $GITHUB_ENV
       # Get PR title to be updated with version
-      - name : Get PR title and clean version number from it
+      - name: Get PR title and clean version number from it
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
@@ -136,7 +136,7 @@ jobs:
           fi
           echo "[ok] Version increased changed!"
       # Add version number to PR title
-      - name : Make new title for PR
+      - name: Make new title for PR
         run: |
           NEW_TITLE="${NEW_TITLE} [version:$CURRENT_VERSION]"
           echo "New title: $NEW_TITLE"

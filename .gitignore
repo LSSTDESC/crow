@@ -1,2 +1,15 @@
 *.swp
 *__pycache__
+
+# Building artifacts
+dist/
+desc_crow.egg-info/
+
+# Coverage
+.coverage
+
+# VS Code settings
+.vscode/
+
+# hypothesis
+.hypothesis/
