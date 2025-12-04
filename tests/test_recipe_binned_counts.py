@@ -10,9 +10,6 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 from scipy.integrate import dblquad, simpson
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
 from crow import (
     ClusterAbundance,
     completeness_models,

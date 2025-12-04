@@ -7,8 +7,6 @@ import numpy as np
 import pyccl
 import pytest
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from crow import (
     ClusterAbundance,
     ClusterShearProfile,

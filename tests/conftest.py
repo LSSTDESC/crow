@@ -10,7 +10,6 @@ import sys
 import pytest
 
 # Ensure we can import from the main crow/ package
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 def pytest_addoption(parser):
