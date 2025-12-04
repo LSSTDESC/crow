@@ -7,7 +7,6 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.integrator.scipy_integrator import ScipyIntegrator

@@ -9,8 +9,6 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 from crow import ClusterAbundance, kernel, mass_proxy, purity_models
 from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
