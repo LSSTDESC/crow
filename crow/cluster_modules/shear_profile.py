@@ -87,7 +87,7 @@ class ClusterShearProfile(ClusterAbundance):
 
     @cluster_concentration.setter
     def cluster_concentration(self, value):
-        if value < 0:
+        if value is not None and value < 0:
             value = None
         self.parameters["cluster_concentration"] = value
 
