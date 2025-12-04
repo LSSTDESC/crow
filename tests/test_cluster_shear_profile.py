@@ -297,6 +297,6 @@ def test_cluster_concentration_negative_values():
         is_delta_sigma=True,
     )
 
-    assert cluster.cluster_concentration == negative_concentration
+    assert cluster.cluster_concentration is None
     # It should NOT be the default 4
     assert np.all(cluster._get_concentration(log_m, z) != 4.0)

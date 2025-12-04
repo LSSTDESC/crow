@@ -64,7 +64,8 @@ class ClusterShearProfile(ClusterAbundance):
         """
         super().__init__(cosmo, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
-        self.parameters = Parameters({"cluster_concentration": cluster_concentration})
+        self.parameters = Parameters({"cluster_concentration": None})
+        self.cluster_concentration = cluster_concentration
 
         self.two_halo_term = two_halo_term
         self.boost_factor = boost_factor
