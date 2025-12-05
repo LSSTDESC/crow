@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
 from scipy.integrate import simpson
+from scipy.integrate import quad
 
 from crow import ClusterShearProfile, kernel
 from crow.cluster_modules.completeness_models import Completeness
@@ -78,27 +79,15 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             absolute_tolerance=1e-12,
         )
 
-        def integration_func(int_args, extra_args):
-            ln_mass_proxy = int_args[:, 0]
+        def integration_func(ln_mass_proxy, log_mass, z):
             log_mass_proxy = ln_mass_proxy / np.log(10.0)
-            return np.array(
-                [
-                    self.mass_distribution.gaussian_kernel(
-                        log_mass, z, np.array([_log_mass_proxy])
-                    )
-                    / self.purity.distribution(np.array([_log_mass_proxy]), z)
-                    for _log_mass_proxy in log_mass_proxy
-                ]
-            )
+            return self.mass_distribution.gaussian_kernel( np.array([log_mass]),  np.array([z]), np.array([log_mass_proxy]))/self.purity.distribution(np.array([log_mass_proxy]), np.array([z]))
+        
+        def integration(log_mass,z):
+            return quad(integration_func, log_mass_proxy_limits[0], log_mass_proxy_limits[1], args=(log_mass,z))[0]
 
-        integrator.integral_bounds = [
-            (
-                np.log(10.0) * log_mass_proxy_limits[0],
-                np.log(10.0) * log_mass_proxy_limits[1],
-            )
-        ]
-
-        return integrator.integrate(integration_func)
+        impure_mass_distribution_integral  = np.vectorize(integration)
+        return impure_mass_distribution_integral(log_mass, z)
 
     def _get_theory_prediction_counts(
         self,
