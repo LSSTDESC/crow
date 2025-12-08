@@ -311,7 +311,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 [*log_proxy_edges, sky_area, radius_center]
             )
             if self.cluster_theory._beta_parameters is not None:
-                self.cluster_theory.set_beta_s_interp(*z_edges)
+                self.cluster_theory.set_beta_s_interp(*z_edges, 30)
             theory_prediction = self._get_theory_prediction_shear_profile(average_on)
             prediction_wrapper = self._get_function_to_integrate_shear_profile(
                 theory_prediction
