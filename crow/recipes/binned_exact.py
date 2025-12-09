@@ -6,8 +6,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 import pyccl as ccl
-from scipy.integrate import simpson
-from scipy.integrate import quad
+from scipy.integrate import simpson, quad
 
 from crow import ClusterShearProfile, kernel
 from crow.cluster_modules.completeness_models import Completeness
@@ -61,33 +60,19 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             self._completeness_distribution = self.completeness.distribution
 
     def _setup_with_purity(self):
-        """Makes mass distribution use additional integral with completeness"""
-        if self.purity is None:
+        """Makes mass distribution use additional integral with purity"""
+        if self.purity is None: 
             self._mass_distribution_distribution = self.mass_distribution.distribution
         else:
             self._mass_distribution_distribution = self._impure_mass_distribution
 
-    def _impure_mass_distribution(self, log_mass, z, log_mass_proxy_limits):
+    def _impure_mass_distribution(self, log_mass, z, log_mass_proxy):
 
         ##############################
         # Fix this function, Henrique
         # Good luck!
         ##############################
-
-        integrator = NumCosmoIntegrator(
-            relative_tolerance=1e-6,
-            absolute_tolerance=1e-12,
-        )
-
-        def integration_func(ln_mass_proxy, log_mass, z):
-            log_mass_proxy = ln_mass_proxy / np.log(10.0)
-            return self.mass_distribution.gaussian_kernel( np.array([log_mass]),  np.array([z]), np.array([log_mass_proxy]))/self.purity.distribution(np.array([log_mass_proxy]), np.array([z]))
-        
-        def integration(log_mass,z):
-            return quad(integration_func, log_mass_proxy_limits[0], log_mass_proxy_limits[1], args=(log_mass,z))[0]
-
-        impure_mass_distribution_integral  = np.vectorize(integration)
-        return impure_mass_distribution_integral(log_mass, z)
+        return self.mass_distribution.gaussian_kernel(log_mass, z, log_mass_proxy)/self.purity.distribution(log_mass_proxy, z) * np.log(10)
 
     def _get_theory_prediction_counts(
         self,
@@ -119,7 +104,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
             if average_on is None:
                 return prediction
-
+    
             for cluster_prop in ClusterProperty:
                 include_prop = cluster_prop & average_on
                 if not include_prop:
@@ -132,6 +117,49 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         return theory_prediction
 
+    def _get_theory_prediction_impure_counts(
+        self,
+        average_on: None | ClusterProperty = None,
+    ) -> Callable[
+        [npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], float],
+        npt.NDArray[np.float64],
+    ]:
+        """Get a callable that evaluates a cluster theory prediction.
+
+        Returns a callable function that accepts mass, redshift, mass_proxy,
+        and the sky area of your survey and returns the theoretical prediction for the
+        expected number of clusters including false detections.
+        """
+
+        def theory_prediction(
+            mass: npt.NDArray[np.float64],
+            z: npt.NDArray[np.float64],
+            mass_proxy: npt.NDArray[np.float64],
+            sky_area: float,
+        ):
+            prediction = (
+                self.cluster_theory.comoving_volume(z, sky_area)
+                * self.cluster_theory.mass_function(mass, z)
+                * self._completeness_distribution(mass, z)
+                * self.redshift_distribution.distribution()
+                * self._mass_distribution_distribution(mass, z, mass_proxy)
+            )
+
+            if average_on is None:
+                return prediction
+    
+            for cluster_prop in ClusterProperty:
+                include_prop = cluster_prop & average_on
+                if not include_prop:
+                    continue
+                if cluster_prop == ClusterProperty.MASS:
+                    prediction *= mass
+                if cluster_prop == ClusterProperty.REDSHIFT:
+                    prediction *= z
+            return prediction
+
+        return theory_prediction
+    
     def _get_function_to_integrate_counts(
         self,
         prediction: Callable[
@@ -164,6 +192,37 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         return function_mapper
 
+    def _get_function_to_integrate_impure_counts(
+        self,
+        prediction: Callable[
+            [
+                npt.NDArray[np.float64],
+                npt.NDArray[np.float64],
+                npt.NDArray[np.float64],
+                float,
+            ],
+            npt.NDArray[np.float64],
+        ],
+    ) -> Callable[[npt.NDArray, npt.NDArray], npt.NDArray]:
+        """Returns a callable function that can be evaluated by an integrator.
+
+        This function is responsible for mapping arguments from the numerical integrator
+        to the arguments of the theoretical prediction function.
+        """
+
+        def function_mapper(
+            int_args: npt.NDArray, extra_args: npt.NDArray
+        ) -> npt.NDArray[np.float64]:
+            mass = int_args[:, 0]
+            z = int_args[:, 1]
+            mass_proxy = int_args[:, 2]
+            
+            sky_area = extra_args[0]
+
+            return prediction(mass, z, mass_proxy, sky_area)
+
+        return function_mapper
+    
     def evaluate_theory_prediction_counts(
         self,
         z_edges,
@@ -177,18 +236,33 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        self.integrator.integral_bounds = [
-            self.mass_interval,
-            z_edges,
-        ]
-        self.integrator.extra_args = np.array([*log_proxy_edges, sky_area])
+        if self.purity == None:
+            self.integrator.integral_bounds = [
+                self.mass_interval,
+                z_edges,
+            ]
+            self.integrator.extra_args = np.array([*log_proxy_edges, sky_area])
+    
+            theory_prediction = self._get_theory_prediction_counts(average_on)
+            prediction_wrapper = self._get_function_to_integrate_counts(theory_prediction)
+    
+            counts = self.integrator.integrate(prediction_wrapper)
+    
+            return counts
+        else:
+            self.integrator.integral_bounds = [
+                self.mass_interval,
+                z_edges,
+                log_proxy_edges,
+            ]
+            self.integrator.extra_args = np.array([sky_area])
 
-        theory_prediction = self._get_theory_prediction_counts(average_on)
-        prediction_wrapper = self._get_function_to_integrate_counts(theory_prediction)
+            theory_prediction = self._get_theory_prediction_impure_counts(average_on)
+            prediction_wrapper = self._get_function_to_integrate_impure_counts(theory_prediction)
+    
+            counts = self.integrator.integrate(prediction_wrapper)
 
-        counts = self.integrator.integrate(prediction_wrapper)
-
-        return counts
+            return counts
 
     def _get_theory_prediction_shear_profile(
         self,
