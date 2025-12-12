@@ -8,7 +8,7 @@ import pyccl
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
-from scipy.integrate import dblquad, simpson, quad
+from scipy.integrate import dblquad, quad, simpson
 
 from crow import (
     ClusterAbundance,
@@ -387,12 +387,16 @@ def test_evaluates_theory_prediction_with_purity(
     prediction_exact = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
+    assert len(binned_exact.integrator.extra_args) == 3
+    assert len(binned_exact.integrator.integral_bounds) == 2
 
     binned_exact.purity = purity_models.PurityAguena16()
 
     prediction_exact_purity = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
+    assert len(binned_exact.integrator.extra_args) == 1
+    assert len(binned_exact.integrator.integral_bounds) == 3
 
     assert prediction_exact <= prediction_exact_purity
 
