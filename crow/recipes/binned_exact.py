@@ -61,21 +61,29 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
     def _setup_with_purity(self):
         """Makes mass distribution use additional integral with purity"""
-        if self.purity is None: 
+        if self.purity is None:
             self._mass_distribution_distribution = self.mass_distribution.distribution
         else:
             self._mass_distribution_distribution = self._mass_distribution_purity
 
     def _mass_distribution_purity(self, log_mass, z, log_mass_proxy):
 
-        return self.mass_distribution.gaussian_kernel(log_mass, z, log_mass_proxy)/self.purity.distribution(log_mass_proxy, z) * np.log(10)
-
+        return (
+            self.mass_distribution.gaussian_kernel(log_mass, z, log_mass_proxy)
+            / self.purity.distribution(log_mass_proxy, z)
+            * np.log(10)
+        )
 
     def _get_theory_prediction_counts(
         self,
         average_on: None | ClusterProperty = None,
     ) -> Callable[
-        [npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64], float],
+        [
+            npt.NDArray[np.float64],
+            npt.NDArray[np.float64],
+            npt.NDArray[np.float64],
+            float,
+        ],
         npt.NDArray[np.float64],
     ]:
         """Get a callable that evaluates a cluster theory prediction.
@@ -99,13 +107,15 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             )
 
             if self.purity == None:
-                prediction *= self._mass_distribution_distribution(mass, z, (mass_proxy[0], mass_proxy[1]))
+                prediction *= self._mass_distribution_distribution(
+                    mass, z, (mass_proxy[0], mass_proxy[1])
+                )
             else:
                 prediction *= self._mass_distribution_distribution(mass, z, mass_proxy)
 
             if average_on is None:
                 return prediction
-    
+
             for cluster_prop in ClusterProperty:
                 include_prop = cluster_prop & average_on
                 if not include_prop:
@@ -117,7 +127,6 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             return prediction
 
         return theory_prediction
-
 
     def _get_function_to_integrate_counts(
         self,
@@ -147,13 +156,13 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 mass_proxy = np.array([extra_args[0], extra_args[1]])
                 sky_area = extra_args[2]
             else:
-                mass_proxy = int_args[:, 2]            
+                mass_proxy = int_args[:, 2]
                 sky_area = extra_args[0]
 
             return prediction(mass, z, mass_proxy, sky_area)
 
         return function_mapper
-    
+
     def evaluate_theory_prediction_counts(
         self,
         z_edges,
@@ -167,9 +176,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        assert(len(log_proxy_edges) == 2)
-        assert(len(z_edges) == 2)
-        
+        assert len(log_proxy_edges) == 2
+        assert len(z_edges) == 2
+
         if self.purity == None:
             self.integrator.integral_bounds = [
                 self.mass_interval,
@@ -186,7 +195,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         theory_prediction = self._get_theory_prediction_counts(average_on)
         prediction_wrapper = self._get_function_to_integrate_counts(theory_prediction)
-    
+
         counts = self.integrator.integrate(prediction_wrapper)
 
         return counts

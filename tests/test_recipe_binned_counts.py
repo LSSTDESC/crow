@@ -8,7 +8,7 @@ import pyccl
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
-from scipy.integrate import dblquad, simpson
+from scipy.integrate import dblquad, simpson, quad
 
 from crow import (
     ClusterAbundance,
@@ -357,9 +357,45 @@ def test_evaluates_theory_prediction_with_purity(
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
     sky_area = 360**2
-    ######################################
-    # Henrique, also set up the tests here
-    ######################################
+
+    mass_proxy_edges_err = (2, 5, 6)
+    z_edges_err = (0.5, 1, 1.2)
+
+    try:
+        binned_exact.evaluate_theory_prediction_counts(
+            z_edges=z_edges,
+            log_proxy_edges=mass_proxy_edges,
+            sky_area=sky_area,
+        )
+    except AssertionError as e:
+        pytest.fail(f"Valid inputs raised an AssertionError unexpectedly: {e}")
+
+    with pytest.raises(AssertionError):
+        binned_exact.evaluate_theory_prediction_counts(
+            z_edges=z_edges,
+            log_proxy_edges=mass_proxy_edges_err,
+            sky_area=sky_area,
+        )
+
+    with pytest.raises(AssertionError):
+        binned_exact.evaluate_theory_prediction_counts(
+            z_edges=z_edges_err,
+            log_proxy_edges=mass_proxy_edges,
+            sky_area=sky_area,
+        )
+
+    prediction_exact = binned_exact.evaluate_theory_prediction_counts(
+        z_edges, mass_proxy_edges, sky_area
+    )
+
+    binned_exact.purity = purity_models.PurityAguena16()
+
+    prediction_exact_purity = binned_exact.evaluate_theory_prediction_counts(
+        z_edges, mass_proxy_edges, sky_area
+    )
+
+    assert prediction_exact <= prediction_exact_purity
+
     binned_grid_w_pur = get_base_binned_grid(  # Create grid recipe with purity
         None, purity_models.PurityAguena16()
     )
@@ -425,9 +461,21 @@ def test_evaluates_theory_mass_distribution_with_purity(
     binned_exact_w_pur = ExactBinnedClusterRecipe(
         **_kwargs, purity=purity_models.PurityAguena16()
     )
-    probability_w_pur = binned_exact_w_pur._mass_distribution_distribution(
-        mass_array, z_array, mass_proxy_limits
-    )
+
+    def mass_distribtuion_purity_integrand(mass_proxy, mass, z):
+        return binned_exact_w_pur._mass_distribution_distribution(
+            np.array([mass]), np.array([z]), mass_proxy
+        )
+
+    probability_w_pur = [
+        quad(
+            mass_distribtuion_purity_integrand,
+            mass_proxy_limits[0],
+            mass_proxy_limits[1],
+            args=(mass, z),
+        )[0]
+        for mass, z in zip(mass_array, z_array)
+    ]
 
     assert (probability < probability_w_pur).all()
 
