@@ -126,7 +126,8 @@ def test_binned_grid_init(
 
 def test_get_theory_prediction_returns_value(
     binned_exact: ExactBinnedClusterRecipe,
-):
+):  
+    
     prediction = binned_exact._get_theory_prediction_counts(ClusterProperty.COUNTS)
 
     assert prediction is not None

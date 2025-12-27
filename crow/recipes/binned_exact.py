@@ -107,6 +107,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             )
 
             if self.purity == None:
+                assert len(mass_proxy) == 2, "mass_proxy with no purity should be size 2"
                 prediction *= self._mass_distribution_distribution(
                     mass, z, (mass_proxy[0], mass_proxy[1])
                 )
@@ -176,8 +177,8 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        assert len(log_proxy_edges) == 2
-        assert len(z_edges) == 2
+        assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
+        assert len(z_edges) == 2, "z_edges should be size 2"
 
         if self.purity == None:
             self.integrator.integral_bounds = [
@@ -207,7 +208,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         [
             npt.NDArray[np.float64],
             npt.NDArray[np.float64],
-            tuple[float, float],
+            npt.NDArray[np.float64],
             float,
             float,
         ],
@@ -223,7 +224,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         def theory_prediction(
             mass: npt.NDArray[np.float64],
             z: npt.NDArray[np.float64],
-            mass_proxy_limits: tuple[float, float],
+            mass_proxy: npt.NDArray[np.float64],
             sky_area: float,
             radius_center: float,
         ):
@@ -232,7 +233,6 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 * self.cluster_theory.mass_function(mass, z)
                 * self.redshift_distribution.distribution()
                 * self._completeness_distribution(mass, z)
-                * self.mass_distribution.distribution(mass, z, mass_proxy_limits)
             )
             if average_on is None:
                 # pylint: disable=no-member
@@ -247,6 +247,16 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                     z=z,
                     radius_center=radius_center,
                 )
+                if self.purity == None:
+                    assert len(mass_proxy) == 2, "mass_proxy with no purity should be size 2"
+                    prediction *= self._mass_distribution_distribution(
+                    mass, z, (mass_proxy[0], mass_proxy[1])
+                )
+                else:
+                    prediction *= self._mass_distribution_distribution(mass, z, mass_proxy)
+                
+                    
+                
             return prediction
 
         return theory_prediction
@@ -257,7 +267,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             [
                 npt.NDArray[np.float64],
                 npt.NDArray[np.float64],
-                tuple[float, float],
+                npt.NDArray[np.float64],
                 float,
                 float,
             ],
@@ -273,16 +283,20 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         def function_mapper(
             int_args: npt.NDArray, extra_args: npt.NDArray
         ) -> npt.NDArray[np.float64]:
+      
             mass = int_args[:, 0]
             z = int_args[:, 1]
 
-            mass_proxy_low = extra_args[0]
-            mass_proxy_high = extra_args[1]
-            sky_area = extra_args[2]
-            radius_center = extra_args[3]
-            return prediction(
-                mass, z, (mass_proxy_low, mass_proxy_high), sky_area, radius_center
-            )
+            if self.purity == None:
+                mass_proxy = np.array([extra_args[0], extra_args[1]])
+                sky_area = extra_args[2]
+                radius_center = extra_args[3]
+            else:
+                mass_proxy = int_args[:, 2]
+                sky_area = extra_args[0]
+                radius_center = extra_args[1]
+            
+            return prediction(mass, z, mass_proxy, sky_area, radius_center)
 
         return function_mapper
 
@@ -300,21 +314,43 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         using the Murata 2019 binned mass-richness relation and assuming perfectly
         measured redshifts.
         """
-        self.integrator.integral_bounds = [
-            self.mass_interval,
-            z_edges,
-        ]
-        deltasigma_list = []
-        for radius_center in radius_centers:
-            self.integrator.extra_args = np.array(
-                [*log_proxy_edges, sky_area, radius_center]
-            )
-            if self.cluster_theory._beta_parameters is not None:
-                self.cluster_theory.set_beta_s_interp(*z_edges)
-            theory_prediction = self._get_theory_prediction_shear_profile(average_on)
-            prediction_wrapper = self._get_function_to_integrate_shear_profile(
-                theory_prediction
-            )
-            deltasigma = self.integrator.integrate(prediction_wrapper)
-            deltasigma_list.append(deltasigma)
-        return np.array(deltasigma_list).flatten()
+        assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
+        assert len(z_edges) == 2, "z_edges should be size 2"
+        
+        if self.purity == None:
+            self.integrator.integral_bounds = [
+                self.mass_interval,
+                z_edges,
+            ]
+            deltasigma_list = []
+            for radius_center in radius_centers:
+                self.integrator.extra_args = np.array(
+                    [*log_proxy_edges, sky_area, radius_center]
+                )
+                if self.cluster_theory._beta_parameters is not None:
+                    self.cluster_theory.set_beta_s_interp(*z_edges)
+                theory_prediction = self._get_theory_prediction_shear_profile(average_on)
+                prediction_wrapper = self._get_function_to_integrate_shear_profile(
+                    theory_prediction
+                )
+                deltasigma = self.integrator.integrate(prediction_wrapper)
+                deltasigma_list.append(deltasigma)
+            return np.array(deltasigma_list).flatten()
+        else:
+            self.integrator.integral_bounds = [
+                    self.mass_interval,
+                    z_edges,
+                    log_proxy_edges,
+                ]
+            deltasigma_list = []
+            for radius_center in radius_centers:
+                self.integrator.extra_args = np.array([sky_area, radius_center])
+                if self.cluster_theory._beta_parameters is not None:
+                    self.cluster_theory.set_beta_s_interp(*z_edges)
+                theory_prediction = self._get_theory_prediction_shear_profile(average_on)
+                prediction_wrapper = self._get_function_to_integrate_shear_profile(
+                    theory_prediction
+                )
+                deltasigma = self.integrator.integrate(prediction_wrapper)
+                deltasigma_list.append(deltasigma)
+            return np.array(deltasigma_list).flatten()
