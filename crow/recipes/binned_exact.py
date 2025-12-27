@@ -107,9 +107,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             )
 
             if self.purity == None:
-                assert (
-                    len(mass_proxy) == 2
-                ), "mass_proxy with no purity should be size 2"
+                assert len(mass_proxy) == 2, "mass_proxy with no purity should be size 2"
                 prediction *= self._mass_distribution_distribution(
                     mass, z, (mass_proxy[0], mass_proxy[1])
                 )
@@ -250,17 +248,15 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                     radius_center=radius_center,
                 )
                 if self.purity == None:
-                    assert (
-                        len(mass_proxy) == 2
-                    ), "mass_proxy with no purity should be size 2"
+                    assert len(mass_proxy) == 2, "mass_proxy with no purity should be size 2"
                     prediction *= self._mass_distribution_distribution(
-                        mass, z, (mass_proxy[0], mass_proxy[1])
-                    )
+                    mass, z, (mass_proxy[0], mass_proxy[1])
+                )
                 else:
-                    prediction *= self._mass_distribution_distribution(
-                        mass, z, mass_proxy
-                    )
-
+                    prediction *= self._mass_distribution_distribution(mass, z, mass_proxy)
+                
+                    
+                
             return prediction
 
         return theory_prediction
@@ -287,7 +283,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         def function_mapper(
             int_args: npt.NDArray, extra_args: npt.NDArray
         ) -> npt.NDArray[np.float64]:
-
+      
             mass = int_args[:, 0]
             z = int_args[:, 1]
 
@@ -299,7 +295,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 mass_proxy = int_args[:, 2]
                 sky_area = extra_args[0]
                 radius_center = extra_args[1]
-
+            
             return prediction(mass, z, mass_proxy, sky_area, radius_center)
 
         return function_mapper
@@ -320,7 +316,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
-
+        
         if self.purity == None:
             self.integrator.integral_bounds = [
                 self.mass_interval,
@@ -333,9 +329,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 )
                 if self.cluster_theory._beta_parameters is not None:
                     self.cluster_theory.set_beta_s_interp(*z_edges)
-                theory_prediction = self._get_theory_prediction_shear_profile(
-                    average_on
-                )
+                theory_prediction = self._get_theory_prediction_shear_profile(average_on)
                 prediction_wrapper = self._get_function_to_integrate_shear_profile(
                     theory_prediction
                 )
@@ -344,18 +338,16 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             return np.array(deltasigma_list).flatten()
         else:
             self.integrator.integral_bounds = [
-                self.mass_interval,
-                z_edges,
-                log_proxy_edges,
-            ]
+                    self.mass_interval,
+                    z_edges,
+                    log_proxy_edges,
+                ]
             deltasigma_list = []
             for radius_center in radius_centers:
                 self.integrator.extra_args = np.array([sky_area, radius_center])
                 if self.cluster_theory._beta_parameters is not None:
                     self.cluster_theory.set_beta_s_interp(*z_edges)
-                theory_prediction = self._get_theory_prediction_shear_profile(
-                    average_on
-                )
+                theory_prediction = self._get_theory_prediction_shear_profile(average_on)
                 prediction_wrapper = self._get_function_to_integrate_shear_profile(
                     theory_prediction
                 )
