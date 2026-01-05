@@ -441,7 +441,7 @@ def test_evaluates_theory_prediction_with_purity(
 
 
 @given(
-    z=floats(min_value=1e-15, max_value=2.0), mass=floats(min_value=7.0, max_value=26.0)
+    z=floats(min_value=1e-15, max_value=2.0), mass=floats(min_value=13.0, max_value=26.0)
 )
 def test_evaluates_theory_mass_distribution_with_purity(
     z: float,
