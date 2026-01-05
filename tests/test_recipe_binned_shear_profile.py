@@ -273,10 +273,59 @@ def test_grid_shear_matches_exact_within_tolerance(
     sky_area = 360**2
     average_on = ClusterProperty.DELTASIGMA
 
+    binned_exact_deltasigma.completeness = None
+    binned_grid_deltasigma.completeness = None
+    binned_exact_deltasigma.purity = None
+    binned_grid_deltasigma.purity = None
+
     pred_exact = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
     pred_grid = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, radii, sky_area, average_on
+    )
+
+    binned_exact_deltasigma.completeness = completeness_models.CompletenessAguena16()
+    binned_grid_deltasigma.completeness = completeness_models.CompletenessAguena16()
+    binned_exact_deltasigma.purity = None
+    binned_grid_deltasigma.purity = None
+
+    pred_exact_w_comp = (
+        binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
+    )
+    pred_grid_w_comp = (
+        binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
+    )
+
+    binned_exact_deltasigma.completeness = None
+    binned_grid_deltasigma.completeness = None
+    binned_exact_deltasigma.purity = purity_models.PurityAguena16()
+    binned_grid_deltasigma.purity = purity_models.PurityAguena16()
+
+    pred_exact_w_pur = (
+        binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
+    )
+    pred_grid_w_pur = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, radii, sky_area, average_on
+    )
+
+    binned_exact_deltasigma.completeness = completeness_models.CompletenessAguena16()
+    binned_grid_deltasigma.completeness = completeness_models.CompletenessAguena16()
+    binned_exact_deltasigma.purity = purity_models.PurityAguena16()
+    binned_grid_deltasigma.purity = purity_models.PurityAguena16()
+
+    pred_exact_w_cp = (
+        binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
+    )
+    pred_grid_w_cp = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
 
@@ -286,6 +335,24 @@ def test_grid_shear_matches_exact_within_tolerance(
     # avoid division by zero
     denom = np.where(pred_exact == 0, 1.0, pred_exact)
     assert np.all(np.abs((pred_grid - pred_exact) / denom) < rel_tol)
+
+    rel_tol = 1.0e-1
+    assert pred_exact_w_comp.shape == pred_grid_w_comp.shape
+    # avoid division by zero
+    denom = np.where(pred_exact_w_comp == 0, 1.0, pred_grid_w_comp)
+    assert np.all(np.abs((pred_grid_w_comp - pred_exact_w_comp) / denom) < rel_tol)
+
+    rel_tol = 1.0e-4
+    assert pred_exact_w_pur.shape == pred_grid_w_pur.shape
+    # avoid division by zero
+    denom = np.where(pred_exact_w_pur == 0, 1.0, pred_grid_w_pur)
+    assert np.all(np.abs((pred_grid_w_pur - pred_exact_w_pur) / denom) < rel_tol)
+
+    rel_tol = 1.0e-1
+    assert pred_exact_w_cp.shape == pred_grid_w_cp.shape
+    # avoid division by zero
+    denom = np.where(pred_exact_w_cp == 0, 1.0, pred_grid_w_cp)
+    assert np.all(np.abs((pred_grid_w_cp - pred_exact_w_cp) / denom) < rel_tol)
 
 
 def test_grid_reduced_shear_matches_exact_within_tolerance(
@@ -422,5 +489,6 @@ def test_shear_respects_completeness_and_purity_effects(
 
     # purity model usually acts to reduce contamination; behavior depends on model details,
     # but it should produce finite, non-negative numbers (sanity)
+
     assert np.isfinite(pur_val)
     assert pur_val >= 0.0

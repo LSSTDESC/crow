@@ -351,9 +351,8 @@ def test_evaluates_theory_prediction_with_completeness(
     assert np.abs(prediction_grid_w_comp / prediction_w_comp - 1.0) <= 1.0e-4
 
 
-def test_evaluates_theory_prediction_with_purity(
+def test_evaluates_theory_prediction_assertions(
     binned_exact: ExactBinnedClusterRecipe,
-    binned_grid: GridBinnedClusterRecipe,
 ):
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
@@ -385,21 +384,40 @@ def test_evaluates_theory_prediction_with_purity(
             sky_area=sky_area,
         )
 
+    binned_exact.purity = None
     prediction_exact = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
+
     assert len(binned_exact.integrator.extra_args) == 3
     assert len(binned_exact.integrator.integral_bounds) == 2
 
     binned_exact.purity = purity_models.PurityAguena16()
-
-    prediction_exact_purity = binned_exact.evaluate_theory_prediction_counts(
+    prediction_exact_w_pur = binned_exact.evaluate_theory_prediction_counts(
         z_edges, mass_proxy_edges, sky_area
     )
+
     assert len(binned_exact.integrator.extra_args) == 1
     assert len(binned_exact.integrator.integral_bounds) == 3
 
-    assert prediction_exact <= prediction_exact_purity
+
+def test_evaluates_theory_prediction_with_purity(
+    binned_exact: ExactBinnedClusterRecipe,
+    binned_grid: GridBinnedClusterRecipe,
+):
+    mass_proxy_edges = (2, 5)
+    z_edges = (0.5, 1)
+    sky_area = 360**2
+
+    prediction_exact = binned_exact.evaluate_theory_prediction_counts(
+        z_edges, mass_proxy_edges, sky_area
+    )
+
+    binned_exact.purity = purity_models.PurityAguena16()
+
+    prediction_exact_w_pur = binned_exact.evaluate_theory_prediction_counts(
+        z_edges, mass_proxy_edges, sky_area
+    )
 
     binned_grid_w_pur = get_base_binned_grid(  # Create grid recipe with purity
         None, purity_models.PurityAguena16()
@@ -416,6 +434,10 @@ def test_evaluates_theory_prediction_with_purity(
     )
 
     assert prediction_grid <= prediction_grid_w_pur
+    assert prediction_exact <= prediction_exact_w_pur
+
+    assert np.abs(prediction_grid / prediction_exact - 1.0) <= 1.0e-4
+    assert np.abs(prediction_grid_w_pur / prediction_exact_w_pur - 1.0) <= 1.0e-4
 
 
 @given(
