@@ -18,7 +18,7 @@ Quick steps (run from the repository root)
 -----------------------------------------
 1. Generate module rst files into this folder (overwrite existing):
 
-   python -m sphinx.apidoc -o crow/docs/ crow -f
+   sphinx-apidoc -o crow/docs/ crow -f
 
    This will create a set of reST files in `crow/docs/` referencing the
    `crow` package modules.
