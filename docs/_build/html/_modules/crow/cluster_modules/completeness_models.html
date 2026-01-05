@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.cluster_modules.completeness_models &mdash; Crow  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">crow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">crow.cluster_modules.completeness_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for crow.cluster_modules.completeness_models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The cluster completeness module.</span>
+
+<span class="sd">This module holds the classes that define completeness kernels that can be included</span>
+<span class="sd">in the cluster prediction integrand.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameters</span>
+
+
+<div class="viewcode-block" id="Completeness">
+<a class="viewcode-back" href="../../../crow.cluster_modules.html#crow.cluster_modules.completeness_models.Completeness">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Completeness</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The completeness kernel base class.</span>
+
+<span class="sd">    This kernel affects the prediction integrand by accounting for the incompleteness</span>
+<span class="sd">    of a cluster selection. Subclasses should implement the ``distribution`` method.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameters : Parameters, optional</span>
+<span class="sd">        Container for completeness model parameters (defined by subclasses).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Completeness.distribution">
+<a class="viewcode-back" href="../../../crow.cluster_modules.html#crow.cluster_modules.completeness_models.Completeness.distribution">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distribution</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the completeness kernel contribution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        log_mass : array_like</span>
+<span class="sd">            Array of log10 halo masses (units: Msun).</span>
+<span class="sd">        z : array_like</span>
+<span class="sd">            Array of redshifts matching ``log_mass``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            Array of completeness values in the range [0, 1] with the same</span>
+<span class="sd">            broadcastable shape as the inputs. Subclasses should guarantee the</span>
+<span class="sd">            output dtype is floating point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</div>
+
+
+
+<span class="n">REDMAPPER_DEFAULT_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;a_n&quot;</span><span class="p">:</span> <span class="mf">0.38</span><span class="p">,</span>
+    <span class="s2">&quot;b_n&quot;</span><span class="p">:</span> <span class="mf">1.2634</span><span class="p">,</span>
+    <span class="s2">&quot;a_logm_piv&quot;</span><span class="p">:</span> <span class="mf">13.31</span><span class="p">,</span>
+    <span class="s2">&quot;b_logm_piv&quot;</span><span class="p">:</span> <span class="mf">0.2025</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="CompletenessAguena16">
+<a class="viewcode-back" href="../../../crow.cluster_modules.html#crow.cluster_modules.completeness_models.CompletenessAguena16">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompletenessAguena16</span><span class="p">(</span><span class="n">Completeness</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Completeness model following Aguena et al. (2016) parametrisation.</span>
+
+<span class="sd">    The model uses a pivot mass and a redshift-dependent power-law index to</span>
+<span class="sd">    compute a sigmoid-like completeness as a function of mass and redshift.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    (set during initialization)</span>
+<span class="sd">    a_n, b_n : float</span>
+<span class="sd">        Parameters controlling the redshift evolution of the power-law index.</span>
+<span class="sd">    a_logm_piv, b_logm_piv : float</span>
+<span class="sd">        Parameters controlling the pivot mass (in log10 units) and its</span>
+<span class="sd">        redshift evolution.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parameters : Parameters</span>
+<span class="sd">        Container holding the parameter values; defaults are defined in</span>
+<span class="sd">        ``REDMAPPER_DEFAULT_PARAMETERS``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">({</span><span class="o">**</span><span class="n">REDMAPPER_DEFAULT_PARAMETERS</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mpiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the pivot mass (not in log) at redshift `z`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z : array_like</span>
+<span class="sd">            Redshift or array of redshifts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            Pivot mass values in Msun (10**log_mpiv). Returned dtype is float64.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log_mpiv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;a_logm_piv&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;b_logm_piv&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mf">1.0</span> <span class="o">+</span> <span class="n">z</span>
+        <span class="p">)</span>
+        <span class="n">mpiv</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">**</span><span class="n">log_mpiv</span>
+        <span class="k">return</span> <span class="n">mpiv</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the redshift-dependent power-law index nc(z).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z : array_like</span>
+<span class="sd">            Redshift or array of redshifts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            The value of the power-law index at each provided redshift.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;a_n&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;b_n&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">z</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nc</span>
+
+<div class="viewcode-block" id="CompletenessAguena16.distribution">
+<a class="viewcode-back" href="../../../crow.cluster_modules.html#crow.cluster_modules.completeness_models.CompletenessAguena16.distribution">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distribution</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the completeness fraction for given mass and redshift.</span>
+<span class="sd">        The completeness is given by</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            c(M, z) = \frac{\left(M / M_{\rm piv}(z)\right)^{n_c(z)}}</span>
+<span class="sd">                  {1 + \left(M / M_{\rm piv}(z)\right)^{n_c(z)}}</span>
+
+<span class="sd">        where M = 10^{\text{log\_mass}}, M_{\rm piv}(z) is returned by _mpiv(z),</span>
+<span class="sd">        and n_c(z) is returned by _nc(z).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        log_mass : array_like</span>
+<span class="sd">            Array of log10 halo masses (Msun).</span>
+<span class="sd">        z : array_like</span>
+<span class="sd">            Array of redshifts matching ``log_mass``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            Completeness values in the interval [0, 1] with shape matching the</span>
+<span class="sd">            broadcasted inputs. dtype is float64.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mass_norm_pow</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">**</span><span class="n">log_mass</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpiv</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nc</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="n">completeness</span> <span class="o">=</span> <span class="n">mass_norm_pow</span> <span class="o">/</span> <span class="p">(</span><span class="n">mass_norm_pow</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">completeness</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">completeness</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generating the Crow documentation (package-local docs) &mdash; Crow  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">crow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Generating the Crow documentation (package-local docs)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="generating-the-crow-documentation-package-local-docs">
+<h1>Generating the Crow documentation (package-local docs)<a class="headerlink" href="#generating-the-crow-documentation-package-local-docs" title="Link to this heading"></a></h1>
+<p>This README explains how to generate documentation for the <cite>crow</cite> package
+itself. It mirrors the top-level <cite>docs/README.rst</cite> but sets paths relative to
+this <cite>crow/docs/</cite> directory.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Sphinx builds the API docs by importing the <cite>crow</cite> package in this repository
+and pulling docstrings from the Python source files under <cite>crow/</cite> (for
+example: <cite>crow/cluster_modules/shear_profile.py</cite>, <cite>crow/cluster_modules/parameters.py</cite>,
+<cite>crow/cluster_modules/purity_models.py</cite>, etc.). The <cite>sphinx-apidoc</cite> step scans
+these modules and writes reST files that call <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">automodule::</span></code> for each
+module; Sphinx then imports them and extracts the docstrings.</p>
+</section>
+<section id="quick-steps-run-from-the-repository-root">
+<h2>Quick steps (run from the repository root)<a class="headerlink" href="#quick-steps-run-from-the-repository-root" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Generate module rst files into this folder (overwrite existing):</p>
+<p>python -m sphinx.apidoc -o crow/docs/ crow -f</p>
+<p>This will create a set of reST files in <cite>crow/docs/</cite> referencing the
+<cite>crow</cite> package modules.</p>
+</li>
+<li><p>Build the HTML docs for the package (from repo root):</p>
+<p>sphinx-build -b html crow/docs/ crow/docs/_build/html</p>
+</li>
+<li><p>Serve the built docs locally to inspect them:</p>
+<p>python -m http.server –directory crow/docs/_build/html 8000</p>
+</li>
+</ol>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Ensure <cite>crow/docs/conf.py</cite> is configured to add the repository root to
+<code class="docutils literal notranslate"><span class="pre">sys.path</span></code> so that the <cite>crow</cite> package is importable by Sphinx.</p></li>
+<li><p>If heavy external dependencies break imports during the build, add them to
+<code class="docutils literal notranslate"><span class="pre">autodoc_mock_imports</span></code> in <cite>crow/docs/conf.py</cite> or install the real deps.</p></li>
+<li><p>Re-run <code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span> <span class="pre">-f</span></code> after adding new modules so rst stubs are
+regenerated.</p></li>
+</ul>
+<p>If you want, I can generate the apidoc files for you (write the generated
+rst files) and run the build — tell me to proceed and confirm you want the
+package-local <cite>crow/docs</cite> built.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

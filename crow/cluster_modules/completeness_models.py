@@ -1,7 +1,7 @@
 """The cluster completeness module.
 
-This module holds the classes that define the kernels that can be included
-in the cluster abundance integrand.
+This module holds the classes that define completeness kernels that can be included
+in the cluster prediction integrand.
 """
 
 import numpy as np
@@ -11,10 +11,15 @@ from .parameters import Parameters
 
 
 class Completeness:
-    """The completeness kernel for the numcosmo simulated survey.
+    """The completeness kernel base class.
 
-    This kernel will affect the integrand by accounting for the incompleteness
-    of a cluster selection.
+    This kernel affects the prediction integrand by accounting for the incompleteness
+    of a cluster selection. Subclasses should implement the ``distribution`` method.
+
+    Attributes
+    ----------
+    parameters : Parameters, optional
+        Container for completeness model parameters (defined by subclasses).
     """
 
     def __init__(self):
@@ -25,7 +30,22 @@ class Completeness:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the completeness contribution to the integrand."""
+        """Evaluate the completeness kernel contribution.
+
+        Parameters
+        ----------
+        log_mass : array_like
+            Array of log10 halo masses (units: Msun).
+        z : array_like
+            Array of redshifts matching ``log_mass``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of completeness values in the range [0, 1] with the same
+            broadcastable shape as the inputs. Subclasses should guarantee the
+            output dtype is floating point.
+        """
         raise NotImplementedError
 
 
@@ -38,10 +58,25 @@ REDMAPPER_DEFAULT_PARAMETERS = {
 
 
 class CompletenessAguena16(Completeness):
-    """The completeness kernel for the numcosmo simulated survey.
+    """Completeness model following Aguena et al. (2016) parametrisation.
 
-    This kernel will affect the integrand by accounting for the incompleteness
-    of a cluster selection.
+    The model uses a pivot mass and a redshift-dependent power-law index to
+    compute a sigmoid-like completeness as a function of mass and redshift.
+
+    Parameters
+    ----------
+    (set during initialization)
+    a_n, b_n : float
+        Parameters controlling the redshift evolution of the power-law index.
+    a_logm_piv, b_logm_piv : float
+        Parameters controlling the pivot mass (in log10 units) and its
+        redshift evolution.
+
+    Attributes
+    ----------
+    parameters : Parameters
+        Container holding the parameter values; defaults are defined in
+        ``REDMAPPER_DEFAULT_PARAMETERS``.
     """
 
     def __init__(
@@ -50,6 +85,18 @@ class CompletenessAguena16(Completeness):
         self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
     def _mpiv(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Return the pivot mass (not in log) at redshift `z`.
+
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts.
+
+        Returns
+        -------
+        numpy.ndarray
+            Pivot mass values in Msun (10**log_mpiv). Returned dtype is float64.
+        """
         log_mpiv = self.parameters["a_logm_piv"] + self.parameters["b_logm_piv"] * (
             1.0 + z
         )
@@ -57,6 +104,18 @@ class CompletenessAguena16(Completeness):
         return mpiv.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Return the redshift-dependent power-law index nc(z).
+
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts.
+
+        Returns
+        -------
+        numpy.ndarray
+            The value of the power-law index at each provided redshift.
+        """
         nc = self.parameters["a_n"] + self.parameters["b_n"] * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
@@ -66,7 +125,29 @@ class CompletenessAguena16(Completeness):
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the completeness contribution to the integrand."""
+        r"""Compute the completeness fraction for given mass and redshift.
+        The completeness is given by
+
+        .. math::
+            c(M, z) = \frac{\left(M / M_{\rm piv}(z)\right)^{n_c(z)}}
+                  {1 + \left(M / M_{\rm piv}(z)\right)^{n_c(z)}}
+
+        where M = 10^{\text{log\_mass}}, M_{\rm piv}(z) is returned by _mpiv(z),
+        and n_c(z) is returned by _nc(z).
+
+        Parameters
+        ----------
+        log_mass : array_like
+            Array of log10 halo masses (Msun).
+        z : array_like
+            Array of redshifts matching ``log_mass``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Completeness values in the interval [0, 1] with shape matching the
+            broadcasted inputs. dtype is float64.
+        """
 
         mass_norm_pow = (10.0**log_mass / self._mpiv(z)) ** self._nc(z)
 
