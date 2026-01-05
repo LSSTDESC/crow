@@ -13,10 +13,21 @@ from .parameters import Parameters
 
 
 class Purity:
-    """The purity kernel for the numcosmo simulated survey.
+    """Purity kernel base class.
 
-    This kernel will affect the integrand by accounting for the inpurity
-    of a cluster selection.
+    This kernel represents the probability that a detected object in the
+    cluster catalogue is a true galaxy cluster (i.e. purity). Subclasses should
+    implement the ``distribution`` method.
+
+    Notes
+    -----
+    Mass-proxy inputs to methods in this module are provided as log10 values
+    of the observable mass proxy.
+
+    Attributes
+    ----------
+    parameters : Parameters, optional
+        Container for model parameters defined by subclasses.
     """
 
     def __init__(self):
@@ -27,7 +38,21 @@ class Purity:
         z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the purity contribution to the integrand."""
+        """Evaluate the purity kernel contribution.
+
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts for the objects.
+        log_mass_proxy : array_like
+            Array of log10 mass-proxy values corresponding to the objects.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array with purity values in the interval [0, 1]. The output shape
+            will follow NumPy broadcasting rules applied to the inputs.
+        """
         raise NotImplementedError
 
 
@@ -40,10 +65,23 @@ REDMAPPER_DEFAULT_PARAMETERS = {
 
 
 class PurityAguena16(Purity):
-    """The purity kernel for the numcosmo simulated survey.
+    """Purity model following Aguena et al. (2016) parametrisation.
 
-    This kernel will affect the integrand by accounting for the purity
-    of a cluster selection.
+    The model computes a sigmoid-like purity as a function of a mass proxy
+    and redshift using a pivot mass and a redshift-dependent power-law index.
+
+    Important
+    ---------
+    Note that the base class `Purity.distribution` defines the argument order
+    as ``(z, log_mass_proxy)`` while this subclass implements
+    ``distribution(self, log_mass_proxy, z)``. Callers should use the
+    subclass' signature when invoking the concrete implementation.
+
+    Attributes
+    ----------
+    parameters : Parameters
+        Container holding default parameters defined in
+        ``REDMAPPER_DEFAULT_PARAMETERS``.
     """
 
     def __init__(self):
@@ -51,6 +89,18 @@ class PurityAguena16(Purity):
         self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS})
 
     def _mpiv(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Return the pivot mass.
+
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts.
+
+        Returns
+        -------
+        numpy.ndarray
+            Pivot mass values in Msun (10**log_mpiv), dtype float64.
+        """
         log_mpiv = self.parameters["a_logm_piv"] + self.parameters["b_logm_piv"] * (
             1.0 + z
         )
@@ -58,6 +108,18 @@ class PurityAguena16(Purity):
         return mpiv.astype(np.float64)
 
     def _nc(self, z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Return the redshift-dependent power-law index nc(z).
+
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts.
+
+        Returns
+        -------
+        numpy.ndarray
+            The value of the power-law index at each provided redshift.
+        """
         nc = self.parameters["a_n"] + self.parameters["b_n"] * (1.0 + z)
         assert isinstance(nc, np.ndarray)
         return nc
@@ -67,7 +129,27 @@ class PurityAguena16(Purity):
         log_mass_proxy: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the purity contribution to the integrand."""
+        """Compute the purity fraction for given mass-proxy and redshift.
+        The purity is given by the sigmoid-like expression
+
+            p(M, z) = ( (M / M_piv(z))**(n_c(z)) ) / ( 1 + (M / M_piv(z))**(n_c(z)) ),
+
+        where M = 10**(log_mass_proxy), M_piv(z) = 10**(a_logm_piv + b_logm_piv*(1 + z))
+        and n_c(z) = a_n + b_n*(1 + z).
+
+        Parameters
+        ----------
+        log_mass_proxy : array_like
+            Array of log10 mass-proxy values.
+        z : array_like
+            Array of redshifts matching ``log_mass_proxy``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Purity values in the interval [0, 1] with shape matching the
+            broadcasted inputs. dtype is float64.
+        """
 
         rich_norm_pow = (10**log_mass_proxy / self._mpiv(z)) ** self._nc(z)
 
