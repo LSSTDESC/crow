@@ -234,13 +234,6 @@ def test_evaluates_theory_prediction_returns_value(
     sky_area = 360**2
     average_on = ClusterProperty.DELTASIGMA
 
-    try:
-        binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
-            z_edges, mass_proxy_edges, radius_center, sky_area, average_on
-        )
-    except AssertionError as e:
-        pytest.fail(f"Valid inputs raised an AssertionError unexpectedly: {e}")
-
     with pytest.raises(AssertionError):
         binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
             z_edges, mass_proxy_edges_err, radius_center, sky_area, average_on

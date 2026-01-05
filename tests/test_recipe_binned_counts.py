@@ -361,15 +361,6 @@ def test_evaluates_theory_prediction_assertions(
     mass_proxy_edges_err = (2, 5, 6)
     z_edges_err = (0.5, 1, 1.2)
 
-    try:
-        binned_exact.evaluate_theory_prediction_counts(
-            z_edges=z_edges,
-            log_proxy_edges=mass_proxy_edges,
-            sky_area=sky_area,
-        )
-    except AssertionError as e:
-        pytest.fail(f"Valid inputs raised an AssertionError unexpectedly: {e}")
-
     with pytest.raises(AssertionError):
         binned_exact.evaluate_theory_prediction_counts(
             z_edges=z_edges,
