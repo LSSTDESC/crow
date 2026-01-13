@@ -267,9 +267,7 @@ def test_grid_shear_matches_exact_within_tolerance(
     average_on = ClusterProperty.DELTASIGMA
 
     binned_exact_deltasigma.completeness = None
-    binned_grid_deltasigma.completeness = None
     binned_exact_deltasigma.purity = None
-    binned_grid_deltasigma.purity = None
 
     pred_exact = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
@@ -279,9 +277,10 @@ def test_grid_shear_matches_exact_within_tolerance(
     )
 
     binned_exact_deltasigma.completeness = completeness_models.CompletenessAguena16()
-    binned_grid_deltasigma.completeness = completeness_models.CompletenessAguena16()
     binned_exact_deltasigma.purity = None
-    binned_grid_deltasigma.purity = None
+    binned_grid_deltasigma_w_c = get_base_binned_grid(
+        completeness_models.CompletenessAguena16(), None, True
+    )
 
     pred_exact_w_comp = (
         binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
@@ -289,37 +288,43 @@ def test_grid_shear_matches_exact_within_tolerance(
         )
     )
     pred_grid_w_comp = (
-        binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
+        binned_grid_deltasigma_w_c.evaluate_theory_prediction_lensing_profile(
             z_edges, mass_proxy_edges, radii, sky_area, average_on
         )
     )
 
     binned_exact_deltasigma.completeness = None
-    binned_grid_deltasigma.completeness = None
     binned_exact_deltasigma.purity = purity_models.PurityAguena16()
-    binned_grid_deltasigma.purity = purity_models.PurityAguena16()
+    binned_grid_deltasigma_w_p = get_base_binned_grid(
+        None, purity_models.PurityAguena16(), True
+    )
 
     pred_exact_w_pur = (
         binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
             z_edges, mass_proxy_edges, radii, sky_area, average_on
         )
     )
-    pred_grid_w_pur = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges, mass_proxy_edges, radii, sky_area, average_on
+    pred_grid_w_pur = (
+        binned_grid_deltasigma_w_p.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
     )
 
     binned_exact_deltasigma.completeness = completeness_models.CompletenessAguena16()
-    binned_grid_deltasigma.completeness = completeness_models.CompletenessAguena16()
     binned_exact_deltasigma.purity = purity_models.PurityAguena16()
-    binned_grid_deltasigma.purity = purity_models.PurityAguena16()
+    binned_grid_deltasigma_w_cp = get_base_binned_grid(
+        completeness_models.CompletenessAguena16(), purity_models.PurityAguena16(), True
+    )
 
     pred_exact_w_cp = (
         binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
             z_edges, mass_proxy_edges, radii, sky_area, average_on
         )
     )
-    pred_grid_w_cp = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges, mass_proxy_edges, radii, sky_area, average_on
+    pred_grid_w_cp = (
+        binned_grid_deltasigma_w_cp.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radii, sky_area, average_on
+        )
     )
 
     # Allow a modest relative tolerance for grid approximation
@@ -329,7 +334,7 @@ def test_grid_shear_matches_exact_within_tolerance(
     denom = np.where(pred_exact == 0, 1.0, pred_exact)
     assert np.all(np.abs((pred_grid - pred_exact) / denom) < rel_tol)
 
-    rel_tol = 1.0e-1
+    rel_tol = 1.0e-4
     assert pred_exact_w_comp.shape == pred_grid_w_comp.shape
     # avoid division by zero
     denom = np.where(pred_exact_w_comp == 0, 1.0, pred_grid_w_comp)
@@ -341,7 +346,7 @@ def test_grid_shear_matches_exact_within_tolerance(
     denom = np.where(pred_exact_w_pur == 0, 1.0, pred_grid_w_pur)
     assert np.all(np.abs((pred_grid_w_pur - pred_exact_w_pur) / denom) < rel_tol)
 
-    rel_tol = 1.0e-1
+    rel_tol = 1.0e-4
     assert pred_exact_w_cp.shape == pred_grid_w_cp.shape
     # avoid division by zero
     denom = np.where(pred_exact_w_cp == 0, 1.0, pred_grid_w_cp)
