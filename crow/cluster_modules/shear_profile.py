@@ -57,10 +57,28 @@ class ClusterShearProfile(ClusterAbundance):
         two_halo_term: bool = False,
         boost_factor: bool = False,
     ) -> None:
-        """
-        Note
+        """Class to compute cluster shear lensing signal.
         ----
             If cluster_concentration < 0, concentration set to None!
+
+        Attributes
+        ----------
+        _is_delta_sigma : bool
+            If True, work in physical DeltaSigma units; otherwise compute reduced shear.
+        parameters : Parameters
+            Container for model parameters (e.g. `cluster_concentration`).
+        _clmm_cosmo : clmm.Cosmology
+            CLMM-wrapped cosmology object for evaluations.
+        beta_parameters : dict or None
+            Parameters used when computing geometric lensing efficiency <beta_s>.
+        miscentering_parameters : dict or None
+            Parameters describing miscentering model (fraction, sigma, distribution, etc).
+        two_halo_term : bool
+            If True include 2-halo contribution.
+        boost_factor : bool
+            If True apply boost-factor correction.
+        vectorized : bool
+            Flag indicating whether vectorized evaluation is used.
         """
         super().__init__(cosmo, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
@@ -83,20 +101,24 @@ class ClusterShearProfile(ClusterAbundance):
 
     @property
     def cluster_concentration(self):
+        """The cluster concentration parameter."""
         return self.parameters["cluster_concentration"]
 
     @cluster_concentration.setter
     def cluster_concentration(self, value):
+        """Set the cluster concentration parameter."""
         if value is not None and value < 0:
             value = None
         self.parameters["cluster_concentration"] = value
 
     @property
     def use_beta_s_interp(self):
+        """Flag to use beta_s interpolation (interpolate lens efficiency or not)."""
         return self.__use_beta_s_interp
 
     @use_beta_s_interp.setter
     def use_beta_s_interp(self, value):
+        """Set flag to use beta_s interpolation (interpolate lens efficiency or not)."""
         if not isinstance(value, bool):
             raise ValueError(f"value (={value}) for use_beta_s_interp must be boolean.")
         self.__use_beta_s_interp = value
@@ -160,8 +182,7 @@ class ClusterShearProfile(ClusterAbundance):
                       {\left<\beta_s\right>^2}-1\right)\left<\beta_s\right>\kappa_{\infty}\right)
         Returns
         -------
-        float
-            Mean value of the geometric lensing efficicency
+        None
         """
         self._beta_parameters = {
             "z_inf": z_inf,
@@ -173,6 +194,22 @@ class ClusterShearProfile(ClusterAbundance):
         self.approx = approx.lower()
 
     def _beta_s_mean_exact(self, z_cl):
+        r"""Compute exact mean value of the geometric lensing efficiency <beta_s>.
+        
+        .. math::
+           \left<\beta_s\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
+           {\int_{z = z_{min}}^{z_{max}}N(z)}
+           \text{ where } N(z) \text{ is the redshift distribution function.}
+
+        Parameters
+        ----------
+        z_cl: float or npt.NDArray[np.float64]
+            Cluster redshift(s)
+        Returns
+        -------
+        npt.NDArray[np.float64]
+            Mean geometric lensing efficiency <beta_s> at given cluster redshift(s)        
+        """
         z_cl = np.asarray(z_cl)
         if z_cl.ndim == 0:
             return compute_beta_s_mean_from_distribution(
@@ -188,6 +225,21 @@ class ClusterShearProfile(ClusterAbundance):
         )
 
     def _beta_s_square_mean_exact(self, z_cl):
+        r"""Compute exact mean value of the geometric lensing efficiency squared <beta_s^2>.
+        .. math::
+              \left<\beta_s^2\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s^2(z)N(z)}
+              {\int_{z = z_{min}}^{z_{max}}N(z)}
+              \text{ where } N(z) \text{ is the redshift distribution function.}
+
+        Parameters
+        ----------
+        z_cl: float or npt.NDArray[np.float64]
+            Cluster redshift(s)
+        Returns
+        -------
+        npt.NDArray[np.float64]
+            Mean geometric lensing efficiency squared <beta_s^2> at given cluster redshift(s)        
+        """
         z_cl = np.asarray(z_cl)
         if z_cl.ndim == 0:
             return compute_beta_s_square_mean_from_distribution(
@@ -203,7 +255,19 @@ class ClusterShearProfile(ClusterAbundance):
         )
 
     def set_beta_s_interp(self, z_min, z_max, n_intep=3):
+        """Build quadratic interpolators for <beta_s> and <beta_s^2> over a redshift grid.
 
+        Parameters
+        ----------
+        z_min, z_max : float
+            Redshift bounds for the interpolation grid.
+        n_intep : int, optional
+            Number of interpolation nodes. Default 3.
+
+        Returns
+        -------
+        None
+        """
         # Note: this will set an interpolator with a fixed cosmology
         # must add check to verify consistency with main cosmology
 
@@ -229,7 +293,22 @@ class ClusterShearProfile(ClusterAbundance):
         z: npt.NDArray[np.float64],
         radius_center: np.float64,
     ) -> npt.NDArray[np.float64]:
-        """Delta sigma for clusters."""
+        """Compute DeltaSigma (or reduced shear) for a list of cluster masses/redshifts.
+
+        Parameters
+        ----------
+        log_mass : numpy.ndarray
+            Array of log10(mass) values for clusters.
+        z : numpy.ndarray
+            Array of cluster redshifts (same length as `log_mass`).
+        radius_center : float
+            Radius (single value) at which the profile is evaluated [same units used by CLMM Modeling].
+
+        Returns
+        -------
+        numpy.ndarray
+            1D array of DeltaSigma (or reduced shear) values, one per input cluster.
+        """
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
@@ -267,7 +346,23 @@ class ClusterShearProfile(ClusterAbundance):
         z: npt.NDArray[np.float64],
         radius_center: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Delta sigma for clusters."""
+        """Vectorized evaluation of the cluster profile when inputs are arrays.
+
+        Parameters
+        ----------
+        log_mass : numpy.ndarray
+            Array (or scalar) of log10(mass) values.
+        z : numpy.ndarray
+            Array (or scalar) of redshifts.
+        radius_center : numpy.ndarray
+            Radii at which to evaluate the profile (can be 1D array).
+
+        Returns
+        -------
+        numpy.ndarray
+            Array with profile values. Shape depends on input broadcasting (typically
+            (n_clusters, n_radii) or (n_radii, n_clusters) depending on call).
+        """
         mass_def = self.halo_mass_function.mass_def
         mass_type = mass_def.rho_type
         if mass_type == "matter":
@@ -299,7 +394,24 @@ class ClusterShearProfile(ClusterAbundance):
         sigma_offset=0.12,
         **kwargs,
     ) -> npt.NDArray[np.float64]:
-        """Calculate the second halo contribution to the delta sigma."""
+        """Compute the 1-halo contribution (either DeltaSigma or reduced shear).
+
+        Parameters
+        ----------
+        clmm_model : clmm.Modeling
+            CLMM modeling object configured with mass and concentration.
+        radius_center : float or array_like
+            Radius or radii at which to evaluate.
+        redshift : float or array_like
+            Cluster redshift(s).
+        sigma_offset : float, optional
+            Offset parameter (unused in many flows).
+
+        Returns
+        -------
+        numpy.ndarray
+            Evaluated 1-halo profile (same shape as input radius_center after broadcasting).
+        """
         beta_s_mean = None
         beta_s_square_mean = None
         if self.is_delta_sigma:
@@ -330,7 +442,26 @@ class ClusterShearProfile(ClusterAbundance):
     def _two_halo_contribution(
         self, clmm_model: clmm.Modeling, radius_center, redshift
     ) -> npt.NDArray[np.float64]:
-        """Calculate the second halo contribution to the delta sigma."""
+        """Compute the 2-halo contribution for DeltaSigma.
+
+        Notes
+        -----
+        Currently raises if `is_delta_sigma` is False (2-halo for reduced shear not implemented).
+
+        Parameters
+        ----------
+        clmm_model : clmm.Modeling
+            CLMM modeling object.
+        radius_center : float
+            Radius at which to evaluate (single value).
+        redshift : float
+            Cluster redshift.
+
+        Returns
+        -------
+        numpy.ndarray or float
+            2-halo contribution evaluated at the given radius/redshift (scalar if single radius).
+        """        
         # pylint: disable=protected-access
         if self.is_delta_sigma == False:
             raise Exception("Two halo contribution for gt is not suported yet.")
@@ -342,7 +473,20 @@ class ClusterShearProfile(ClusterAbundance):
         return second_halo_right_centered[0]
 
     def _get_concentration(self, log_m: float, redshift: float) -> float:
-        """Determine the concentration for a halo."""
+        """Return concentration for a halo given log-mass and redshift.
+
+        Parameters
+        ----------
+        log_m : float
+            log10 of halo mass.
+        redshift : float
+            Halo redshift.
+
+        Returns
+        -------
+        float
+            Halo concentration parameter.
+        """
         if self.cluster_concentration is not None:
             return self.cluster_concentration
 
@@ -357,7 +501,20 @@ class ClusterShearProfile(ClusterAbundance):
     def _correct_with_boost_nfw(
         self, profiles: npt.NDArray[np.float64], radius_list: npt.NDArray[np.float64]
     ) -> npt.NDArray[np.float64]:
-        """Determine the nfw boost factor and correct the shear profiles."""
+        """Apply boost-factor correction to NFW profiles using CLMM utilities.
+
+        Parameters
+        ----------
+        profiles : numpy.ndarray
+            Profile values to correct.
+        radius_list : numpy.ndarray
+            Radii corresponding to `profiles`.
+
+        Returns
+        -------
+        numpy.ndarray
+            Corrected profiles (same shape as `profiles`).
+        """
         boost_factors = clmm.utils.compute_powerlaw_boost(radius_list, 1.0)
         corrected_profiles = clmm.utils.correct_with_boost_values(
             profiles, boost_factors
@@ -397,6 +554,30 @@ class ClusterShearProfile(ClusterAbundance):
     def compute_miscentering(
         self, clmm_model, radius_center, redshift, beta_s_mean, beta_s_square_mean
     ):
+        """Compute the miscentered profile integral and return fraction.
+
+        Parameters
+        ----------
+        clmm_model : clmm.Modeling
+            CLMM model used to evaluate (reduced) shear or DeltaSigma.
+        radius_center : float
+            Radius where the profile is evaluated.
+        redshift : float
+            Cluster redshift.
+        beta_s_mean : float or None
+            Mean beta_s if using reduced shear; None if computing DeltaSigma.
+        beta_s_square_mean : float or None
+            Mean beta_s^2 for order2 approx; None if not used.
+
+        Returns
+        -------
+        tuple
+            (miscentering_integral, miscentering_fraction)
+            miscentering_integral : numpy.ndarray or float
+                Integral value of the miscentered profile at `radius_center`.
+            miscentering_fraction : float
+                Fraction of clusters that are miscentered (from parameters).
+        """
         params = self.miscentering_parameters
         miscentering_frac = params["miscentering_fraction"]
         sigma = params["sigma"]
