@@ -202,7 +202,7 @@ class ClusterShearProfile(ClusterAbundance):
             ]
         )
 
-    def set_beta_s_interp(self, z_min, z_max, n_intep=3):
+    def set_beta_s_interp(self, z_min, z_max, n_intep=10):
 
         # Note: this will set an interpolator with a fixed cosmology
         # must add check to verify consistency with main cosmology
@@ -307,6 +307,15 @@ class ClusterShearProfile(ClusterAbundance):
                 radius_center, redshift
             )
         else:
+            if self._beta_parameters is None:
+                raise ValueError(
+                    "Beta parameters must be set in order to compute the reduced shear."
+                )
+            if self.use_beta_s_interp and self._beta_s_mean_interp is None:
+                raise ValueError(
+                    "Interpolation parameters must be set when using the interpolation "
+                    "option for the lens efficiency."
+                )
             beta_s_mean = self.eval_beta_s_mean(redshift)
             beta_s_square_mean = self.eval_beta_s_square_mean(redshift)
             first_halo_right_centered = clmm_model.eval_reduced_tangential_shear(
