@@ -340,8 +340,6 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         for radius_center in radius_centers:
             extra_args.extend([sky_area, radius_center])
             self.integrator.extra_args = np.array(extra_args)
-            if self.cluster_theory._beta_parameters is not None:
-                self.cluster_theory.set_beta_s_interp(*z_edges)
             theory_prediction = self._get_theory_prediction_shear_profile(average_on)
             prediction_wrapper = self._get_function_to_integrate_shear_profile(
                 theory_prediction
