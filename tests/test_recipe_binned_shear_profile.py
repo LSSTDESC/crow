@@ -255,6 +255,58 @@ def test_evaluates_theory_prediction_returns_value(
     assert prediction_c > 0
 
 
+def test_evaluates_theory_prediction_returns_value(
+    binned_exact_deltasigma: ExactBinnedClusterRecipe,
+    binned_grid_gt: GridBinnedClusterRecipe,
+):
+
+    mass_proxy_edges = (2, 5)
+    mass_proxy_edges_err = (2, 5, 6)
+    z_edges = (0.5, 1)
+    z_edges_err = (0.5, 1.0, 1.2)
+    radius_center = np.atleast_1d(1.5)
+    sky_area = 360**2
+    average_on = ClusterProperty.DELTASIGMA
+
+    z_bin_mean = (z_edges[1] + z_edges[0]) / 2.0
+    a = 1.0 / (1.0 + z_bin_mean)
+    angular_center_arcmin = (
+        radius_center
+        / binned_exact_deltasigma.cluster_theory.cosmo.angular_diameter_distance(a)
+        * 180.0
+        / np.pi
+        * 60.0
+    )
+    # test exact deltasigma
+    prediction_rad = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, radius_center, sky_area, average_on, "mpc"
+    )
+    prediction_ang = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, angular_center_arcmin, sky_area, average_on, "arcmin"
+    )
+    rel_tol = 1.0e-4
+    assert np.all(np.abs(prediction_rad - prediction_ang) < rel_tol)
+    # test grid reduced shear
+    average_on = ClusterProperty.SHEAR
+    prediction_rad = binned_grid_gt.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, radius_center, sky_area, average_on, "mpc"
+    )
+    prediction_ang = binned_grid_gt.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, angular_center_arcmin, sky_area, average_on, "arcmin"
+    )
+    rel_tol = 1.0e-4
+    assert np.all(np.abs(prediction_rad - prediction_ang) < rel_tol)
+
+    with pytest.raises(ValueError, match="Unknown distance_units='rad'"):
+        binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radius_center, sky_area, average_on, "rad"
+        )
+    with pytest.raises(ValueError, match="Unknown distance_units='rad'"):
+        binned_grid_gt.evaluate_theory_prediction_lensing_profile(
+            z_edges, mass_proxy_edges, radius_center, sky_area, average_on, "rad"
+        )
+
+
 def test_grid_shear_matches_exact_within_tolerance(
     binned_exact_deltasigma: ExactBinnedClusterRecipe,
     binned_grid_deltasigma: GridBinnedClusterRecipe,

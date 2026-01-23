@@ -97,9 +97,10 @@ class BinnedClusterRecipe:
         self,
         z_edges,
         mass_proxy_edges,
-        radius_centers,
+        distance_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
+        distance_units: str = "mpc",
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe.
 
