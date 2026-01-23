@@ -255,7 +255,7 @@ def test_evaluates_theory_prediction_returns_value(
     assert prediction_c > 0
 
 
-def test_evaluates_theory_prediction_returns_value(
+def test_evaluates_theory_prediction_different_bins(
     binned_exact_deltasigma: ExactBinnedClusterRecipe,
     binned_grid_gt: GridBinnedClusterRecipe,
 ):
