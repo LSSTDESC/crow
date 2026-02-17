@@ -338,7 +338,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         deltasigma_list = []
 
         for radius_center in radius_centers:
-            extra_args_radi = np.concatenate((extra_args, [sky_area,radius_center]))
+            extra_args_radi = np.concatenate((extra_args, [sky_area, radius_center]))
             self.integrator.extra_args = extra_args_radi
             theory_prediction = self._get_theory_prediction_shear_profile(average_on)
             prediction_wrapper = self._get_function_to_integrate_shear_profile(
