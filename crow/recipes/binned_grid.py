@@ -111,7 +111,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             vol = self.cluster_theory.comoving_volume(z, sky_area)
             # assign
             self._hmf_grid[key] = vol[:, np.newaxis] * mass_function_2d
-
         return self._hmf_grid[key]
 
     def _get_mass_richness_grid(
@@ -147,7 +146,6 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             self._completeness_grid[key] = self._completeness_distribution(
                 self.log_mass_grid[np.newaxis, :], z[:, np.newaxis]
             )
-
         return self._completeness_grid[key]
 
     def _get_purity_grid(

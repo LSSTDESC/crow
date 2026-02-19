@@ -298,3 +298,28 @@ def test_cluster_concentration_negative_values():
     assert cluster.cluster_concentration is None
     # It should NOT be the default 4
     assert np.all(cluster._get_concentration(log_m, z) != 4.0)
+
+
+def test_unset_beta_parameters_error():
+    """Test using ClusterShearProfile without beta parameters set."""
+    cosmo = _TEST_COSMO
+    hmf = pyccl.halos.MassFuncBocquet16()
+    log_m = np.array([14.0])
+    z = np.array([1.0])
+    radius = 3.0
+    cluster = ClusterShearProfile(
+        cosmo, hmf, is_delta_sigma=False, use_beta_s_interp=True
+    )
+    with pytest.raises(
+        ValueError,
+        match="Beta parameters must be set in order to compute the reduced shear.",
+    ):
+        cluster.compute_shear_profile(log_m, z, radius)
+
+    cluster.set_beta_parameters(10.0)
+
+    with pytest.raises(
+        ValueError,
+        match="Interpolation parameters must be set when using the interpolation option for the lens efficiency.",
+    ):
+        cluster.compute_shear_profile(log_m, z, radius)
