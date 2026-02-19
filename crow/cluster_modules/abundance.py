@@ -21,6 +21,18 @@ class ClusterAbundance:
     an area on the sky, a halo mass function, as well as multiple kernels, where
     each kernel represents a different distribution involved in the final cluster
     abundance integrand.
+
+    Attributes
+    ----------
+    cosmo : pyccl.cosmology.Cosmology or None
+        Cosmology object used for predictions. Set via the `cosmo` property.
+    halo_mass_function : callable
+        Halo mass function object compatible with PyCCL's MassFunc interface.
+    parameters : Parameters
+        Container for optional model parameters.
+    _hmf_cache : dict
+        Cache for previously computed halo mass function evaluations keyed by
+        (log_mass, scale_factor).
     """
 
     @property
@@ -47,9 +59,28 @@ class ClusterAbundance:
     def comoving_volume(
         self, z: npt.NDArray[np.float64], sky_area: float = 0
     ) -> npt.NDArray[np.float64]:
-        """The differential comoving volume given area sky_area at redshift z.
+        """Differential comoving volume for a given sky area.
 
-        :param sky_area: The area of the survey on the sky in square degrees.
+        Parameters
+        ----------
+        z : array_like
+            Redshift or array of redshifts at which to compute the differential
+            comoving volume (dV/dz per steradian).
+        sky_area : float, optional
+            Survey area in square degrees. Default 0 returns per-steradian volume.
+
+        Returns
+        -------
+        numpy.ndarray
+            Differential comoving volume (same shape as `z`) multiplied by the
+            survey area (converted to steradians). Units: [Mpc/h]^3 (consistent
+            with the internal PyCCL conventions used here).
+
+        Notes
+        -----
+        This uses PyCCL background helpers to evaluate the angular diameter
+        distance and h(z) factor. If `sky_area` is zero the returned array is
+        the per-steradian dV/dz.
         """
         assert self.cosmo is not None
         scale_factor = 1.0 / (1.0 + z)
@@ -73,7 +104,26 @@ class ClusterAbundance:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """The mass function at z and mass."""
+        """Evaluate the halo mass function at given log-mass and redshift.
+
+        Parameters
+        ----------
+        log_mass : array_like
+            Array of log10 halo masses (M_sun).
+        z : array_like
+            Array of redshifts matching `log_mass`.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array with mass function values (dn/dlnM or as provided by the
+            configured `halo_mass_function`) evaluated at each (mass, z).
+
+        Notes
+        -----
+        Results are cached in `_hmf_cache` keyed by (log_mass, scale_factor)
+        to avoid repeated expensive evaluations for identical inputs.
+        """
         scale_factor = 1.0 / (1.0 + z)
         return_vals = []
 
