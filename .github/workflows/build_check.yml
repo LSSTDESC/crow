@@ -98,6 +98,7 @@ jobs:
       - name: Compare new version number
         run: |
           IFS=. read -r C1 C2 C3 <<< "$CURRENT_VERSION"
+          if [ "$MAIN_VERSION" == "1.0.2-1" ]; then MAIN_VERSION="1.0.2-1"; fi
           IFS=. read -r M1 M2 M3 <<< "$MAIN_VERSION"
           if [ "$C1" != "$M1" ]; then
             GOAL="$((M1 + 1)).0.0"
