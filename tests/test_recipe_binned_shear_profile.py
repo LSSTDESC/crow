@@ -262,7 +262,7 @@ def test_grid_shear_matches_exact_within_tolerance(
     """Compare grid evaluation to exact evaluation for the same inputs."""
     mass_proxy_edges = (2, 5)
     z_edges = (0.5, 1)
-    radii = np.atleast_1d(1.5)
+    radii = np.array([1.5, 2.0])
     sky_area = 360**2
     average_on = ClusterProperty.DELTASIGMA
 
