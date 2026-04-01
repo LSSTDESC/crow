@@ -42,10 +42,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
 
     The computation is structured around reusable cached grids for efficiency,
     including:
-        - Halo mass function × comoving volume
-        - Mass–richness probability distribution
-        - Completeness and purity corrections
-        - Shear profiles for lensing observables
+    - Halo mass function × comoving volume
+    - Mass–richness probability distribution
+    - Completeness and purity corrections
+    - Shear profiles for lensing observables
 
     Parameters
     ----------

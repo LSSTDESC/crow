@@ -195,7 +195,7 @@ class ClusterShearProfile(ClusterAbundance):
 
     def _beta_s_mean_exact(self, z_cl):
         r"""Compute exact mean value of the geometric lensing efficiency <beta_s>.
-        
+
         .. math::
            \left<\beta_s\right> = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
            {\int_{z = z_{min}}^{z_{max}}N(z)}
@@ -208,7 +208,7 @@ class ClusterShearProfile(ClusterAbundance):
         Returns
         -------
         npt.NDArray[np.float64]
-            Mean geometric lensing efficiency <beta_s> at given cluster redshift(s)        
+            Mean geometric lensing efficiency <beta_s> at given cluster redshift(s)
         """
         z_cl = np.asarray(z_cl)
         if z_cl.ndim == 0:
@@ -238,7 +238,7 @@ class ClusterShearProfile(ClusterAbundance):
         Returns
         -------
         npt.NDArray[np.float64]
-            Mean geometric lensing efficiency squared <beta_s^2> at given cluster redshift(s)        
+            Mean geometric lensing efficiency squared <beta_s^2> at given cluster redshift(s)
         """
         z_cl = np.asarray(z_cl)
         if z_cl.ndim == 0:
@@ -470,7 +470,7 @@ class ClusterShearProfile(ClusterAbundance):
         -------
         numpy.ndarray or float
             2-halo contribution evaluated at the given radius/redshift (scalar if single radius).
-        """        
+        """
         # pylint: disable=protected-access
         if self.is_delta_sigma == False:
             raise Exception("Two halo contribution for gt is not suported yet.")
@@ -582,10 +582,13 @@ class ClusterShearProfile(ClusterAbundance):
         -------
         tuple
             (miscentering_integral, miscentering_fraction)
-            miscentering_integral : numpy.ndarray or float
-                Integral value of the miscentered profile at `radius_center`.
-            miscentering_fraction : float
-                Fraction of clusters that are miscentered (from parameters).
+
+        Notes
+        -----
+        miscentering_integral : numpy.ndarray or float
+            Integral value of the miscentered profile at `radius_center`.
+        miscentering_fraction : float
+            Fraction of clusters that are miscentered (from parameters).
         """
         params = self.miscentering_parameters
         miscentering_frac = params["miscentering_fraction"]

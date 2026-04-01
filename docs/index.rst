@@ -6,8 +6,4 @@ Crow documentation
    :caption: Contents:
 
    modules
-
-.. autosummary::
-   :toctree: generated/
-
-   crow
+   README

@@ -10,7 +10,13 @@ from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 
 class MassRichnessGaussian:
-    """The representation of mass richness relations that are of a gaussian form."""
+    """
+    Base class for Gaussian mass–richness relations.
+
+    This class defines the interface and common utilities for models where
+    the observable mass proxy follows a Gaussian distribution in log-space,
+    conditioned on halo mass and redshift.
+    """
 
     @abstractmethod
     def get_ln_mass_proxy_mean(
@@ -18,7 +24,13 @@ class MassRichnessGaussian:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Return observed quantity corrected by redshift and mass."""
+        """
+        Base class for Gaussian mass–richness relations.
+
+        This class defines the interface and common utilities for models where
+        the observable mass proxy follows a Gaussian distribution in log-space,
+        conditioned on halo mass and redshift.
+        """
 
     @abstractmethod
     def get_ln_mass_proxy_sigma(
@@ -26,7 +38,13 @@ class MassRichnessGaussian:
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
-        """Return observed scatter corrected by redshift and mass."""
+        """
+        Base class for Gaussian mass–richness relations.
+
+        This class defines the interface and common utilities for models where
+        the observable mass proxy follows a Gaussian distribution in log-space,
+        conditioned on halo mass and redshift.
+        """
 
     def integrated_gaussian(
         self,
@@ -34,6 +52,26 @@ class MassRichnessGaussian:
         z: npt.NDArray[np.float64],
         log_mass_proxy_limits: tuple[float, float],
     ) -> npt.NDArray[np.float64]:
+        """
+        Compute the integrated Gaussian probability within given bounds.
+
+        This evaluates the integral of the Gaussian distribution between
+        two limits in log10 space of the mass proxy.
+
+        Parameters
+        ----------
+        log_mass : ndarray of float64
+            Logarithm (base 10) of halo mass.
+        z : ndarray of float64
+            Redshift values.
+        log_mass_proxy_limits : tuple of float
+            Lower and upper bounds in log10 space.
+
+        Returns
+        -------
+        ndarray of float64
+            Integrated probability within the specified bounds.
+        """
         ln_mass_proxy_mean = self.get_ln_mass_proxy_mean(log_mass, z)
         ln_mass_proxy_sigma = self.get_ln_mass_proxy_sigma(log_mass, z)
 
@@ -65,6 +103,23 @@ class MassRichnessGaussian:
         z: npt.NDArray[np.float64],
         log_mass_proxy: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.float64]:
+        """
+        Evaluate the Gaussian probability density function.
+
+        Parameters
+        ----------
+        log_mass : ndarray of float64
+            Logarithm (base 10) of halo mass.
+        z : ndarray of float64
+            Redshift values.
+        log_mass_proxy : ndarray of float64
+            Logarithm (base 10) of the observed mass proxy.
+
+        Returns
+        -------
+        ndarray of float64
+            Value of the Gaussian PDF evaluated at the given inputs.
+        """
         ln_mass_proxy_mean = self.get_ln_mass_proxy_mean(log_mass, z)
         ln_mass_proxy_sigma = self.get_ln_mass_proxy_sigma(log_mass, z)
 

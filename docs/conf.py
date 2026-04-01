@@ -1,31 +1,85 @@
-# Sphinx configuration for the Crow documentation
 import os
 import sys
+from unittest.mock import MagicMock
 
-# Add the repo root to sys.path so autodoc can import the crow package
+# ----------------------------------------------------------------------
+# Path setup (IMPORTANT)
+# ----------------------------------------------------------------------
+# Add repo root so Sphinx can import `crow`
 sys.path.insert(0, os.path.abspath(".."))
+# ----------------------------------------------------------------------
+# Mock heavy / optional dependencies (EDIT if needed)
+# ----------------------------------------------------------------------
+MOCK_MODULES = [
+    # Add any modules that fail to import during autodoc
+    # Example:
+    # "numpy",
+    # "scipy",
+]
 
-project = "Crow"
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = MagicMock()
+
+# ----------------------------------------------------------------------
+# Project import (used for version)
+# ----------------------------------------------------------------------
+import crow
+
+# ----------------------------------------------------------------------
+# General configuration
+# ----------------------------------------------------------------------
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
 ]
 
 autosummary_generate = True
-napoleon_numpy_docstring = True
 
-# Prevent heavy/optional imports from breaking the build
-autodoc_mock_imports = [
-    "clmm",
-    "pyccl",
-    "numcosmo",
-    "scipy",
-    "crow.integrator.numcosmo_integrator",
+templates_path = ["_templates"]
+source_suffix = [".rst"]
+
+master_doc = "index"
+
+project = "crow"
+author = "Eduardo Barroso, Michel Aguena"
+copyright = "2026"
+language = "en"
+
+# ----------------------------------------------------------------------
+# Versioning
+# ----------------------------------------------------------------------
+version = getattr(crow, "__version__", "0.0.0")
+release = version
+
+# ----------------------------------------------------------------------
+# Exclusions
+# ----------------------------------------------------------------------
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
 ]
 
-html_theme = "sphinx_rtd_theme"
+# ----------------------------------------------------------------------
+# HTML output
+# ----------------------------------------------------------------------
+html_theme = "alabaster"  # or "sphinx_rtd_theme" if installed
+html_static_path = []
 
-# Basic HTML options
-html_static_path = ["_static"]
+# ----------------------------------------------------------------------
+# Napoleon (docstring parsing)
+# ----------------------------------------------------------------------
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_use_ivar = True
+
+# ----------------------------------------------------------------------
+# Autodoc options
+# ----------------------------------------------------------------------
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}

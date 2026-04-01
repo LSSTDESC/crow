@@ -1,5 +1,5 @@
 Generating the Crow documentation (package-local docs)
-=====================================================
+======================================================
 
 This README explains how to generate documentation for the `crow` package
 itself. It mirrors the top-level `docs/README.rst` but sets paths relative to
@@ -15,17 +15,17 @@ these modules and writes reST files that call ``.. automodule::`` for each
 module; Sphinx then imports them and extracts the docstrings.
 
 Quick steps (run from the repository root)
------------------------------------------
+==========================================
 1. Generate module rst files into this folder (overwrite existing):
 
-   sphinx-apidoc -o crow/docs/ crow -f
+   sphinx-apidoc -f -o docs crow
 
    This will create a set of reST files in `crow/docs/` referencing the
    `crow` package modules.
 
 2. Build the HTML docs for the package (from repo root):
 
-   sphinx-build -b html crow/docs/ crow/docs/_build/html
+   sphinx-build -b html docs docs/build/html
 
 3. Serve the built docs locally to inspect them::
 
