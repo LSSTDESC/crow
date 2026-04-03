@@ -4,3 +4,5 @@ nbconvert
 ipython
 ipykernel
 jupyter
+numpy
+scipy
