@@ -215,3 +215,17 @@ jobs:
           use_oidc: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  doc-valid:
+    name: Documentation build
+    runs-on: ubuntu-latest
+    needs: quick-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install doc dependencies
+        run: pip install -r docs/requirements.txt numpy scipy
+      - name: Build the docs
+        run: make -C docs/ html
