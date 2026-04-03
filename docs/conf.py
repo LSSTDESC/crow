@@ -2,7 +2,7 @@ import os
 import sys
 from unittest.mock import MagicMock
 import subprocess
-
+from sphinx.ext.apidoc import main as apidoc_main
 # ----------------------------------------------------------------------
 # Path setup (IMPORTANT)
 # ----------------------------------------------------------------------
@@ -35,19 +35,15 @@ for mod in [
 
 
 # --------------Run the makefile documentation--------
-subprocess.run(
-    [
-        "sphinx-apidoc",
-        "--separate",
-        "--no-toc",
-        "-f",
-        "-M",
-        "-o",
-        "api",
-        "../crow",
-    ],
-    cwd=os.path.dirname(os.path.abspath(__file__)),
-)
+docs_dir = os.path.dirname(os.path.abspath(__file__))
+apidoc_main([
+    "--separate",
+    "--no-toc",
+    "-f",
+    "-M",
+    "-o", os.path.join(docs_dir, "api"),
+    os.path.join(docs_dir, "../crow"),
+])
 #---------------------------------------------------
 
 
