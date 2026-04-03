@@ -80,6 +80,7 @@ exclude_patterns = [
     "Thumbs.db",
     ".DS_Store",
     "source/index_body.rst",
+    "api/crow.rst",
 ]
 
 highlight_language = "python3"
