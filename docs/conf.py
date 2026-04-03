@@ -172,12 +172,6 @@ with open("index.rst", "a") as indexfile:
    :caption: Reference
 
    api
-   api/crow
-
-.. toctree::
-   :maxdepth: 1
-
-   README
 """
     )
 
