@@ -3,7 +3,7 @@ Installation
 
 Clone the repository and install::
 
-    git clone https://github.com/your-org/crow.git
+    git clone git@github.com:LSSTDESC/crow.git
     cd crow
     pip install .
 
