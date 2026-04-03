@@ -31,6 +31,28 @@ for mod in [
     "clmm.utils.beta_lens"
 ]:
     sys.modules[mod] = Mock()
+
+
+
+# --------------Run the makefile documentation--------
+subprocess.run(
+    [
+        "sphinx-apidoc",
+        "--separate",
+        "--no-toc",
+        "-f",
+        "-M",
+        "-o",
+        "api",
+        "../crow",
+    ],
+    cwd=os.path.dirname(os.path.abspath(__file__)),
+)
+#---------------------------------------------------
+
+
+
+
 # ----------------------------------------------------------------------
 # Project import (used for version)
 # ----------------------------------------------------------------------

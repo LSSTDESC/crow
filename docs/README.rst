@@ -15,7 +15,7 @@ these modules and writes reST files that call ``.. automodule::`` for each
 module; Sphinx then imports them and extracts the docstrings.
 
 Quick steps (run from the repository root)
-==========================================
+------------------------------------------
 1. Generate module rst files into this folder (overwrite existing)::
 
     sphinx-apidoc -f -o docs crow
@@ -26,10 +26,6 @@ This will create a set of reST files in `crow/docs/` referencing the
 2. Build the HTML docs for the package (from repo root)::
 
     sphinx-build -b html docs docs/build/html
-
-3. Serve the built docs locally to inspect them::
-
-    python -m http.server --directory crow/docs/_build/html 8000
 
 Notes
 -----
