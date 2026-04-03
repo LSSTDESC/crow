@@ -215,3 +215,19 @@ jobs:
           use_oidc: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  doc-valid:
+    name: Documentation build
+    runs-on: ubuntu-latest
+    needs: quick-validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ${{ env.CONDA_ENV }}
+          use-mamba: true
+          environment-file: environment.yml
+      - name: Install the package
+        run: conda run -n crow pip install . --no-deps --no-build-isolation
+      - name: Build the docs
+        run: conda run -n crow make -C docs/ html
