@@ -12,9 +12,5 @@ build:
   tools:
     python: "3.11"
 
-python:
-  install:
-    - method: pip
-      path: .
 conda:
   environment: environment.yml
