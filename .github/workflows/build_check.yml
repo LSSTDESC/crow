@@ -221,13 +221,11 @@ jobs:
     needs: quick-validation
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          activate-environment: ${{ env.CONDA_ENV }}
-          use-mamba: true
-          environment-file: environment.yml
-      - name: Install the package
-        run: conda run -n crow pip install . --no-deps --no-build-isolation
+          python-version: "3.11"
+      - name: Install doc dependencies
+        run: pip install -r docs/requirements.txt numpy scipy
       - name: Build the docs
-        run: conda run -n crow make -C docs/ html
+        run: make -C docs/ html
