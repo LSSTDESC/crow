@@ -16,3 +16,5 @@ python:
   install:
     - method: pip
       path: .
+conda:
+  environment: environment.yml
