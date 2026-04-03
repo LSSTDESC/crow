@@ -35,15 +35,15 @@ for mod in [
 
 
 # --------------Run the makefile documentation--------
-docs_dir = os.path.dirname(os.path.abspath(__file__))
-apidoc_main([
-    "--separate",
-    "--no-toc",
-    "-f",
-    "-M",
-    "-o", os.path.join(docs_dir, "api"),
-    os.path.join(docs_dir, "../crow"),
-])
+#docs_dir = os.path.dirname(os.path.abspath(__file__))
+#apidoc_main([
+#    "--separate",
+#    "--no-toc",
+#    "-f",
+#    "-M",
+#    "-o", os.path.join(docs_dir, "api"),
+#    os.path.join(docs_dir, "../crow"),
+#])
 #---------------------------------------------------
 
 
