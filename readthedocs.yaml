@@ -13,4 +13,4 @@ build:
     python: "miniconda3-4.7"
 
 conda:
-  environment: environment.yml
+  environment: environment_docs.yml

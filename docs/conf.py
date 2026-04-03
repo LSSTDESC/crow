@@ -10,11 +10,11 @@ sys.path.insert(0, os.path.abspath(".."))
 # ----------------------------------------------------------------------
 # Mock heavy / optional dependencies (EDIT if needed)
 # ----------------------------------------------------------------------
+
+
 MOCK_MODULES = [
-    # Add any modules that fail to import during autodoc
-    # Example:
-    # "numpy",
-    # "scipy",
+"numcosmo",
+"numcosmo_py"
 ]
 
 for mod_name in MOCK_MODULES:
