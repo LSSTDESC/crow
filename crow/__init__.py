@@ -9,3 +9,4 @@ from .recipes.binned_grid import GridBinnedClusterRecipe
 from .recipes.binned_parent import BinnedClusterRecipe
 
 __version__ = "1.0.6"
+
