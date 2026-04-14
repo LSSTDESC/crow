@@ -3,5 +3,5 @@ crow.cluster\_modules.purity\_models module
 
 .. automodule:: crow.cluster_modules.purity_models
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

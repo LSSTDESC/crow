@@ -3,8 +3,8 @@ crow.integrator package
 
 .. automodule:: crow.integrator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

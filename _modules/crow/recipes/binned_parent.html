@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.recipes.binned_parent &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -105,46 +105,48 @@
   <h1>Source code for crow.recipes.binned_parent</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module for defining the classes used in the BinnedClusterRecipe cluster recipe.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
 
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.completeness_models</span> <span class="kn">import</span> <span class="n">Completeness</span>
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.purity_models</span> <span class="kn">import</span> <span class="n">Purity</span>
-<span class="kn">from</span> <span class="nn">crow.properties</span> <span class="kn">import</span> <span class="n">ClusterProperty</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.completeness_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Completeness</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.purity_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Purity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterProperty</span>
 
 <span class="c1"># To run with firecrown, use this import instead</span>
 <span class="c1"># from firecrown.models.cluster import ClusterProperty</span>
 
 
-<div class="viewcode-block" id="BinnedClusterRecipe"><a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe">[docs]</a><span class="k">class</span> <span class="nc">BinnedClusterRecipe</span><span class="p">:</span>
+<div class="viewcode-block" id="BinnedClusterRecipe">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BinnedClusterRecipe</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cluster recipe.</span>
 
 <span class="sd">    Object used to compute cluster statistics.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Completeness</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Completeness</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The completeness used to predict the cluster number count.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__completeness</span>
 
     <span class="nd">@completeness</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">completeness</span><span class="p">:</span> <span class="n">Completeness</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">completeness</span><span class="p">:</span> <span class="n">Completeness</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the cluster recipe with a new completeness.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__completeness</span> <span class="o">=</span> <span class="n">completeness</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_with_completeness</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">purity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Purity</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">purity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Purity</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The purity used to predict the cluster number count.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__purity</span>
 
     <span class="nd">@purity</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">purity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">purity</span><span class="p">:</span> <span class="n">Purity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">purity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">purity</span><span class="p">:</span> <span class="n">Purity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the cluster recipe calculation with a new purity.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__purity</span> <span class="o">=</span> <span class="n">purity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_with_purity</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cluster_theory</span><span class="p">,</span>
         <span class="n">redshift_distribution</span><span class="p">,</span>
@@ -163,11 +165,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mass_interval</span> <span class="o">=</span> <span class="n">mass_interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">true_z_interval</span> <span class="o">=</span> <span class="n">true_z_interval</span>
 
-    <span class="k">def</span> <span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Additional setup of class with the completeness&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Additional setup of class with the purity&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
@@ -175,7 +177,9 @@
     <span class="c1"># Functions to be implemented in child classes</span>
     <span class="c1">##############################################</span>
 
-<div class="viewcode-block" id="BinnedClusterRecipe.setup"><a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BinnedClusterRecipe.setup">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform any necessary pre-computation before evaluation.</span>
 
@@ -192,7 +196,10 @@
             <span class="s2">&quot;This function is not implemented in the parent class&quot;</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BinnedClusterRecipe.evaluate_theory_prediction_counts"><a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
+
+<div class="viewcode-block" id="BinnedClusterRecipe.evaluate_theory_prediction_counts">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">,</span>
         <span class="n">mass_proxy_edges</span><span class="p">,</span>
@@ -233,7 +240,10 @@
             <span class="s2">&quot;This function is not implemented in the parent class&quot;</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
+
+<div class="viewcode-block" id="BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">,</span>
         <span class="n">mass_proxy_edges</span><span class="p">,</span>
@@ -267,7 +277,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;This function is not implemented in the parent class&quot;</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>
