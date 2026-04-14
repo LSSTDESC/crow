@@ -1,0 +1,17 @@
+crow.recipes package
+====================
+
+.. automodule:: crow.recipes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   crow.recipes.binned_exact
+   crow.recipes.binned_grid
+   crow.recipes.binned_parent

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.cluster_modules.shear_profile module &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="crow.integrator package" href="crow.integrator.html" />
+    <link rel="prev" title="crow.cluster_modules.purity_models module" href="crow.cluster_modules.purity_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crow.cluster_modules.html">crow.cluster_modules package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crow.cluster_modules.html">crow.cluster_modules package</a></li>
+      <li class="breadcrumb-item active">crow.cluster_modules.shear_profile module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/crow.cluster_modules.shear_profile.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-crow.cluster_modules.shear_profile">
+<span id="crow-cluster-modules-shear-profile-module"></span><h1>crow.cluster_modules.shear_profile module<a class="headerlink" href="#module-crow.cluster_modules.shear_profile" title="Permalink to this heading"></a></h1>
+<p>Module to compute the cluster excess surface mass density (delta sigma).</p>
+<p>The galaxy cluster delta sigma integral is a combination of both theoretical
+and phenomenological predictions.  This module contains the classes and
+functions that produce those predictions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.cluster_modules.shear_profile.</span></span><span class="sig-name descname"><span class="pre">ClusterShearProfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cosmo:</span> <span class="pre">&lt;MagicMock</span> <span class="pre">id='140449080263760'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halo_mass_function:</span> <span class="pre">&lt;MagicMock</span> <span class="pre">name='mock.MassFunc'</span> <span class="pre">id='140448552223632'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_concentration:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_delta_sigma:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta_s_interp:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">two_halo_term:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boost_factor:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance" title="crow.cluster_modules.abundance.ClusterAbundance"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClusterAbundance</span></code></a></p>
+<p>The class that calculates the predicted delta sigma of galaxy clusters.</p>
+<p>The excess density surface mass density is a function of a specific cosmology,
+a mass and redshift range, an area on the sky, as well as multiple kernels, where
+each kernel represents a different distribution involved in the final cluster
+shear integrand.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.cluster_concentration">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cluster_concentration</span></span><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.cluster_concentration" title="Permalink to this definition"></a></dt>
+<dd><p>The cluster concentration parameter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.compute_miscentering">
+<span class="sig-name descname"><span class="pre">compute_miscentering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clmm_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_s_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_s_square_mean</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.compute_miscentering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_miscentering" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the miscentered profile integral and return fraction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clmm_model</strong> (<em>clmm.Modeling</em>) -- CLMM model used to evaluate (reduced) shear or DeltaSigma.</p></li>
+<li><p><strong>radius_center</strong> (<em>float</em>) -- Radius where the profile is evaluated.</p></li>
+<li><p><strong>redshift</strong> (<em>float</em>) -- Cluster redshift.</p></li>
+<li><p><strong>beta_s_mean</strong> (<em>float</em><em> or </em><em>None</em>) -- Mean beta_s if using reduced shear; None if computing DeltaSigma.</p></li>
+<li><p><strong>beta_s_square_mean</strong> (<em>float</em><em> or </em><em>None</em>) -- Mean beta_s^2 for order2 approx; None if not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(miscentering_integral, miscentering_fraction)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt>miscentering_integral<span class="classifier">numpy.ndarray or float</span></dt><dd><p>Integral value of the miscentered profile at <cite>radius_center</cite>.</p>
+</dd>
+<dt>miscentering_fraction<span class="classifier">float</span></dt><dd><p>Fraction of clusters that are miscentered (from parameters).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile">
+<span class="sig-name descname"><span class="pre">compute_shear_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.compute_shear_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Compute DeltaSigma (or reduced shear) for a list of cluster masses/redshifts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass</strong> (<em>numpy.ndarray</em>) -- Array of log10(mass) values for clusters.</p></li>
+<li><p><strong>z</strong> (<em>numpy.ndarray</em>) -- Array of cluster redshifts (same length as <cite>log_mass</cite>).</p></li>
+<li><p><strong>radius_center</strong> (<em>float</em>) -- Radius (single value) at which the profile is evaluated [same units used by CLMM Modeling].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1D array of DeltaSigma (or reduced shear) values, one per input cluster.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized">
+<span class="sig-name descname"><span class="pre">compute_shear_profile_vectorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.compute_shear_profile_vectorized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>Vectorized evaluation of the cluster profile when inputs are arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass</strong> (<em>numpy.ndarray</em>) -- Array (or scalar) of log10(mass) values.</p></li>
+<li><p><strong>z</strong> (<em>numpy.ndarray</em>) -- Array (or scalar) of redshifts.</p></li>
+<li><p><strong>radius_center</strong> (<em>numpy.ndarray</em>) -- Radii at which to evaluate the profile (can be 1D array).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with profile values. Shape depends on input broadcasting (typically
+(n_clusters, n_radii) or (n_radii, n_clusters) depending on call).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_parameters">
+<span class="sig-name descname"><span class="pre">set_beta_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_z_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_distrib_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'order1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.set_beta_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Set parameters to comput mean value of the geometric lensing efficicency</p>
+<div class="math notranslate nohighlight">
+\[\left&lt;\beta_s\right&gt; = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s(z)N(z)}
+{\int_{z = z_{min}}^{z_{max}}N(z)}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_inf</strong> (<em>float</em>) -- Redshift at infinity</p></li>
+<li><p><strong>zmax</strong> (<em>float</em><em>, </em><em>optional</em>) -- Maximum redshift to be set as the source of the galaxy when performing the sum.
+Default: 10</p></li>
+<li><p><strong>delta_z_cut</strong> (<em>float</em><em>, </em><em>optional</em>) -- Redshift interval to be summed with <span class="math notranslate nohighlight">\(z_{cl}\)</span> to return <span class="math notranslate nohighlight">\(z_{min}\)</span>.
+This feature is not used if <span class="math notranslate nohighlight">\(z_{min}\)</span> is provided by the user. Default: 0.1</p></li>
+<li><p><strong>zmin</strong> (<em>float</em><em>, </em><em>None</em><em>, </em><em>optional</em>) -- Minimum redshift to be set as the source of the galaxy when performing the sum.
+Default: None</p></li>
+<li><p><strong>z_distrib_func</strong> (<em>one-parameter function</em><em>, </em><em>optional</em>) -- Redshift distribution function. Default is Chang et al (2013) distribution function.</p></li>
+<li><p><strong>approx</strong> (<em>str</em><em>, </em><em>optional</em>) -- <p>Type of computation to be made for reduced tangential shears, options are:</p>
+<blockquote>
+<div><ul>
+<li><p>'order1' : Same approach as in Weighing the Giants - III (equation 6 in
+Applegate et al. 2014; <a class="reference external" href="https://arxiv.org/abs/1208.0605">https://arxiv.org/abs/1208.0605</a>). <cite>z_src_info</cite> must be
+'beta':</p>
+<div class="math notranslate nohighlight">
+\[g_t\approx\frac{\left&lt;\beta_s\right&gt;\gamma_{\infty}}
+{1-\left&lt;\beta_s\right&gt;\kappa_{\infty}}\]</div>
+</li>
+<li><p>'order2' : Same approach as in Cluster Mass Calibration at High
+Redshift (equation 12 in Schrabback et al. 2017;
+<a class="reference external" href="https://arxiv.org/abs/1611.03866">https://arxiv.org/abs/1611.03866</a>).
+<cite>z_src_info</cite> must be 'beta':</p>
+<div class="math notranslate nohighlight">
+\[g_t\approx\frac{\left&lt;\beta_s\right&gt;\gamma_{\infty}}
+{1-\left&lt;\beta_s\right&gt;\kappa_{\infty}}
+\left(1+\left(\frac{\left&lt;\beta_s^2\right&gt;}
+{\left&lt;\beta_s\right&gt;^2}-1\right)\left&lt;\beta_s\right&gt;\kappa_{\infty}\right)\]</div>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_s_interp">
+<span class="sig-name descname"><span class="pre">set_beta_s_interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_intep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.set_beta_s_interp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_s_interp" title="Permalink to this definition"></a></dt>
+<dd><p>Build quadratic interpolators for &lt;beta_s&gt; and &lt;beta_s^2&gt; over a redshift grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_min</strong> (<em>float</em>) -- Redshift bounds for the interpolation grid.</p></li>
+<li><p><strong>z_max</strong> (<em>float</em>) -- Redshift bounds for the interpolation grid.</p></li>
+<li><p><strong>n_intep</strong> (<em>int</em><em>, </em><em>optional</em>) -- Number of interpolation nodes. Default 3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering">
+<span class="sig-name descname"><span class="pre">set_miscentering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">miscentering_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miscentering_distribution_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/shear_profile.html#ClusterShearProfile.set_miscentering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering" title="Permalink to this definition"></a></dt>
+<dd><p>Set the miscentering model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>miscentering_fraction</strong> (<em>float</em>) -- Fraction of miscentered clusters (required).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>optional</em>) -- Width of the miscentering distribution. Default is 0.12.</p></li>
+<li><p><strong>miscentering_distribution_function</strong> (<em>callable</em><em>, </em><em>optional</em>) -- Function describing the miscentering distribution (single-parameter). Default is None.</p></li>
+<li><p><strong>integration_max</strong> (<em>float</em><em>, </em><em>optional</em>) -- Maximum radius for integration in units of sigma. Default is 25 * sigma.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="crow.cluster_modules.shear_profile.ClusterShearProfile.use_beta_s_interp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_beta_s_interp</span></span><a class="headerlink" href="#crow.cluster_modules.shear_profile.ClusterShearProfile.use_beta_s_interp" title="Permalink to this definition"></a></dt>
+<dd><p>Flag to use beta_s interpolation (interpolate lens efficiency or not).</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

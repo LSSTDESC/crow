@@ -1,0 +1,7 @@
+crow.cluster\_modules.parameters module
+=======================================
+
+.. automodule:: crow.cluster_modules.parameters
+   :members:
+   :undoc-members:
+   :show-inheritance:

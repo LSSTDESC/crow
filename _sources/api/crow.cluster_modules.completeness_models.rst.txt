@@ -1,0 +1,7 @@
+crow.cluster\_modules.completeness\_models module
+=================================================
+
+.. automodule:: crow.cluster_modules.completeness_models
+   :members:
+   :undoc-members:
+   :show-inheritance:

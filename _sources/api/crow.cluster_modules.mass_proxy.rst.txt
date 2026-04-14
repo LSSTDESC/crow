@@ -1,0 +1,16 @@
+crow.cluster\_modules.mass\_proxy package
+=========================================
+
+.. automodule:: crow.cluster_modules.mass_proxy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   crow.cluster_modules.mass_proxy.gaussian_protocol
+   crow.cluster_modules.mass_proxy.murata

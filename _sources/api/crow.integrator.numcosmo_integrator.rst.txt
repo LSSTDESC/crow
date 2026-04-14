@@ -1,0 +1,7 @@
+crow.integrator.numcosmo\_integrator module
+===========================================
+
+.. automodule:: crow.integrator.numcosmo_integrator
+   :members:
+   :undoc-members:
+   :show-inheritance:

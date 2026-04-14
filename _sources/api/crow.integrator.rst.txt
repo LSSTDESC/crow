@@ -1,0 +1,17 @@
+crow.integrator package
+=======================
+
+.. automodule:: crow.integrator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   crow.integrator.integrator
+   crow.integrator.numcosmo_integrator
+   crow.integrator.scipy_integrator

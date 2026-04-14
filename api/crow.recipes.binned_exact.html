@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.recipes.binned_exact module &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="crow.recipes.binned_grid module" href="crow.recipes.binned_grid.html" />
+    <link rel="prev" title="crow.recipes package" href="crow.recipes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="crow.recipes.html">crow.recipes package</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crow.recipes.html">crow.recipes package</a></li>
+      <li class="breadcrumb-item active">crow.recipes.binned_exact module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/crow.recipes.binned_exact.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-crow.recipes.binned_exact">
+<span id="crow-recipes-binned-exact-module"></span><h1>crow.recipes.binned_exact module<a class="headerlink" href="#module-crow.recipes.binned_exact" title="Permalink to this heading"></a></h1>
+<p>Module for defining the classes used in the BinnedClusterRecipe cluster recipe.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.recipes.binned_exact.ExactBinnedClusterRecipe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.recipes.binned_exact.</span></span><span class="sig-name descname"><span class="pre">ExactBinnedClusterRecipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cluster_theory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completeness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.Completeness" title="crow.cluster_modules.completeness_models.Completeness"><span class="pre">Completeness</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity" title="crow.cluster_modules.purity_models.Purity"><span class="pre">Purity</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(11.0,</span> <span class="pre">17.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_z_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">5.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/recipes/binned_exact.html#ExactBinnedClusterRecipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_exact.ExactBinnedClusterRecipe" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe" title="crow.recipes.binned_parent.BinnedClusterRecipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinnedClusterRecipe</span></code></a></p>
+<p>Concrete implementation of BinnedClusterRecipe using direct numerical integration.</p>
+<p>This recipe evaluates cluster observables by explicitly integrating over
+mass, redshift, and mass proxy using a numerical integrator. It assumes:</p>
+<ul class="simple">
+<li><p>Murata et al. (2019) mass–richness relation</p></li>
+<li><p>Perfectly measured spectroscopic redshifts</p></li>
+<li><p>No precomputed grids or interpolation (fully numerical evaluation)</p></li>
+</ul>
+<p>The integration is performed using a configurable integrator
+(NumCosmoIntegrator), which maps the theoretical prediction into an
+integrable function over the relevant parameter space.</p>
+<p>Compared to other implementations, this class:
+- Does not rely on interpolation tables
+- Computes predictions on-the-fly via numerical quadrature
+- Handles purity/completeness through explicit modification of the integrand</p>
+<p class="rubric">Notes</p>
+<p>This implementation is computationally more expensive but provides
+a reference &quot;exact&quot; evaluation of the model under the stated assumptions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts">
+<span class="sig-name descname"><span class="pre">evaluate_theory_prediction_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_proxy_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><span class="pre">ClusterProperty</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/crow/recipes/binned_exact.html#ExactBinnedClusterRecipe.evaluate_theory_prediction_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts" title="Permalink to this definition"></a></dt>
+<dd><p>Compute predicted cluster number counts within a bin.</p>
+<p>This method performs a multidimensional numerical integral over:</p>
+<ul class="simple">
+<li><p>halo mass</p></li>
+<li><p>redshift</p></li>
+<li><p>mass proxy</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_edges</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>2</em><em>,</em><em>)</em>) -- Redshift bin limits.</p></li>
+<li><p><strong>log_proxy_edges</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>2</em><em>,</em><em>)</em>) -- Mass proxy bin limits in log10 space.</p></li>
+<li><p><strong>sky_area</strong> (<em>float</em>) -- Survey area in square degrees.</p></li>
+<li><p><strong>average_on</strong> (<a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><em>ClusterProperty</em></a><em>, </em><em>optional</em>) -- Observable over which to average (e.g., mass, redshift).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Expected number of clusters in the bin.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Uses NumCosmoIntegrator for numerical quadrature.</p></li>
+<li><p>Handles purity and completeness internally by modifying the integrand.</p></li>
+<li><p>Assumes perfect redshift measurements.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">
+<span class="sig-name descname"><span class="pre">evaluate_theory_prediction_lensing_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_proxy_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><span class="pre">ClusterProperty</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/crow/recipes/binned_exact.html#ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the predicted stacked lensing (shear) profile.</p>
+<p>This method integrates the theoretical lensing signal over:</p>
+<ul class="simple">
+<li><p>halo mass</p></li>
+<li><p>redshift</p></li>
+<li><p>mass proxy</p></li>
+</ul>
+<p>and evaluates it at multiple radial bins.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_edges</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>2</em><em>,</em><em>)</em>) -- Redshift bin limits.</p></li>
+<li><p><strong>log_proxy_edges</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>2</em><em>,</em><em>)</em>) -- Mass proxy bin limits in log10 space.</p></li>
+<li><p><strong>radius_centers</strong> (<em>array-like</em>) -- Radii at which the shear profile is evaluated.</p></li>
+<li><p><strong>sky_area</strong> (<em>float</em>) -- Survey area in square degrees.</p></li>
+<li><p><strong>average_on</strong> (<a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><em>ClusterProperty</em></a><em>, </em><em>optional</em>) -- Observable defining the weighting of the prediction.
+Must include shear-related properties.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Predicted shear profile evaluated at each radius.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Each radius is integrated independently.</p></li>
+<li><dl class="simple">
+<dt>The integrand includes the halo shear profile computed from the</dt><dd><p>underlying cluster theory model.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Purity and completeness modify the integrand similarly to the</dt><dd><p>number counts case.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/recipes/binned_exact.html#ExactBinnedClusterRecipe.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Perform any necessary pre-computation before evaluation.</p>
+<p>This method is intended to be implemented by subclasses. It should
+initialize any internal quantities required for evaluating theoretical
+predictions (e.g., reseting/ precomputing grids, normalization
+factors, or integrators).</p>
+<p class="rubric">Notes</p>
+<p>This method must be called before any evaluation method.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

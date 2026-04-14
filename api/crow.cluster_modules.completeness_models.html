@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.cluster_modules.completeness_models module &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="crow.cluster_modules.kernel module" href="crow.cluster_modules.kernel.html" />
+    <link rel="prev" title="crow.cluster_modules.abundance module" href="crow.cluster_modules.abundance.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crow.cluster_modules.html">crow.cluster_modules package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crow.cluster_modules.html">crow.cluster_modules package</a></li>
+      <li class="breadcrumb-item active">crow.cluster_modules.completeness_models module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/crow.cluster_modules.completeness_models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-crow.cluster_modules.completeness_models">
+<span id="crow-cluster-modules-completeness-models-module"></span><h1>crow.cluster_modules.completeness_models module<a class="headerlink" href="#module-crow.cluster_modules.completeness_models" title="Permalink to this heading"></a></h1>
+<p>The cluster completeness module.</p>
+<p>This module holds the classes that define completeness kernels that can be included
+in the cluster prediction integrand.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.cluster_modules.completeness_models.Completeness">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.cluster_modules.completeness_models.</span></span><span class="sig-name descname"><span class="pre">Completeness</span></span><a class="reference internal" href="../_modules/crow/cluster_modules/completeness_models.html#Completeness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.completeness_models.Completeness" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The completeness kernel base class.</p>
+<p>This kernel affects the prediction integrand by accounting for the incompleteness
+of a cluster selection. Subclasses should implement the <code class="docutils literal notranslate"><span class="pre">distribution</span></code> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference internal" href="crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters" title="crow.cluster_modules.parameters.Parameters"><em>Parameters</em></a><em>, </em><em>optional</em>) -- Container for completeness model parameters (defined by subclasses).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.completeness_models.Completeness.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/completeness_models.html#Completeness.distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.completeness_models.Completeness.distribution" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the completeness kernel contribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass</strong> (<em>array_like</em>) -- Array of log10 halo masses (units: Msun).</p></li>
+<li><p><strong>z</strong> (<em>array_like</em>) -- Array of redshifts matching <code class="docutils literal notranslate"><span class="pre">log_mass</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of completeness values in the range [0, 1] with the same
+broadcastable shape as the inputs. Subclasses should guarantee the
+output dtype is floating point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.cluster_modules.completeness_models.CompletenessAguena16">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.cluster_modules.completeness_models.</span></span><span class="sig-name descname"><span class="pre">CompletenessAguena16</span></span><a class="reference internal" href="../_modules/crow/cluster_modules/completeness_models.html#CompletenessAguena16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.completeness_models.CompletenessAguena16" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#crow.cluster_modules.completeness_models.Completeness" title="crow.cluster_modules.completeness_models.Completeness"><code class="xref py py-class docutils literal notranslate"><span class="pre">Completeness</span></code></a></p>
+<p>Completeness model following Aguena et al. (2016) parametrisation.</p>
+<p>The model uses a pivot mass and a redshift-dependent power-law index to
+compute a sigmoid-like completeness as a function of mass and redshift.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initialization</strong><strong>)</strong> (<em>(</em><em>set during</em>) -- </p></li>
+<li><p><strong>a_n</strong> (<em>float</em>) -- Parameters controlling the redshift evolution of the power-law index.</p></li>
+<li><p><strong>b_n</strong> (<em>float</em>) -- Parameters controlling the redshift evolution of the power-law index.</p></li>
+<li><p><strong>a_logm_piv</strong> (<em>float</em>) -- Parameters controlling the pivot mass (in log10 units) and its
+redshift evolution.</p></li>
+<li><p><strong>b_logm_piv</strong> (<em>float</em>) -- Parameters controlling the pivot mass (in log10 units) and its
+redshift evolution.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>parameters</strong> (<a class="reference internal" href="crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters" title="crow.cluster_modules.parameters.Parameters"><em>Parameters</em></a>) -- Container holding the parameter values; defaults are defined in
+<code class="docutils literal notranslate"><span class="pre">REDMAPPER_DEFAULT_PARAMETERS</span></code>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.completeness_models.CompletenessAguena16.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/completeness_models.html#CompletenessAguena16.distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.completeness_models.CompletenessAguena16.distribution" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the completeness fraction for given mass and redshift.
+The completeness is given by</p>
+<div class="math notranslate nohighlight">
+\[c(M, z) = \frac{\left(M / M_{\rm piv}(z)\right)^{n_c(z)}}
+      {1 + \left(M / M_{\rm piv}(z)\right)^{n_c(z)}}\]</div>
+<p>where M = 10^{text{log_mass}}, M_{rm piv}(z) is returned by _mpiv(z),
+and n_c(z) is returned by _nc(z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass</strong> (<em>array_like</em>) -- Array of log10 halo masses (Msun).</p></li>
+<li><p><strong>z</strong> (<em>array_like</em>) -- Array of redshifts matching <code class="docutils literal notranslate"><span class="pre">log_mass</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Completeness values in the interval [0, 1] with shape matching the
+broadcasted inputs. dtype is float64.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

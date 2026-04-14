@@ -1,0 +1,7 @@
+crow.cluster\_modules.abundance module
+======================================
+
+.. automodule:: crow.cluster_modules.abundance
+   :members:
+   :undoc-members:
+   :show-inheritance:
