@@ -3,5 +3,5 @@ crow.integrator.scipy\_integrator module
 
 .. automodule:: crow.integrator.scipy_integrator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

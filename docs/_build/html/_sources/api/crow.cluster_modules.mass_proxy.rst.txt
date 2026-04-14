@@ -3,8 +3,8 @@ crow.cluster\_modules.mass\_proxy package
 
 .. automodule:: crow.cluster_modules.mass_proxy
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

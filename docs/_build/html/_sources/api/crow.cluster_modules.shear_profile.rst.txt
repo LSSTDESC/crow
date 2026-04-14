@@ -3,5 +3,5 @@ crow.cluster\_modules.shear\_profile module
 
 .. automodule:: crow.cluster_modules.shear_profile
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

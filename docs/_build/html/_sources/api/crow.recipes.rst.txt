@@ -3,8 +3,8 @@ crow.recipes package
 
 .. automodule:: crow.recipes
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

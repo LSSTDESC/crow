@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.cluster_modules.shear_profile &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -110,25 +110,25 @@
 <span class="sd">functions that produce those predictions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">clmm</span>  <span class="c1"># pylint: disable=import-error</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pyccl</span>
-<span class="kn">from</span> <span class="nn">clmm.utils.beta_lens</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">clmm</span>  <span class="c1"># pylint: disable=import-error</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyccl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">clmm.utils.beta_lens</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">compute_beta_s_mean_from_distribution</span><span class="p">,</span>
     <span class="n">compute_beta_s_square_mean_from_distribution</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyccl.cosmology</span> <span class="kn">import</span> <span class="n">Cosmology</span>
-<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gamma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyccl.cosmology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmology</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">gamma</span>
 
-<span class="kn">from</span> <span class="nn">crow</span> <span class="kn">import</span> <span class="n">ClusterAbundance</span>
-<span class="kn">from</span> <span class="nn">crow.integrator.numcosmo_integrator</span> <span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterAbundance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.integrator.numcosmo_integrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_clmm_patches</span>
-<span class="kn">from</span> <span class="nn">.parameters</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_clmm_patches</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameters</span>
 
 <span class="c1">##############################</span>
 <span class="c1"># Monkeypatch CLMM functions #</span>
@@ -143,7 +143,9 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="ClusterShearProfile"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile">[docs]</a><span class="k">class</span> <span class="nc">ClusterShearProfile</span><span class="p">(</span><span class="n">ClusterAbundance</span><span class="p">):</span>
+<div class="viewcode-block" id="ClusterShearProfile">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClusterShearProfile</span><span class="p">(</span><span class="n">ClusterAbundance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The class that calculates the predicted delta sigma of galaxy clusters.</span>
 
 <span class="sd">    The excess density surface mass density is a function of a specific cosmology,</span>
@@ -152,7 +154,7 @@
 <span class="sd">    shear integrand.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">,</span>
         <span class="n">halo_mass_function</span><span class="p">:</span> <span class="n">pyccl</span><span class="o">.</span><span class="n">halos</span><span class="o">.</span><span class="n">MassFunc</span><span class="p">,</span>
@@ -205,24 +207,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vectorized</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cluster_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cluster_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The cluster concentration parameter.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;cluster_concentration&quot;</span><span class="p">]</span>
 
     <span class="nd">@cluster_concentration</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">cluster_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cluster_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the cluster concentration parameter.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;cluster_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">use_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">use_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Flag to use beta_s interpolation (interpolate lens efficiency or not).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_beta_s_interp</span>
 
     <span class="nd">@use_beta_s_interp</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">use_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">use_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set flag to use beta_s interpolation (interpolate lens efficiency or not).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;value (=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">) for use_beta_s_interp must be boolean.&quot;</span><span class="p">)</span>
@@ -234,7 +236,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_beta_s_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta_s_mean_exact</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_beta_s_square_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta_s_square_mean_exact</span>
 
-<div class="viewcode-block" id="ClusterShearProfile.set_beta_parameters"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_beta_parameters</span><span class="p">(</span>
+<div class="viewcode-block" id="ClusterShearProfile.set_beta_parameters">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_beta_parameters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_inf</span><span class="p">,</span>
         <span class="n">zmax</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
@@ -298,7 +302,8 @@
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">approx</span> <span class="o">=</span> <span class="n">approx</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_beta_s_mean_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_cl</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_beta_s_mean_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_cl</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute exact mean value of the geometric lensing efficiency &lt;beta_s&gt;.</span>
 
 <span class="sd">        .. math::</span>
@@ -329,7 +334,7 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_beta_s_square_mean_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_cl</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_beta_s_square_mean_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_cl</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute exact mean value of the geometric lensing efficiency squared &lt;beta_s^2&gt;.</span>
 <span class="sd">        .. math::</span>
 <span class="sd">              \left&lt;\beta_s^2\right&gt; = \frac{\int_{z = z_{min}}^{z_{max}}\beta_s^2(z)N(z)}</span>
@@ -359,7 +364,9 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="ClusterShearProfile.set_beta_s_interp"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_s_interp">[docs]</a>    <span class="k">def</span> <span class="nf">set_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">,</span> <span class="n">n_intep</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="ClusterShearProfile.set_beta_s_interp">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_s_interp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_beta_s_interp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_min</span><span class="p">,</span> <span class="n">z_max</span><span class="p">,</span> <span class="n">n_intep</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build quadratic interpolators for &lt;beta_s&gt; and &lt;beta_s^2&gt; over a redshift grid.</span>
 
 <span class="sd">        Parameters</span>
@@ -392,7 +399,10 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_beta_s_interp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_beta_s_interp</span></div>
 
-<div class="viewcode-block" id="ClusterShearProfile.compute_shear_profile"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile">[docs]</a>    <span class="k">def</span> <span class="nf">compute_shear_profile</span><span class="p">(</span>
+
+<div class="viewcode-block" id="ClusterShearProfile.compute_shear_profile">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_shear_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -445,7 +455,10 @@
             <span class="n">return_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ClusterShearProfile.compute_shear_profile_vectorized"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized">[docs]</a>    <span class="k">def</span> <span class="nf">compute_shear_profile_vectorized</span><span class="p">(</span>
+
+<div class="viewcode-block" id="ClusterShearProfile.compute_shear_profile_vectorized">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_shear_profile_vectorized</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -491,7 +504,8 @@
             <span class="n">return_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correct_with_boost_nfw</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="n">radius_center</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">return_vals</span></div>
 
-    <span class="k">def</span> <span class="nf">_one_halo_contribution</span><span class="p">(</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_one_halo_contribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">clmm_model</span><span class="p">:</span> <span class="n">clmm</span><span class="o">.</span><span class="n">Modeling</span><span class="p">,</span>
         <span class="n">radius_center</span><span class="p">,</span>
@@ -553,7 +567,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">first_halo_right_centered</span>
 
-    <span class="k">def</span> <span class="nf">_two_halo_contribution</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_two_halo_contribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">clmm_model</span><span class="p">:</span> <span class="n">clmm</span><span class="o">.</span><span class="n">Modeling</span><span class="p">,</span> <span class="n">radius_center</span><span class="p">,</span> <span class="n">redshift</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the 2-halo contribution for DeltaSigma.</span>
@@ -586,7 +600,7 @@
 
         <span class="k">return</span> <span class="n">second_halo_right_centered</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">redshift</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">redshift</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return concentration for a halo given log-mass and redshift.</span>
 
 <span class="sd">        Parameters</span>
@@ -612,7 +626,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span><span class="p">,</span> <span class="mf">10.0</span><span class="o">**</span><span class="n">log_m</span><span class="p">,</span> <span class="n">a</span>
         <span class="p">)</span>  <span class="c1"># pylint: disable=protected-access</span>
 
-    <span class="k">def</span> <span class="nf">_correct_with_boost_nfw</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_correct_with_boost_nfw</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">profiles</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">radius_list</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply boost-factor correction to NFW profiles using CLMM utilities.</span>
@@ -635,7 +649,9 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">corrected_profiles</span>
 
-<div class="viewcode-block" id="ClusterShearProfile.set_miscentering"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering">[docs]</a>    <span class="k">def</span> <span class="nf">set_miscentering</span><span class="p">(</span>
+<div class="viewcode-block" id="ClusterShearProfile.set_miscentering">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_miscentering</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">miscentering_fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.12</span><span class="p">,</span>
@@ -665,7 +681,10 @@
             <span class="s2">&quot;integration_max&quot;</span><span class="p">:</span> <span class="n">integration_max</span><span class="p">,</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="ClusterShearProfile.compute_miscentering"><a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_miscentering">[docs]</a>    <span class="k">def</span> <span class="nf">compute_miscentering</span><span class="p">(</span>
+
+<div class="viewcode-block" id="ClusterShearProfile.compute_miscentering">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_miscentering">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_miscentering</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">clmm_model</span><span class="p">,</span> <span class="n">radius_center</span><span class="p">,</span> <span class="n">redshift</span><span class="p">,</span> <span class="n">beta_s_mean</span><span class="p">,</span> <span class="n">beta_s_square_mean</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the miscentered profile integral and return fraction.</span>
@@ -708,7 +727,7 @@
             <span class="n">absolute_tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">integration_func</span><span class="p">(</span><span class="n">int_args</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">integration_func</span><span class="p">(</span><span class="n">int_args</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">):</span>
             <span class="n">sigma_local</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">r_mis_list</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -753,7 +772,9 @@
         <span class="n">integrator</span><span class="o">.</span><span class="n">integral_bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">integration_max</span><span class="p">)]</span>
         <span class="n">integrator</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sigma</span><span class="p">])</span>
         <span class="n">miscentering_integral</span> <span class="o">=</span> <span class="n">integrator</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">integration_func</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">miscentering_integral</span><span class="p">,</span> <span class="n">miscentering_frac</span></div></div>
+        <span class="k">return</span> <span class="n">miscentering_integral</span><span class="p">,</span> <span class="n">miscentering_frac</span></div>
+</div>
+
 </pre></div>
 
            </div>

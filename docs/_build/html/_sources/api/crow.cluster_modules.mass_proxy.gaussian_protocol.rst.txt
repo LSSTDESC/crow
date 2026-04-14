@@ -3,5 +3,5 @@ crow.cluster\_modules.mass\_proxy.gaussian\_protocol module
 
 .. automodule:: crow.cluster_modules.mass_proxy.gaussian_protocol
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

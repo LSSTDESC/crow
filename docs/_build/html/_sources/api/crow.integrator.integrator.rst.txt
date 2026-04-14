@@ -3,5 +3,5 @@ crow.integrator.integrator module
 
 .. automodule:: crow.integrator.integrator
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

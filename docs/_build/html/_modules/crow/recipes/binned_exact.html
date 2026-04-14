@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.recipes.binned_exact &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -106,26 +106,28 @@
 <span></span><span class="sd">&quot;&quot;&quot;Module for defining the classes used in the BinnedClusterRecipe cluster recipe.&quot;&quot;&quot;</span>
 
 <span class="c1"># pylint: disable=duplicate-code</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pyccl</span> <span class="k">as</span> <span class="nn">ccl</span>
-<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">simpson</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyccl</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ccl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">simpson</span>
 
-<span class="kn">from</span> <span class="nn">crow</span> <span class="kn">import</span> <span class="n">ClusterShearProfile</span><span class="p">,</span> <span class="n">kernel</span>
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.completeness_models</span> <span class="kn">import</span> <span class="n">Completeness</span>
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.purity_models</span> <span class="kn">import</span> <span class="n">Purity</span>
-<span class="kn">from</span> <span class="nn">crow.integrator.numcosmo_integrator</span> <span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
-<span class="kn">from</span> <span class="nn">crow.properties</span> <span class="kn">import</span> <span class="n">ClusterProperty</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterShearProfile</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.completeness_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Completeness</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.purity_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Purity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.integrator.numcosmo_integrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterProperty</span>
 
-<span class="kn">from</span> <span class="nn">.binned_parent</span> <span class="kn">import</span> <span class="n">BinnedClusterRecipe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.binned_parent</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinnedClusterRecipe</span>
 
 <span class="c1"># To run with firecrown, use this import instead</span>
 <span class="c1"># from firecrown.models.cluster import ClusterProperty</span>
 
 
-<div class="viewcode-block" id="ExactBinnedClusterRecipe"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe">[docs]</a><span class="k">class</span> <span class="nc">ExactBinnedClusterRecipe</span><span class="p">(</span><span class="n">BinnedClusterRecipe</span><span class="p">):</span>
+<div class="viewcode-block" id="ExactBinnedClusterRecipe">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExactBinnedClusterRecipe</span><span class="p">(</span><span class="n">BinnedClusterRecipe</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Concrete implementation of BinnedClusterRecipe using direct numerical integration.</span>
 
@@ -151,7 +153,7 @@
 <span class="sd">    a reference &quot;exact&quot; evaluation of the model under the stated assumptions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cluster_theory</span><span class="p">,</span>
         <span class="n">redshift_distribution</span><span class="p">,</span>
@@ -173,10 +175,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="o">=</span> <span class="n">NumCosmoIntegrator</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ExactBinnedClusterRecipe.setup"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.setup">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-    <span class="k">def</span> <span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configure the completeness contribution to the integrand.</span>
 
@@ -189,7 +194,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">completeness</span><span class="o">.</span><span class="n">distribution</span>
 
-    <span class="k">def</span> <span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configure the completeness contribution to the integrand.</span>
 
@@ -202,7 +207,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_purity</span>
 
-    <span class="k">def</span> <span class="nf">_mass_distribution_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_mass_proxy</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mass_distribution_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_mass_proxy</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mass_distribution</span><span class="o">.</span><span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">log_mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_mass_proxy</span><span class="p">)</span>
@@ -210,7 +215,7 @@
             <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_theory_prediction_counts</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_theory_prediction_counts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span>
@@ -244,7 +249,7 @@
 <span class="sd">        (e.g., by mass or redshift).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">theory_prediction</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">theory_prediction</span><span class="p">(</span>
             <span class="n">mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="n">mass_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -282,7 +287,7 @@
 
         <span class="k">return</span> <span class="n">theory_prediction</span>
 
-    <span class="k">def</span> <span class="nf">_get_function_to_integrate_counts</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_function_to_integrate_counts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
             <span class="p">[</span>
@@ -306,7 +311,7 @@
 <span class="sd">            Function compatible with the numerical integrator.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">function_mapper</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">function_mapper</span><span class="p">(</span>
             <span class="n">int_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
             <span class="n">mass</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -323,7 +328,9 @@
 
         <span class="k">return</span> <span class="n">function_mapper</span>
 
-<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_counts"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_counts">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">,</span>
         <span class="n">log_proxy_edges</span><span class="p">,</span>
@@ -385,7 +392,8 @@
 
         <span class="k">return</span> <span class="n">counts</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_theory_prediction_shear_profile</span><span class="p">(</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_theory_prediction_shear_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span>
@@ -405,7 +413,7 @@
 <span class="sd">        expected number of clusters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">theory_prediction</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">theory_prediction</span><span class="p">(</span>
             <span class="n">mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
             <span class="n">mass_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -447,7 +455,7 @@
 
         <span class="k">return</span> <span class="n">theory_prediction</span>
 
-    <span class="k">def</span> <span class="nf">_get_function_to_integrate_shear_profile</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_function_to_integrate_shear_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
             <span class="p">[</span>
@@ -466,7 +474,7 @@
 <span class="sd">        to the arguments of the theoretical prediction function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">function_mapper</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">function_mapper</span><span class="p">(</span>
             <span class="n">int_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 
@@ -486,7 +494,9 @@
 
         <span class="k">return</span> <span class="n">function_mapper</span>
 
-<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">,</span>
         <span class="n">log_proxy_edges</span><span class="p">,</span>
@@ -561,7 +571,9 @@
             <span class="p">)</span>
             <span class="n">deltasigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">prediction_wrapper</span><span class="p">)</span>
             <span class="n">deltasigma_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deltasigma</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">deltasigma_list</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">deltasigma_list</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+</div>
+
 </pre></div>
 
            </div>

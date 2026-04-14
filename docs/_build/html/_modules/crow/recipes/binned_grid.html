@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.recipes.binned_grid &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -119,24 +119,26 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># pylint: disable=duplicate-code</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pyccl</span> <span class="k">as</span> <span class="nn">ccl</span>
-<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">simpson</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyccl</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ccl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">simpson</span>
 
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.completeness_models</span> <span class="kn">import</span> <span class="n">Completeness</span>
-<span class="kn">from</span> <span class="nn">crow.cluster_modules.purity_models</span> <span class="kn">import</span> <span class="n">Purity</span>
-<span class="kn">from</span> <span class="nn">crow.properties</span> <span class="kn">import</span> <span class="n">ClusterProperty</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.completeness_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Completeness</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.cluster_modules.purity_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Purity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterProperty</span>
 
-<span class="kn">from</span> <span class="nn">.binned_parent</span> <span class="kn">import</span> <span class="n">BinnedClusterRecipe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.binned_parent</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinnedClusterRecipe</span>
 
 <span class="c1"># To run with firecrown, use this import instead</span>
 <span class="c1"># from firecrown.models.cluster import ClusterProperty</span>
 
 
-<div class="viewcode-block" id="GridBinnedClusterRecipe"><a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe">[docs]</a><span class="k">class</span> <span class="nc">GridBinnedClusterRecipe</span><span class="p">(</span><span class="n">BinnedClusterRecipe</span><span class="p">):</span>
+<div class="viewcode-block" id="GridBinnedClusterRecipe">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GridBinnedClusterRecipe</span><span class="p">(</span><span class="n">BinnedClusterRecipe</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cluster recipe using a grid-based integration scheme for cluster observables.</span>
 
 <span class="sd">    This class implements a binned cluster model based on the Murata (2019)</span>
@@ -192,7 +194,7 @@
 <span class="sd">        Cache of shear profile grids.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cluster_theory</span><span class="p">,</span>
         <span class="n">redshift_distribution</span><span class="p">,</span>
@@ -226,7 +228,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_purity_grid</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># (n_proxy, n_z)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shear_grids</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># (n_z, n_mass)</span>
 
-    <span class="k">def</span> <span class="nf">_flat_distribution</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flat_distribution</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -251,21 +253,23 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">log_mass</span> <span class="o">*</span> <span class="n">z</span>
 
-    <span class="k">def</span> <span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Additional setup of class with the completeness&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">completeness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_distribution</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">completeness</span><span class="o">.</span><span class="n">distribution</span>
 
-    <span class="k">def</span> <span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Additional setup of class with the purity&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_purity_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_distribution</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_purity_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span><span class="o">.</span><span class="n">distribution</span>
 
-<div class="viewcode-block" id="GridBinnedClusterRecipe.setup"><a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GridBinnedClusterRecipe.setup">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset all cached grids.</span>
 
 <span class="sd">        This method clears all internally stored grids used for caching intermediate</span>
@@ -279,7 +283,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_purity_grid</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shear_grids</span> <span class="o">=</span> <span class="p">{}</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_hmf_grid</span><span class="p">(</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_hmf_grid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -321,7 +326,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_hmf_grid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vol</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">mass_function_2d</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hmf_grid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_mass_richness_grid</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_mass_richness_grid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">log_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -364,7 +369,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_richness_grid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_completeness_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_completeness_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute completeness grid and store in the class.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_grid</span><span class="p">:</span>
@@ -373,7 +378,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_grid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_purity_grid</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_purity_grid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">log_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">key</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute purity grid and store in the class.&quot;&quot;&quot;</span>
@@ -384,7 +389,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_purity_grid</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_shear_grid</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_shear_grid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">radius_centers</span><span class="p">,</span>
@@ -404,7 +409,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shear_grids</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_integ_arrays</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_integ_arrays</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">log_proxy_edges</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -430,7 +435,7 @@
             <span class="p">},</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_theory_prediction_generic</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_theory_prediction_generic</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">probe_kernel</span><span class="p">,</span>  <span class="c1"># must be (n_proxy, n_z, n_mass, ...)</span>
         <span class="n">integ_arrays</span><span class="p">,</span>
@@ -526,7 +531,9 @@
         <span class="n">integrated_probe</span> <span class="o">=</span> <span class="n">integral_over_proxy</span>
         <span class="k">return</span> <span class="n">integrated_probe</span>
 
-<div class="viewcode-block" id="GridBinnedClusterRecipe.evaluate_theory_prediction_counts"><a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
+<div class="viewcode-block" id="GridBinnedClusterRecipe.evaluate_theory_prediction_counts">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">,</span>
         <span class="n">log_proxy_edges</span><span class="p">,</span>
@@ -598,7 +605,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">counts</span></div>
 
-<div class="viewcode-block" id="GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
+
+<div class="viewcode-block" id="GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">
+<a class="viewcode-back" href="../../../api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">z_edges</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">log_proxy_edges</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -672,7 +682,9 @@
             <span class="n">integ_arrays</span><span class="p">,</span>
             <span class="n">sky_area</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">shear</span></div></div>
+        <span class="k">return</span> <span class="n">shear</span></div>
+</div>
+
 </pre></div>
 
            </div>

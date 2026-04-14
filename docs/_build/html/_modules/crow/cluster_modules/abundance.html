@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.cluster_modules.abundance &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -110,16 +110,18 @@
 <span class="sd">functions that produce those predictions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pyccl</span>
-<span class="kn">import</span> <span class="nn">pyccl.background</span> <span class="k">as</span> <span class="nn">bkg</span>
-<span class="kn">from</span> <span class="nn">pyccl.cosmology</span> <span class="kn">import</span> <span class="n">Cosmology</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyccl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyccl.background</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bkg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyccl.cosmology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cosmology</span>
 
-<span class="kn">from</span> <span class="nn">.parameters</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameters</span>
 
 
-<div class="viewcode-block" id="ClusterAbundance"><a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance">[docs]</a><span class="k">class</span> <span class="nc">ClusterAbundance</span><span class="p">:</span>
+<div class="viewcode-block" id="ClusterAbundance">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClusterAbundance</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The class that calculates the predicted number counts of galaxy clusters.</span>
 
 <span class="sd">    The abundance is a function of a specific cosmology, a mass and redshift range,</span>
@@ -141,17 +143,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Cosmology</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Cosmology</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The cosmology used to predict the cluster number count.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span>
 
     <span class="nd">@cosmo</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the cluster abundance calculation with a new cosmology.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span> <span class="o">=</span> <span class="n">cosmo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hmf_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">,</span>
         <span class="n">halo_mass_function</span><span class="p">:</span> <span class="n">pyccl</span><span class="o">.</span><span class="n">halos</span><span class="o">.</span><span class="n">MassFunc</span><span class="p">,</span>
@@ -161,7 +163,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">halo_mass_function</span> <span class="o">=</span> <span class="n">halo_mass_function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">({})</span>
 
-<div class="viewcode-block" id="ClusterAbundance.comoving_volume"><a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.comoving_volume">[docs]</a>    <span class="k">def</span> <span class="nf">comoving_volume</span><span class="p">(</span>
+<div class="viewcode-block" id="ClusterAbundance.comoving_volume">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.comoving_volume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">comoving_volume</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Differential comoving volume for a given sky area.</span>
@@ -204,7 +208,10 @@
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dV</span> <span class="o">*</span> <span class="n">sky_area_rad</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ClusterAbundance.mass_function"><a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.mass_function">[docs]</a>    <span class="k">def</span> <span class="nf">mass_function</span><span class="p">(</span>
+
+<div class="viewcode-block" id="ClusterAbundance.mass_function">
+<a class="viewcode-back" href="../../../api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.mass_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mass_function</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -239,7 +246,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_hmf_cache</span><span class="p">[(</span><span class="n">logm</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">val</span>
             <span class="n">return_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

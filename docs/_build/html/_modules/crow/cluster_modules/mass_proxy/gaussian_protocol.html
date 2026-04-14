@@ -1,20 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>crow.cluster_modules.mass_proxy.gaussian_protocol &mdash; Crow  documentation</title>
-      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
   
-        <script src="../../../../_static/jquery.js"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -105,16 +105,18 @@
   <h1>Source code for crow.cluster_modules.mass_proxy.gaussian_protocol</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Gaussian class for mass richness distributiosn.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
 
-<span class="kn">from</span> <span class="nn">crow.integrator.numcosmo_integrator</span> <span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">crow.integrator.numcosmo_integrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
 
 
-<div class="viewcode-block" id="MassRichnessGaussian"><a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian">[docs]</a><span class="k">class</span> <span class="nc">MassRichnessGaussian</span><span class="p">:</span>
+<div class="viewcode-block" id="MassRichnessGaussian">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MassRichnessGaussian</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for Gaussian mass–richness relations.</span>
 
@@ -123,8 +125,10 @@
 <span class="sd">    conditioned on halo mass and redshift.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MassRichnessGaussian.get_ln_mass_proxy_mean"><a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_mean">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_ln_mass_proxy_mean</span><span class="p">(</span>
+<div class="viewcode-block" id="MassRichnessGaussian.get_ln_mass_proxy_mean">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_mean">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ln_mass_proxy_mean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -137,8 +141,11 @@
 <span class="sd">        conditioned on halo mass and redshift.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="MassRichnessGaussian.get_ln_mass_proxy_sigma"><a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_sigma">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_ln_mass_proxy_sigma</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MassRichnessGaussian.get_ln_mass_proxy_sigma">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_sigma">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ln_mass_proxy_sigma</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -151,7 +158,10 @@
 <span class="sd">        conditioned on halo mass and redshift.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="MassRichnessGaussian.integrated_gaussian"><a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.integrated_gaussian">[docs]</a>    <span class="k">def</span> <span class="nf">integrated_gaussian</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MassRichnessGaussian.integrated_gaussian">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.integrated_gaussian">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrated_gaussian</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -202,7 +212,10 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">return_vals</span></div>
 
-<div class="viewcode-block" id="MassRichnessGaussian.gaussian_kernel"><a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.gaussian_kernel">[docs]</a>    <span class="k">def</span> <span class="nf">gaussian_kernel</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MassRichnessGaussian.gaussian_kernel">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.gaussian_kernel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gaussian_kernel</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">log_mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
         <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -236,7 +249,9 @@
         <span class="p">)</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span></div></div>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
 </pre></div>
 
            </div>
