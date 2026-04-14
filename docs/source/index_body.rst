@@ -1,0 +1,11 @@
+CROW Documentation
+==================
+
+**CROW** The LSST-DESC Cluster Reconstruction of Observables Workbench (CROW) code is a DESC tool consisting of a Python library for predicting galaxy cluster observabless.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting Started
+
+   source/installation
+   source/overview

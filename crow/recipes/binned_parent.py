@@ -71,7 +71,18 @@ class BinnedClusterRecipe:
     ##############################################
 
     def setup(self):
-        """Sets up recipe before run"""
+        """
+        Perform any necessary pre-computation before evaluation.
+
+        This method is intended to be implemented by subclasses. It should
+        initialize any internal quantities required for evaluating theoretical
+        predictions (e.g., reseting/ precomputing grids, normalization
+        factors, or integrators).
+
+        Notes
+        -----
+        This method must be called before any evaluation method.
+        """
         raise NotImplementedError(
             "This function is not implemented in the parent class"
         )
@@ -83,11 +94,35 @@ class BinnedClusterRecipe:
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe.
+        """
+        Compute predicted cluster number counts in a bin.
 
-        Evaluate the theoretical prediction for the observable in the provided bin
-        using the Murata 2019 binned mass-richness relation and assuming perfectly
-        measured redshifts.
+        This method must be implemented by subclasses. It evaluates the
+        theoretical number of clusters within the specified redshift and
+        mass-proxy bin.
+
+        Parameters
+        ----------
+        z_edges : array-like
+            Lower and upper edges of the redshift bin.
+        mass_proxy_edges : array-like
+            Lower and upper edges of the mass proxy bin (log10 scale).
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty, optional
+            Property over which the prediction should be averaged.
+
+        Returns
+        -------
+        float
+            Predicted number of clusters in the bin.
+
+        Notes
+        -----
+        The implementation may include:
+        - Mass–richness relations
+        - Selection effects (completeness, purity)
+        - Cosmological volume integration
         """
         raise NotImplementedError(
             "This function is not implemented in the parent class"
@@ -102,11 +137,29 @@ class BinnedClusterRecipe:
         average_on: None | ClusterProperty = None,
         distance_units: str = "mpc",
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe.
+        """
+        Compute predicted stacked lensing profile.
 
-        Evaluate the theoretical prediction for the observable in the provided bin
-        using the Murata 2019 binned mass-richness relation and assuming perfectly
-        measured redshifts.
+        This method must be implemented by subclasses. It evaluates the
+        theoretical lensing signal for clusters within the specified bin.
+
+        Parameters
+        ----------
+        z_edges : array-like
+            Redshift bin edges.
+        mass_proxy_edges : array-like
+            Mass proxy bin edges (log10 scale).
+        radius_centers : array-like
+            Radial positions at which the profile is evaluated.
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty, optional
+            Property over which the prediction should be averaged.
+
+        Returns
+        -------
+        float or ndarray
+            Predicted lensing profile values.
         """
         raise NotImplementedError(
             "This function is not implemented in the parent class"

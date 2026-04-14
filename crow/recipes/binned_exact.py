@@ -21,10 +21,29 @@ from .binned_parent import BinnedClusterRecipe
 
 
 class ExactBinnedClusterRecipe(BinnedClusterRecipe):
-    """Cluster recipe with Murata19 mass-richness and spec-zs.
+    """
+    Concrete implementation of BinnedClusterRecipe using direct numerical integration.
 
-    This recipe uses the Murata 2019 binned mass-richness relation and assumes
-    perfectly measured spec-zs.
+    This recipe evaluates cluster observables by explicitly integrating over
+    mass, redshift, and mass proxy using a numerical integrator. It assumes:
+
+    - Murata et al. (2019) mass–richness relation
+    - Perfectly measured spectroscopic redshifts
+    - No precomputed grids or interpolation (fully numerical evaluation)
+
+    The integration is performed using a configurable integrator
+    (NumCosmoIntegrator), which maps the theoretical prediction into an
+    integrable function over the relevant parameter space.
+
+    Compared to other implementations, this class:
+    - Does not rely on interpolation tables
+    - Computes predictions on-the-fly via numerical quadrature
+    - Handles purity/completeness through explicit modification of the integrand
+
+    Notes
+    -----
+    This implementation is computationally more expensive but provides
+    a reference "exact" evaluation of the model under the stated assumptions.
     """
 
     def __init__(
@@ -53,14 +72,26 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         pass
 
     def _setup_with_completeness(self):
-        """Additional setup of class with the completeness"""
+        """
+        Configure the completeness contribution to the integrand.
+
+        If a completeness model is provided, its distribution function is used
+        directly. Otherwise, completeness is assumed to be unity (no selection
+        effects).
+        """
         if self.completeness is None:
             self._completeness_distribution = lambda *args: 1
         else:
             self._completeness_distribution = self.completeness.distribution
 
     def _setup_with_purity(self):
-        """Makes mass distribution use additional integral with purity"""
+        """
+        Configure the completeness contribution to the integrand.
+
+        If a completeness model is provided, its distribution function is used
+        directly. Otherwise, completeness is assumed to be unity (no selection
+        effects).
+        """
         if self.purity is None:
             self._mass_distribution_distribution = self.mass_distribution.distribution
         else:
@@ -86,11 +117,26 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         ],
         npt.NDArray[np.float64],
     ]:
-        """Get a callable that evaluates a cluster theory prediction.
+        """
+        Construct the integrand for cluster number counts.
 
-        Returns a callable function that accepts mass, redshift, mass_proxy,
-        and the sky area of your survey and returns the theoretical prediction for the
-        expected number of clusters including false detections.
+        Returns
+        -------
+        callable
+            Function of (mass, redshift, mass_proxy, sky_area) that evaluates
+            the differential contribution to the number counts.
+
+        Notes
+        -----
+        The integrand includes:
+        - comoving volume element
+        - halo mass function
+        - completeness selection
+        - redshift distribution
+        - mass–proxy distribution (with optional purity correction)
+
+        If `average_on` is specified, the integrand is weighted accordingly
+        (e.g., by mass or redshift).
         """
 
         def theory_prediction(
@@ -143,10 +189,16 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             npt.NDArray[np.float64],
         ],
     ) -> Callable[[npt.NDArray, npt.NDArray], npt.NDArray]:
-        """Returns a callable function that can be evaluated by an integrator.
+        """
+        Map the theoretical prediction into the integrator's expected signature.
 
-        This function is responsible for mapping arguments from the numerical integrator
-        to the arguments of the theoretical prediction function.
+        This wrapper adapts the prediction function to the interface required by
+        NumCosmoIntegrator by reorganizing input arguments.
+
+        Returns
+        -------
+        callable
+            Function compatible with the numerical integrator.
         """
 
         def function_mapper(
@@ -173,11 +225,36 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe.
+        """
+        Compute predicted cluster number counts within a bin.
 
-        Evaluate the theoretical prediction for the observable in the provided bin
-        using the Murata 2019 binned mass-richness relation and assuming perfectly
-        measured redshifts.
+        This method performs a multidimensional numerical integral over:
+
+        - halo mass
+        - redshift
+        - mass proxy
+
+        Parameters
+        ----------
+        z_edges : array-like of shape (2,)
+            Redshift bin limits.
+        log_proxy_edges : array-like of shape (2,)
+            Mass proxy bin limits in log10 space.
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty, optional
+            Observable over which to average (e.g., mass, redshift).
+
+        Returns
+        -------
+        float
+            Expected number of clusters in the bin.
+
+        Notes
+        -----
+        - Uses NumCosmoIntegrator for numerical quadrature.
+        - Handles purity and completeness internally by modifying the integrand.
+        - Assumes perfect redshift measurements.
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
@@ -313,11 +390,43 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         average_on: None | ClusterProperty = None,
         distance_units: str = "mpc",
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe.
+        """
+        Compute the predicted stacked lensing (shear) profile.
 
-        Evaluate the theoretical prediction for the observable in the provided bin
-        using the Murata 2019 binned mass-richness relation and assuming perfectly
-        measured redshifts.
+        This method integrates the theoretical lensing signal over:
+
+        - halo mass
+        - redshift
+        - mass proxy
+
+        and evaluates it at multiple radial bins.
+
+        Parameters
+        ----------
+        z_edges : array-like of shape (2,)
+            Redshift bin limits.
+        log_proxy_edges : array-like of shape (2,)
+            Mass proxy bin limits in log10 space.
+        radius_centers : array-like
+            Radii at which the shear profile is evaluated.
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty, optional
+            Observable defining the weighting of the prediction.
+            Must include shear-related properties.
+
+        Returns
+        -------
+        ndarray
+            Predicted shear profile evaluated at each radius.
+
+        Notes
+        -----
+        - Each radius is integrated independently.
+        - The integrand includes the halo shear profile computed from the
+            underlying cluster theory model.
+        - Purity and completeness modify the integrand similarly to the
+            number counts case.
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
@@ -341,8 +450,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         deltasigma_list = []
 
         for radius_center in radius_centers:
-            extra_args.extend([sky_area, radius_center])
-            self.integrator.extra_args = np.array(extra_args)
+            self.integrator.extra_args = np.concatenate(
+                (extra_args, [sky_area, radius_center])
+            )
             theory_prediction = self._get_theory_prediction_shear_profile(average_on)
             prediction_wrapper = self._get_function_to_integrate_shear_profile(
                 theory_prediction

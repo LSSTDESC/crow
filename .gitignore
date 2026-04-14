@@ -3,7 +3,7 @@
 
 # Building artifacts
 dist/
-desc_crow.egg-info/
+lsstdesc_crow.egg-info/
 
 # Coverage
 .coverage
@@ -13,3 +13,11 @@ desc_crow.egg-info/
 
 # hypothesis
 .hypothesis/
+
+
+# Documentation
+docs/api/
+docs/api.rst
+docs/index.rst
+docs/compiled-examples/
+docs/_build/
