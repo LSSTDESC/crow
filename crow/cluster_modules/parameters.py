@@ -11,7 +11,7 @@ class Parameters:
     """
 
     def __init__(self, default_parameters_dict):
-        """Create a Parameters container object.
+        """Create a Parameters container.
 
         Parameters
         ----------
