@@ -1,0 +1,7 @@
+crow.recipes.binned\_parent module
+==================================
+
+.. automodule:: crow.recipes.binned_parent
+   :members:
+   :undoc-members:
+   :show-inheritance:

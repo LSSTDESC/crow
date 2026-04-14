@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.recipes.binned_exact &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">crow.recipes.binned_exact</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for crow.recipes.binned_exact</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module for defining the classes used in the BinnedClusterRecipe cluster recipe.&quot;&quot;&quot;</span>
+
+<span class="c1"># pylint: disable=duplicate-code</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span class="kn">import</span> <span class="nn">pyccl</span> <span class="k">as</span> <span class="nn">ccl</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">simpson</span>
+
+<span class="kn">from</span> <span class="nn">crow</span> <span class="kn">import</span> <span class="n">ClusterShearProfile</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="kn">from</span> <span class="nn">crow.cluster_modules.completeness_models</span> <span class="kn">import</span> <span class="n">Completeness</span>
+<span class="kn">from</span> <span class="nn">crow.cluster_modules.purity_models</span> <span class="kn">import</span> <span class="n">Purity</span>
+<span class="kn">from</span> <span class="nn">crow.integrator.numcosmo_integrator</span> <span class="kn">import</span> <span class="n">NumCosmoIntegrator</span>
+<span class="kn">from</span> <span class="nn">crow.properties</span> <span class="kn">import</span> <span class="n">ClusterProperty</span>
+
+<span class="kn">from</span> <span class="nn">.binned_parent</span> <span class="kn">import</span> <span class="n">BinnedClusterRecipe</span>
+
+<span class="c1"># To run with firecrown, use this import instead</span>
+<span class="c1"># from firecrown.models.cluster import ClusterProperty</span>
+
+
+<div class="viewcode-block" id="ExactBinnedClusterRecipe"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe">[docs]</a><span class="k">class</span> <span class="nc">ExactBinnedClusterRecipe</span><span class="p">(</span><span class="n">BinnedClusterRecipe</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Concrete implementation of BinnedClusterRecipe using direct numerical integration.</span>
+
+<span class="sd">    This recipe evaluates cluster observables by explicitly integrating over</span>
+<span class="sd">    mass, redshift, and mass proxy using a numerical integrator. It assumes:</span>
+
+<span class="sd">    - Murata et al. (2019) mass–richness relation</span>
+<span class="sd">    - Perfectly measured spectroscopic redshifts</span>
+<span class="sd">    - No precomputed grids or interpolation (fully numerical evaluation)</span>
+
+<span class="sd">    The integration is performed using a configurable integrator</span>
+<span class="sd">    (NumCosmoIntegrator), which maps the theoretical prediction into an</span>
+<span class="sd">    integrable function over the relevant parameter space.</span>
+
+<span class="sd">    Compared to other implementations, this class:</span>
+<span class="sd">    - Does not rely on interpolation tables</span>
+<span class="sd">    - Computes predictions on-the-fly via numerical quadrature</span>
+<span class="sd">    - Handles purity/completeness through explicit modification of the integrand</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This implementation is computationally more expensive but provides</span>
+<span class="sd">    a reference &quot;exact&quot; evaluation of the model under the stated assumptions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cluster_theory</span><span class="p">,</span>
+        <span class="n">redshift_distribution</span><span class="p">,</span>
+        <span class="n">mass_distribution</span><span class="p">,</span>
+        <span class="n">completeness</span><span class="p">:</span> <span class="n">Completeness</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">purity</span><span class="p">:</span> <span class="n">Purity</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mass_interval</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">17.0</span><span class="p">),</span>
+        <span class="n">true_z_interval</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cluster_theory</span><span class="o">=</span><span class="n">cluster_theory</span><span class="p">,</span>
+            <span class="n">redshift_distribution</span><span class="o">=</span><span class="n">redshift_distribution</span><span class="p">,</span>
+            <span class="n">mass_distribution</span><span class="o">=</span><span class="n">mass_distribution</span><span class="p">,</span>
+            <span class="n">completeness</span><span class="o">=</span><span class="n">completeness</span><span class="p">,</span>
+            <span class="n">purity</span><span class="o">=</span><span class="n">purity</span><span class="p">,</span>
+            <span class="n">mass_interval</span><span class="o">=</span><span class="n">mass_interval</span><span class="p">,</span>
+            <span class="n">true_z_interval</span><span class="o">=</span><span class="n">true_z_interval</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="o">=</span> <span class="n">NumCosmoIntegrator</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.setup"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_setup_with_completeness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the completeness contribution to the integrand.</span>
+
+<span class="sd">        If a completeness model is provided, its distribution function is used</span>
+<span class="sd">        directly. Otherwise, completeness is assumed to be unity (no selection</span>
+<span class="sd">        effects).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">completeness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">completeness</span><span class="o">.</span><span class="n">distribution</span>
+
+    <span class="k">def</span> <span class="nf">_setup_with_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the completeness contribution to the integrand.</span>
+
+<span class="sd">        If a completeness model is provided, its distribution function is used</span>
+<span class="sd">        directly. Otherwise, completeness is assumed to be unity (no selection</span>
+<span class="sd">        effects).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_distribution</span><span class="o">.</span><span class="n">distribution</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_purity</span>
+
+    <span class="k">def</span> <span class="nf">_mass_distribution_purity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_mass_proxy</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mass_distribution</span><span class="o">.</span><span class="n">gaussian_kernel</span><span class="p">(</span><span class="n">log_mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_mass_proxy</span><span class="p">)</span>
+            <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span><span class="o">.</span><span class="n">distribution</span><span class="p">(</span><span class="n">log_mass_proxy</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_theory_prediction_counts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="nb">float</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct the integrand for cluster number counts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable</span>
+<span class="sd">            Function of (mass, redshift, mass_proxy, sky_area) that evaluates</span>
+<span class="sd">            the differential contribution to the number counts.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The integrand includes:</span>
+<span class="sd">        - comoving volume element</span>
+<span class="sd">        - halo mass function</span>
+<span class="sd">        - completeness selection</span>
+<span class="sd">        - redshift distribution</span>
+<span class="sd">        - mass–proxy distribution (with optional purity correction)</span>
+
+<span class="sd">        If `average_on` is specified, the integrand is weighted accordingly</span>
+<span class="sd">        (e.g., by mass or redshift).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">theory_prediction</span><span class="p">(</span>
+            <span class="n">mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">mass_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cluster_theory</span><span class="o">.</span><span class="n">comoving_volume</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sky_area</span><span class="p">)</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_theory</span><span class="o">.</span><span class="n">mass_function</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">redshift_distribution</span><span class="o">.</span><span class="n">distribution</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">mass_proxy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                <span class="p">),</span> <span class="s2">&quot;mass_proxy with no purity should be size 2&quot;</span>
+                <span class="n">prediction</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span><span class="p">(</span>
+                    <span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">mass_proxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mass_proxy</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prediction</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mass_proxy</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">average_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">prediction</span>
+
+            <span class="k">for</span> <span class="n">cluster_prop</span> <span class="ow">in</span> <span class="n">ClusterProperty</span><span class="p">:</span>
+                <span class="n">include_prop</span> <span class="o">=</span> <span class="n">cluster_prop</span> <span class="o">&amp;</span> <span class="n">average_on</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">include_prop</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">cluster_prop</span> <span class="o">==</span> <span class="n">ClusterProperty</span><span class="o">.</span><span class="n">MASS</span><span class="p">:</span>
+                    <span class="n">prediction</span> <span class="o">*=</span> <span class="n">mass</span>
+                <span class="k">if</span> <span class="n">cluster_prop</span> <span class="o">==</span> <span class="n">ClusterProperty</span><span class="o">.</span><span class="n">REDSHIFT</span><span class="p">:</span>
+                    <span class="n">prediction</span> <span class="o">*=</span> <span class="n">z</span>
+            <span class="k">return</span> <span class="n">prediction</span>
+
+        <span class="k">return</span> <span class="n">theory_prediction</span>
+
+    <span class="k">def</span> <span class="nf">_get_function_to_integrate_counts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="nb">float</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map the theoretical prediction into the integrator&#39;s expected signature.</span>
+
+<span class="sd">        This wrapper adapts the prediction function to the interface required by</span>
+<span class="sd">        NumCosmoIntegrator by reorganizing input arguments.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable</span>
+<span class="sd">            Function compatible with the numerical integrator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">function_mapper</span><span class="p">(</span>
+            <span class="n">int_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+            <span class="n">mass</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mass_proxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">extra_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+                <span class="n">sky_area</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mass_proxy</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="n">sky_area</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">prediction</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mass_proxy</span><span class="p">,</span> <span class="n">sky_area</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">function_mapper</span>
+
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_counts"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_counts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">z_edges</span><span class="p">,</span>
+        <span class="n">log_proxy_edges</span><span class="p">,</span>
+        <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute predicted cluster number counts within a bin.</span>
+
+<span class="sd">        This method performs a multidimensional numerical integral over:</span>
+
+<span class="sd">        - halo mass</span>
+<span class="sd">        - redshift</span>
+<span class="sd">        - mass proxy</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z_edges : array-like of shape (2,)</span>
+<span class="sd">            Redshift bin limits.</span>
+<span class="sd">        log_proxy_edges : array-like of shape (2,)</span>
+<span class="sd">            Mass proxy bin limits in log10 space.</span>
+<span class="sd">        sky_area : float</span>
+<span class="sd">            Survey area in square degrees.</span>
+<span class="sd">        average_on : ClusterProperty, optional</span>
+<span class="sd">            Observable over which to average (e.g., mass, redshift).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Expected number of clusters in the bin.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Uses NumCosmoIntegrator for numerical quadrature.</span>
+<span class="sd">        - Handles purity and completeness internally by modifying the integrand.</span>
+<span class="sd">        - Assumes perfect redshift measurements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">log_proxy_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;log_proxy_edges should be size 2&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;z_edges should be size 2&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integral_bounds</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mass_interval</span><span class="p">,</span>
+                <span class="n">z_edges</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">log_proxy_edges</span><span class="p">,</span> <span class="n">sky_area</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integral_bounds</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mass_interval</span><span class="p">,</span>
+                <span class="n">z_edges</span><span class="p">,</span>
+                <span class="n">log_proxy_edges</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sky_area</span><span class="p">])</span>
+
+        <span class="n">theory_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_theory_prediction_counts</span><span class="p">(</span><span class="n">average_on</span><span class="p">)</span>
+        <span class="n">prediction_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_to_integrate_counts</span><span class="p">(</span><span class="n">theory_prediction</span><span class="p">)</span>
+
+        <span class="n">counts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">prediction_wrapper</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">counts</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_theory_prediction_shear_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span>
+        <span class="p">[</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="nb">float</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a callable that evaluates a cluster theory prediction.</span>
+
+<span class="sd">        Returns a callable function that accepts mass, redshift, mass proxy limits,</span>
+<span class="sd">        and the sky area of your survey and returns the theoretical prediction for the</span>
+<span class="sd">        expected number of clusters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">theory_prediction</span><span class="p">(</span>
+            <span class="n">mass</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">z</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">mass_proxy</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+            <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="n">radius_center</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">prediction</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cluster_theory</span><span class="o">.</span><span class="n">comoving_volume</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sky_area</span><span class="p">)</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_theory</span><span class="o">.</span><span class="n">mass_function</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">redshift_distribution</span><span class="o">.</span><span class="n">distribution</span><span class="p">()</span>
+                <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completeness_distribution</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">average_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># pylint: disable=no-member</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The property should be&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">ClusterProperty</span><span class="o">.</span><span class="n">DELTASIGMA</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">ClusterProperty</span><span class="o">.</span><span class="n">SHEAR</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">average_on</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ClusterProperty</span><span class="o">.</span><span class="n">DELTASIGMA</span> <span class="o">|</span> <span class="n">ClusterProperty</span><span class="o">.</span><span class="n">SHEAR</span><span class="p">):</span>
+                <span class="n">prediction</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_theory</span><span class="o">.</span><span class="n">compute_shear_profile</span><span class="p">(</span>
+                    <span class="n">log_mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
+                    <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
+                    <span class="n">radius_center</span><span class="o">=</span><span class="n">radius_center</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">mass_proxy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                    <span class="p">),</span> <span class="s2">&quot;mass_proxy with no purity should be size 2&quot;</span>
+                    <span class="n">prediction</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span><span class="p">(</span>
+                        <span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">mass_proxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mass_proxy</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prediction</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass_distribution_distribution</span><span class="p">(</span>
+                        <span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mass_proxy</span>
+                    <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">prediction</span>
+
+        <span class="k">return</span> <span class="n">theory_prediction</span>
+
+    <span class="k">def</span> <span class="nf">_get_function_to_integrate_shear_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prediction</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+                <span class="nb">float</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">],</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a callable function that can be evaluated by an integrator.</span>
+
+<span class="sd">        This function is responsible for mapping arguments from the numerical integrator</span>
+<span class="sd">        to the arguments of the theoretical prediction function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">function_mapper</span><span class="p">(</span>
+            <span class="n">int_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">extra_args</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+
+            <span class="n">mass</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mass_proxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">extra_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+                <span class="n">sky_area</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">radius_center</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mass_proxy</span> <span class="o">=</span> <span class="n">int_args</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="n">sky_area</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">radius_center</span> <span class="o">=</span> <span class="n">extra_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">prediction</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mass_proxy</span><span class="p">,</span> <span class="n">sky_area</span><span class="p">,</span> <span class="n">radius_center</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">function_mapper</span>
+
+<div class="viewcode-block" id="ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><a class="viewcode-back" href="../../../api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_theory_prediction_lensing_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">z_edges</span><span class="p">,</span>
+        <span class="n">log_proxy_edges</span><span class="p">,</span>
+        <span class="n">radius_centers</span><span class="p">,</span>
+        <span class="n">sky_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">average_on</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">ClusterProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the predicted stacked lensing (shear) profile.</span>
+
+<span class="sd">        This method integrates the theoretical lensing signal over:</span>
+
+<span class="sd">        - halo mass</span>
+<span class="sd">        - redshift</span>
+<span class="sd">        - mass proxy</span>
+
+<span class="sd">        and evaluates it at multiple radial bins.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z_edges : array-like of shape (2,)</span>
+<span class="sd">            Redshift bin limits.</span>
+<span class="sd">        log_proxy_edges : array-like of shape (2,)</span>
+<span class="sd">            Mass proxy bin limits in log10 space.</span>
+<span class="sd">        radius_centers : array-like</span>
+<span class="sd">            Radii at which the shear profile is evaluated.</span>
+<span class="sd">        sky_area : float</span>
+<span class="sd">            Survey area in square degrees.</span>
+<span class="sd">        average_on : ClusterProperty, optional</span>
+<span class="sd">            Observable defining the weighting of the prediction.</span>
+<span class="sd">            Must include shear-related properties.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            Predicted shear profile evaluated at each radius.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Each radius is integrated independently.</span>
+<span class="sd">        - The integrand includes the halo shear profile computed from the</span>
+<span class="sd">            underlying cluster theory model.</span>
+<span class="sd">        - Purity and completeness modify the integrand similarly to the</span>
+<span class="sd">            number counts case.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">log_proxy_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;log_proxy_edges should be size 2&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;z_edges should be size 2&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">purity</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integral_bounds</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mass_interval</span><span class="p">,</span>
+                <span class="n">z_edges</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">extra_args</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">log_proxy_edges</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integral_bounds</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mass_interval</span><span class="p">,</span>
+                <span class="n">z_edges</span><span class="p">,</span>
+                <span class="n">log_proxy_edges</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">extra_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">deltasigma_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">radius_center</span> <span class="ow">in</span> <span class="n">radius_centers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">extra_args</span><span class="p">,</span> <span class="p">[</span><span class="n">sky_area</span><span class="p">,</span> <span class="n">radius_center</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="n">theory_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_theory_prediction_shear_profile</span><span class="p">(</span><span class="n">average_on</span><span class="p">)</span>
+            <span class="n">prediction_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_to_integrate_shear_profile</span><span class="p">(</span>
+                <span class="n">theory_prediction</span>
+            <span class="p">)</span>
+            <span class="n">deltasigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">prediction_wrapper</span><span class="p">)</span>
+            <span class="n">deltasigma_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deltasigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">deltasigma_list</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

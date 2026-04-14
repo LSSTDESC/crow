@@ -1,0 +1,12 @@
+API Documentation
+-----------------
+
+Information on specific functions, classes, and methods.
+
+.. toctree::
+   :glob:
+
+   api/crow.cluster_modules.rst
+   api/crow.integrator.rst
+   api/crow.recipes.rst
+   api/crow.properties.rst

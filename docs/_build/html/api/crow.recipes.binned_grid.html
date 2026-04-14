@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.recipes.binned_grid module &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="crow.recipes.binned_parent module" href="crow.recipes.binned_parent.html" />
+    <link rel="prev" title="crow.recipes.binned_exact module" href="crow.recipes.binned_exact.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="crow.recipes.html">crow.recipes package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crow.recipes.html">crow.recipes package</a></li>
+      <li class="breadcrumb-item active">crow.recipes.binned_grid module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/crow.recipes.binned_grid.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-crow.recipes.binned_grid">
+<span id="crow-recipes-binned-grid-module"></span><h1>crow.recipes.binned_grid module<a class="headerlink" href="#module-crow.recipes.binned_grid" title="Permalink to this heading"></a></h1>
+<p>Module for defining the classes used in the MurataBinnedSpecZ cluster recipe.</p>
+<p>This module provides implementations of cluster abundance and lensing
+predictions based on a binned representation of the mass–richness relation
+(Murata et al. 2019) and spectroscopic redshift assumptions. The primary
+class defined here constructs multi-dimensional grids for efficient numerical
+integration of cluster observables, including number counts and lensing
+profiles.</p>
+<p>The implementation relies on precomputing and caching intermediate quantities
+such as halo mass functions, mass–richness relations, completeness, purity,
+and shear profiles. These cached grids are then combined into integrands and
+evaluated using Simpson integration over mass, redshift, and observable proxy.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.recipes.binned_grid.GridBinnedClusterRecipe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.recipes.binned_grid.</span></span><span class="sig-name descname"><span class="pre">GridBinnedClusterRecipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cluster_theory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completeness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.Completeness" title="crow.cluster_modules.completeness_models.Completeness"><span class="pre">Completeness</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity" title="crow.cluster_modules.purity_models.Purity"><span class="pre">Purity</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(11.0,</span> <span class="pre">17.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_z_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">5.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy_grid_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift_grid_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_grid_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/recipes/binned_grid.html#GridBinnedClusterRecipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_grid.GridBinnedClusterRecipe" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe" title="crow.recipes.binned_parent.BinnedClusterRecipe"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinnedClusterRecipe</span></code></a></p>
+<p>Cluster recipe using a grid-based integration scheme for cluster observables.</p>
+<p>This class implements a binned cluster model based on the Murata (2019)
+mass–richness relation, assuming perfectly measured spectroscopic redshifts.
+It evaluates cluster number counts and lensing signals by constructing
+multi-dimensional grids over mass, redshift, and observable proxy (e.g.,
+richness), and performing numerical integration.</p>
+<p>The computation is structured around reusable cached grids for efficiency,
+including:
+- Halo mass function × comoving volume
+- Mass–richness probability distribution
+- Completeness and purity corrections
+- Shear profiles for lensing observables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster_theory</strong> (<em>object</em>) -- Object providing theoretical predictions such as halo mass function,
+comoving volume, and shear profiles.</p></li>
+<li><p><strong>redshift_distribution</strong> (<em>callable</em>) -- Function describing the redshift distribution of clusters.</p></li>
+<li><p><strong>mass_distribution</strong> (<em>callable</em>) -- Function describing the mass–observable (e.g., richness) relation.</p></li>
+<li><p><strong>completeness</strong> (<a class="reference internal" href="crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.Completeness" title="crow.cluster_modules.completeness_models.Completeness"><em>Completeness</em></a><em>, </em><em>optional</em>) -- Completeness model. If None, a flat (unity) completeness is assumed.</p></li>
+<li><p><strong>purity</strong> (<a class="reference internal" href="crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity" title="crow.cluster_modules.purity_models.Purity"><em>Purity</em></a><em>, </em><em>optional</em>) -- Purity model. If None, a flat (unity) purity is assumed.</p></li>
+<li><p><strong>mass_interval</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) -- Range of log10 halo mass values used for integration.</p></li>
+<li><p><strong>true_z_interval</strong> (<em>tuple</em><em> of </em><em>float</em><em>, </em><em>optional</em>) -- Redshift range used for integration.</p></li>
+<li><p><strong>proxy_grid_size</strong> (<em>int</em><em>, </em><em>optional</em>) -- Number of grid points in observable proxy (e.g., richness).</p></li>
+<li><p><strong>redshift_grid_size</strong> (<em>int</em><em>, </em><em>optional</em>) -- Number of grid points in redshift.</p></li>
+<li><p><strong>mass_grid_size</strong> (<em>int</em><em>, </em><em>optional</em>) -- Number of grid points in log-mass.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>log_mass_grid</strong> (<em>numpy.ndarray</em>) -- 1D grid of log10 halo masses used for integration.</p></li>
+<li><p><strong>_hmf_grid</strong> (<em>dict</em>) -- Cache of halo mass function × volume grids.</p></li>
+<li><p><strong>_mass_richness_grid</strong> (<em>dict</em>) -- Cache of mass–richness probability grids.</p></li>
+<li><p><strong>_completeness_grid</strong> (<em>dict</em>) -- Cache of completeness grids.</p></li>
+<li><p><strong>_purity_grid</strong> (<em>dict</em>) -- Cache of purity grids.</p></li>
+<li><p><strong>_shear_grids</strong> (<em>dict</em>) -- Cache of shear profile grids.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_counts">
+<span class="sig-name descname"><span class="pre">evaluate_theory_prediction_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_proxy_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><span class="pre">ClusterProperty</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/crow/recipes/binned_grid.html#GridBinnedClusterRecipe.evaluate_theory_prediction_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_counts" title="Permalink to this definition"></a></dt>
+<dd><p>Compute predicted cluster number counts in a bin.</p>
+<p>This method evaluates the expected number of clusters within specified
+redshift and observable proxy bins by integrating the full cluster
+abundance model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_edges</strong> (<em>tuple</em><em> of </em><em>float</em>) -- Lower and upper bounds of the redshift bin.</p></li>
+<li><p><strong>log_proxy_edges</strong> (<em>tuple</em><em> of </em><em>float</em>) -- Bounds of the observable proxy bin (log-space).</p></li>
+<li><p><strong>sky_area</strong> (<em>float</em>) -- Survey area in square degrees.</p></li>
+<li><p><strong>average_on</strong> (<a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><em>ClusterProperty</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) -- Optional weighting of the observable (e.g., mass-weighted counts).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Predicted number of clusters in the bin.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile">
+<span class="sig-name descname"><span class="pre">evaluate_theory_prediction_lensing_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_proxy_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_centers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><span class="pre">ClusterProperty</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/crow/recipes/binned_grid.html#GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the average cluster lensing profile in a bin.</p>
+<p>This method evaluates the expected stacked lensing signal
+(e.g., <span class="math notranslate nohighlight">\(\langle \Delta\Sigma(R) \rangle\)</span> or
+<span class="math notranslate nohighlight">\(\langle g_t(R) \rangle\)</span>) by integrating the shear profile
+over the cluster population.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_edges</strong> (<em>tuple</em><em> of </em><em>float</em>) -- Redshift bin boundaries.</p></li>
+<li><p><strong>log_proxy_edges</strong> (<em>tuple</em><em> of </em><em>float</em>) -- Observable proxy bin boundaries (log-space).</p></li>
+<li><p><strong>radius_centers</strong> (<em>numpy.ndarray</em>) -- Radial bins at which the lensing signal is evaluated.</p></li>
+<li><p><strong>sky_area</strong> (<em>float</em>) -- Survey area in square degrees.</p></li>
+<li><p><strong>average_on</strong> (<a class="reference internal" href="crow.properties.html#crow.properties.ClusterProperty" title="crow.properties.ClusterProperty"><em>ClusterProperty</em></a>) -- Must include DELTASIGMA or SHEAR.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Radial profile of the stacked lensing signal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- If the required ClusterProperty flags are not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.recipes.binned_grid.GridBinnedClusterRecipe.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/crow/recipes/binned_grid.html#GridBinnedClusterRecipe.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.recipes.binned_grid.GridBinnedClusterRecipe.setup" title="Permalink to this definition"></a></dt>
+<dd><p>Reset all cached grids.</p>
+<p>This method clears all internally stored grids used for caching intermediate
+quantities (e.g., halo mass function, mass–richness relation, etc.). It
+should be called whenever model parameters or cosmology are updated to
+ensure consistency in subsequent computations.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

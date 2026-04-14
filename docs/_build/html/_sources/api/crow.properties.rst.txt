@@ -1,0 +1,7 @@
+crow.properties module
+======================
+
+.. automodule:: crow.properties
+   :members:
+   :undoc-members:
+   :show-inheritance:

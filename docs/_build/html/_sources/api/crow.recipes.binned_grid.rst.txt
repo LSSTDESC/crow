@@ -1,0 +1,7 @@
+crow.recipes.binned\_grid module
+================================
+
+.. automodule:: crow.recipes.binned_grid
+   :members:
+   :undoc-members:
+   :show-inheritance:

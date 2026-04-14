@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.cluster_modules.abundance module &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="crow.cluster_modules.completeness_models module" href="crow.cluster_modules.completeness_models.html" />
+    <link rel="prev" title="crow.cluster_modules.mass_proxy.murata module" href="crow.cluster_modules.mass_proxy.murata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crow.cluster_modules.html">crow.cluster_modules package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crow.cluster_modules.html">crow.cluster_modules package</a></li>
+      <li class="breadcrumb-item active">crow.cluster_modules.abundance module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/crow.cluster_modules.abundance.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-crow.cluster_modules.abundance">
+<span id="crow-cluster-modules-abundance-module"></span><h1>crow.cluster_modules.abundance module<a class="headerlink" href="#module-crow.cluster_modules.abundance" title="Permalink to this heading"></a></h1>
+<p>The module responsible for building the cluster abundance calculation.</p>
+<p>The galaxy cluster abundance integral is a combination of both theoretical
+and phenomenological predictions.  This module contains the classes and
+functions that produce those predictions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.cluster_modules.abundance.ClusterAbundance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crow.cluster_modules.abundance.</span></span><span class="sig-name descname"><span class="pre">ClusterAbundance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cosmo:</span> <span class="pre">&lt;MagicMock</span> <span class="pre">id='140449080165712'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halo_mass_function:</span> <span class="pre">&lt;MagicMock</span> <span class="pre">name='mock.MassFunc'</span> <span class="pre">id='140449477174480'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/crow/cluster_modules/abundance.html#ClusterAbundance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.abundance.ClusterAbundance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The class that calculates the predicted number counts of galaxy clusters.</p>
+<p>The abundance is a function of a specific cosmology, a mass and redshift range,
+an area on the sky, a halo mass function, as well as multiple kernels, where
+each kernel represents a different distribution involved in the final cluster
+abundance integrand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cosmo</strong> (<em>pyccl.cosmology.Cosmology</em><em> or </em><em>None</em>) -- Cosmology object used for predictions. Set via the <cite>cosmo</cite> property.</p></li>
+<li><p><strong>halo_mass_function</strong> (<em>callable</em>) -- Halo mass function object compatible with PyCCL's MassFunc interface.</p></li>
+<li><p><strong>parameters</strong> (<a class="reference internal" href="crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters" title="crow.cluster_modules.parameters.Parameters"><em>Parameters</em></a>) -- Container for optional model parameters.</p></li>
+<li><p><strong>_hmf_cache</strong> (<em>dict</em>) -- Cache for previously computed halo mass function evaluations keyed by
+(log_mass, scale_factor).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.abundance.ClusterAbundance.comoving_volume">
+<span class="sig-name descname"><span class="pre">comoving_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/abundance.html#ClusterAbundance.comoving_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.abundance.ClusterAbundance.comoving_volume" title="Permalink to this definition"></a></dt>
+<dd><p>Differential comoving volume for a given sky area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>array_like</em>) -- Redshift or array of redshifts at which to compute the differential
+comoving volume (dV/dz per steradian).</p></li>
+<li><p><strong>sky_area</strong> (<em>float</em><em>, </em><em>optional</em>) -- Survey area in square degrees. Default 0 returns per-steradian volume.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Differential comoving volume (same shape as <cite>z</cite>) multiplied by the
+survey area (converted to steradians). Units: [Mpc/h]^3 (consistent
+with the internal PyCCL conventions used here).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This uses PyCCL background helpers to evaluate the angular diameter
+distance and h(z) factor. If <cite>sky_area</cite> is zero the returned array is
+the per-steradian dV/dz.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="crow.cluster_modules.abundance.ClusterAbundance.cosmo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cosmo</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">&lt;MagicMock</span> <span class="pre">name='mock.__or__()'</span> <span class="pre">id='140449080203408'&gt;</span></em><a class="headerlink" href="#crow.cluster_modules.abundance.ClusterAbundance.cosmo" title="Permalink to this definition"></a></dt>
+<dd><p>The cosmology used to predict the cluster number count.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.abundance.ClusterAbundance.mass_function">
+<span class="sig-name descname"><span class="pre">mass_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/abundance.html#ClusterAbundance.mass_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.abundance.ClusterAbundance.mass_function" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the halo mass function at given log-mass and redshift.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass</strong> (<em>array_like</em>) -- Array of log10 halo masses (M_sun).</p></li>
+<li><p><strong>z</strong> (<em>array_like</em>) -- Array of redshifts matching <cite>log_mass</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array with mass function values (dn/dlnM or as provided by the
+configured <cite>halo_mass_function</cite>) evaluated at each (mass, z).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Results are cached in <cite>_hmf_cache</cite> keyed by (log_mass, scale_factor)
+to avoid repeated expensive evaluations for identical inputs.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

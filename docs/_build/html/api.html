@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Documentation &mdash; Crow  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="crow.cluster_modules package" href="api/crow.cluster_modules.html" />
+    <link rel="prev" title="Overview" href="source/overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading"></a></h1>
+<p>Information on specific functions, classes, and methods.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.cluster_modules.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian"><code class="docutils literal notranslate"><span class="pre">MassRichnessGaussian</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.gaussian_kernel"><code class="docutils literal notranslate"><span class="pre">MassRichnessGaussian.gaussian_kernel()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_mean"><code class="docutils literal notranslate"><span class="pre">MassRichnessGaussian.get_ln_mass_proxy_mean()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.get_ln_mass_proxy_sigma"><code class="docutils literal notranslate"><span class="pre">MassRichnessGaussian.get_ln_mass_proxy_sigma()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#crow.cluster_modules.mass_proxy.gaussian_protocol.MassRichnessGaussian.integrated_gaussian"><code class="docutils literal notranslate"><span class="pre">MassRichnessGaussian.integrated_gaussian()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataBinned"><code class="docutils literal notranslate"><span class="pre">MurataBinned</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataBinned.distribution"><code class="docutils literal notranslate"><span class="pre">MurataBinned.distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataModel"><code class="docutils literal notranslate"><span class="pre">MurataModel</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataModel.get_ln_mass_proxy_mean"><code class="docutils literal notranslate"><span class="pre">MurataModel.get_ln_mass_proxy_mean()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataModel.get_ln_mass_proxy_sigma"><code class="docutils literal notranslate"><span class="pre">MurataModel.get_ln_mass_proxy_sigma()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataModel.observed_value"><code class="docutils literal notranslate"><span class="pre">MurataModel.observed_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataUnbinned"><code class="docutils literal notranslate"><span class="pre">MurataUnbinned</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html#crow.cluster_modules.mass_proxy.murata.MurataUnbinned.distribution"><code class="docutils literal notranslate"><span class="pre">MurataUnbinned.distribution()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.cluster_modules.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance"><code class="docutils literal notranslate"><span class="pre">ClusterAbundance</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.comoving_volume"><code class="docutils literal notranslate"><span class="pre">ClusterAbundance.comoving_volume()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.cosmo"><code class="docutils literal notranslate"><span class="pre">ClusterAbundance.cosmo</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.mass_function"><code class="docutils literal notranslate"><span class="pre">ClusterAbundance.mass_function()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.Completeness"><code class="docutils literal notranslate"><span class="pre">Completeness</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.Completeness.distribution"><code class="docutils literal notranslate"><span class="pre">Completeness.distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.CompletenessAguena16"><code class="docutils literal notranslate"><span class="pre">CompletenessAguena16</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html#crow.cluster_modules.completeness_models.CompletenessAguena16.distribution"><code class="docutils literal notranslate"><span class="pre">CompletenessAguena16.distribution()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.kernel.html#crow.cluster_modules.kernel.SpectroscopicRedshift"><code class="docutils literal notranslate"><span class="pre">SpectroscopicRedshift</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.kernel.html#crow.cluster_modules.kernel.SpectroscopicRedshift.distribution"><code class="docutils literal notranslate"><span class="pre">SpectroscopicRedshift.distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.kernel.html#crow.cluster_modules.kernel.TrueMass"><code class="docutils literal notranslate"><span class="pre">TrueMass</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.kernel.html#crow.cluster_modules.kernel.TrueMass.distribution"><code class="docutils literal notranslate"><span class="pre">TrueMass.distribution()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters"><code class="docutils literal notranslate"><span class="pre">Parameters</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters.items"><code class="docutils literal notranslate"><span class="pre">Parameters.items()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters.keys"><code class="docutils literal notranslate"><span class="pre">Parameters.keys()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters.update"><code class="docutils literal notranslate"><span class="pre">Parameters.update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters.values"><code class="docutils literal notranslate"><span class="pre">Parameters.values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity"><code class="docutils literal notranslate"><span class="pre">Purity</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity.distribution"><code class="docutils literal notranslate"><span class="pre">Purity.distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16"><code class="docutils literal notranslate"><span class="pre">PurityAguena16</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16.distribution"><code class="docutils literal notranslate"><span class="pre">PurityAguena16.distribution()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.cluster_concentration"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.cluster_concentration</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_miscentering"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.compute_miscentering()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.compute_shear_profile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.compute_shear_profile_vectorized()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_parameters"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.set_beta_parameters()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_beta_s_interp"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.set_beta_s_interp()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.set_miscentering()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.use_beta_s_interp"><code class="docutils literal notranslate"><span class="pre">ClusterShearProfile.use_beta_s_interp</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.integrator.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.integrator.html">crow.integrator.integrator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.integrator.integrator.html#crow.integrator.integrator.Integrator"><code class="docutils literal notranslate"><span class="pre">Integrator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.integrator.html#crow.integrator.integrator.Integrator.integrate"><code class="docutils literal notranslate"><span class="pre">Integrator.integrate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegralMethod"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegralMethod</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegralMethod.H"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegralMethod.H</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegralMethod.H_V"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegralMethod.H_V</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegralMethod.P"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegralMethod.P</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegralMethod.P_V"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegralMethod.P_V</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegrator"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegrator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.numcosmo_integrator.html#crow.integrator.numcosmo_integrator.NumCosmoIntegrator.integrate"><code class="docutils literal notranslate"><span class="pre">NumCosmoIntegrator.integrate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.integrator.scipy_integrator.html#crow.integrator.scipy_integrator.ScipyIntegrator"><code class="docutils literal notranslate"><span class="pre">ScipyIntegrator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.integrator.scipy_integrator.html#crow.integrator.scipy_integrator.ScipyIntegrator.integrate"><code class="docutils literal notranslate"><span class="pre">ScipyIntegrator.integrate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.recipes.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe"><code class="docutils literal notranslate"><span class="pre">ExactBinnedClusterRecipe</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_counts"><code class="docutils literal notranslate"><span class="pre">ExactBinnedClusterRecipe.evaluate_theory_prediction_counts()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><code class="docutils literal notranslate"><span class="pre">ExactBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup"><code class="docutils literal notranslate"><span class="pre">ExactBinnedClusterRecipe.setup()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe"><code class="docutils literal notranslate"><span class="pre">GridBinnedClusterRecipe</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_counts"><code class="docutils literal notranslate"><span class="pre">GridBinnedClusterRecipe.evaluate_theory_prediction_counts()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><code class="docutils literal notranslate"><span class="pre">GridBinnedClusterRecipe.evaluate_theory_prediction_lensing_profile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_grid.html#crow.recipes.binned_grid.GridBinnedClusterRecipe.setup"><code class="docutils literal notranslate"><span class="pre">GridBinnedClusterRecipe.setup()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.completeness"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe.completeness</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_counts"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe.evaluate_theory_prediction_counts()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe.evaluate_theory_prediction_lensing_profile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.purity"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe.purity</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.setup"><code class="docutils literal notranslate"><span class="pre">BinnedClusterRecipe.setup()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/crow.properties.html">crow.properties module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty"><code class="docutils literal notranslate"><span class="pre">ClusterProperty</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.COUNTS"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.COUNTS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.DELTASIGMA"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.DELTASIGMA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.MASS"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.MASS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.NONE"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.NONE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.REDSHIFT"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.REDSHIFT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.properties.html#crow.properties.ClusterProperty.SHEAR"><code class="docutils literal notranslate"><span class="pre">ClusterProperty.SHEAR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
