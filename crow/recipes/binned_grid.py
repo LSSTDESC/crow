@@ -497,9 +497,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z_edges: tuple[float, float],
         log_proxy_edges: tuple[float, float],
-        radius_centers: np.ndarray,
+        distance_centers: np.ndarray,
         sky_area: float,
         average_on: None | ClusterProperty = None,
+        distance_units: str = "mpc",
     ) -> float:
         r"""Compute the average cluster lensing profile in a bin.
 
@@ -514,12 +515,14 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             Redshift bin boundaries.
         log_proxy_edges : tuple of float
             Observable proxy bin boundaries (log-space).
-        radius_centers : numpy.ndarray
+        distance_centers : numpy.ndarray
             Radial bins at which the lensing signal is evaluated.
         sky_area : float
             Survey area in square degrees.
         average_on : ClusterProperty
             Must include DELTASIGMA or SHEAR.
+        distance_units : str
+            Units of radial bins, must be ``mpc`` or ``arcmin``.
 
         Returns
         -------
@@ -548,6 +551,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ########
         # kernel
         ########
+
+        radius_centers = self.cluster_theory.get_radius_centers_mpc(
+            distance_centers, distance_units, z_edges
+        )
 
         # shape: (n_z, n_mass, n_radius)
         shear_grid = self._get_shear_grid(

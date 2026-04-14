@@ -385,9 +385,10 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z_edges,
         log_proxy_edges,
-        radius_centers,
+        distance_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
+        distance_units: str = "mpc",
     ) -> float:
         """
         Compute the predicted stacked lensing (shear) profile.
@@ -429,7 +430,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
-
+        radius_centers = self.cluster_theory.get_radius_centers_mpc(
+            distance_centers, distance_units, z_edges
+        )
         if self.purity == None:
             self.integrator.integral_bounds = [
                 self.mass_interval,
