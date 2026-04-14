@@ -5,6 +5,7 @@ and phenomenological predictions.  This module contains the classes and
 functions that produce those predictions.
 """
 
+import warnings
 from typing import Callable, Optional, Tuple
 
 import clmm  # pylint: disable=import-error
@@ -109,6 +110,11 @@ class ClusterShearProfile(ClusterAbundance):
         """Set the cluster concentration parameter."""
         if value is None:
             value = -1
+        if value < 1:
+            warnings.warn(
+                f"The concentration value '{value}' results in the"
+                "Bhattacharya13 mass-concentration model being used."
+            )
         self.parameters["cluster_concentration"] = value
 
     @property
