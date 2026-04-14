@@ -77,6 +77,11 @@ your project and share feedback.
 You are welcome to contribute to the code. To do so, please make sure
 you use `isort` and `black` on your code and assure you provide unit tests.
 
+## Updating Public Documentation on lsstdesc.org <a name="updating_public_docs"></a>
+
+This is easy! Once you have merged all approved changes into `main`, you will want to update the public documentation.
+Just go to the `publish-docs` branch (`git checkout publish-docs`) and run the `./publish_docs` script.
+
 # Contact <a name="contact"></a>
 
 If you have comments, questions, or feedback, please contact the current leads
