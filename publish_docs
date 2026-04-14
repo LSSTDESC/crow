@@ -1,0 +1,25 @@
+# Get new changes
+
+git fetch origin
+git merge origin/main
+#python setup.py install --user > /dev/null
+
+# Make the documentation
+
+cd docs/
+make clean
+make html
+cd ..
+
+# Add and commit changes
+
+MASTERCOMMIT="$(git log --pretty=format:'%h' -n 1 main)"
+
+git add docs/_build/
+git status
+git commit -m "Added main commit $MASTERCOMMIT to docs"
+git push
+
+# Push changes to branch used by the website
+
+git subtree push --prefix docs/_build/html/ origin gh-pages
