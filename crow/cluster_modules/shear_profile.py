@@ -82,7 +82,14 @@ class ClusterShearProfile(ClusterAbundance):
         """
         super().__init__(cosmo, halo_mass_function)
         self.is_delta_sigma = is_delta_sigma
-        self.parameters = Parameters({"cluster_concentration": None})
+        self.parameters = Parameters(
+            {"cluster_concentration": None},
+            additional_setter={
+                "cluster_concentration": lambda value: (
+                    None if (value is not None and value < 0) else value
+                )
+            },
+        )
         self.cluster_concentration = cluster_concentration
 
         self.two_halo_term = two_halo_term
@@ -107,8 +114,6 @@ class ClusterShearProfile(ClusterAbundance):
     @cluster_concentration.setter
     def cluster_concentration(self, value):
         """Set the cluster concentration parameter."""
-        if value is not None and value < 0:
-            value = None
         self.parameters["cluster_concentration"] = value
 
     @property
@@ -496,7 +501,7 @@ class ClusterShearProfile(ClusterAbundance):
         float
             Halo concentration parameter.
         """
-        if self.cluster_concentration is not None and self.cluster_concentration > 0:
+        if self.cluster_concentration is not None:
             return self.cluster_concentration
 
         conc_model = pyccl.halos.concentration.ConcentrationBhattacharya13(

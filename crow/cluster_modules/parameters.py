@@ -10,7 +10,7 @@ class Parameters:
     each cluster_module object.
     """
 
-    def __init__(self, default_parameters_dict):
+    def __init__(self, default_parameters_dict, additional_setter=None):
         """Create a Parameters container.
 
         Parameters
@@ -18,8 +18,17 @@ class Parameters:
         default_parameters_dict : dict
             Dictionary with the default parameter names and values. Only keys
             present in this dictionary will be accepted by this instance.
+        __additional_setter : dict
+            Dictionary with helper functions to set given parameters.
+            Ex: ``{'par_positive': abs, 'par_square': lambda x: x**2}``
         """
-        self.__pars = {**default_parameters_dict}
+        self.__additional_setter = (
+            {} if additional_setter is None else {**additional_setter}
+        )
+        self.__pars = {
+            key: self.__additional_setter.get(key, value)
+            for key, value in default_parameters_dict.items()
+        }
 
     def __getitem__(self, item):
         """Retrieve a parameter value by key.
@@ -60,7 +69,7 @@ class Parameters:
             raise KeyError(
                 f"key={item} not accepted, " f"must be in {list(self.__pars.keys())}"
             )
-        self.__pars[item] = value
+        self.__pars[item] = self.__additional_setter.get(item, lambda x: x)(value)
 
     def keys(self):
         """Return an iterable view of parameter names.
@@ -124,7 +133,5 @@ class Parameters:
                 "argument of update must be dict or Parameters, "
                 f"{type(update_dict)} given!"
             )
-        bad_keys = list(filter(lambda key: key not in self.__pars.keys(), update_dict))
-        if len(bad_keys) > 0:
-            raise KeyError(f"bad keys provided for update: {bad_keys}")
-        self.__pars.update(update_dict)
+        for key, value in update_dict.items():
+            self[key] = value
