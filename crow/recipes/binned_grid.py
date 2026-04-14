@@ -1,4 +1,17 @@
-"""Module for defining the classes used in the MurataBinnedSpecZ cluster recipe."""
+"""Module for defining the classes used in the MurataBinnedSpecZ cluster recipe.
+
+This module provides implementations of cluster abundance and lensing
+predictions based on a binned representation of the mass–richness relation
+(Murata et al. 2019) and spectroscopic redshift assumptions. The primary
+class defined here constructs multi-dimensional grids for efficient numerical
+integration of cluster observables, including number counts and lensing
+profiles.
+
+The implementation relies on precomputing and caching intermediate quantities
+such as halo mass functions, mass–richness relations, completeness, purity,
+and shear profiles. These cached grids are then combined into integrands and
+evaluated using Simpson integration over mass, redshift, and observable proxy.
+"""
 
 # pylint: disable=duplicate-code
 from typing import Callable
@@ -19,10 +32,59 @@ from .binned_parent import BinnedClusterRecipe
 
 
 class GridBinnedClusterRecipe(BinnedClusterRecipe):
-    """Cluster recipe with Murata19 mass-richness and spec-zs.
+    """Cluster recipe using a grid-based integration scheme for cluster observables.
 
-    This recipe uses the Murata 2019 binned mass-richness relation and assumes
-    perfectly measured spec-zs.
+    This class implements a binned cluster model based on the Murata (2019)
+    mass–richness relation, assuming perfectly measured spectroscopic redshifts.
+    It evaluates cluster number counts and lensing signals by constructing
+    multi-dimensional grids over mass, redshift, and observable proxy (e.g.,
+    richness), and performing numerical integration.
+
+    The computation is structured around reusable cached grids for efficiency,
+    including:
+    - Halo mass function × comoving volume
+    - Mass–richness probability distribution
+    - Completeness and purity corrections
+    - Shear profiles for lensing observables
+
+    Parameters
+    ----------
+    cluster_theory : object
+        Object providing theoretical predictions such as halo mass function,
+        comoving volume, and shear profiles.
+    redshift_distribution : callable
+        Function describing the redshift distribution of clusters.
+    mass_distribution : callable
+        Function describing the mass–observable (e.g., richness) relation.
+    completeness : Completeness, optional
+        Completeness model. If None, a flat (unity) completeness is assumed.
+    purity : Purity, optional
+        Purity model. If None, a flat (unity) purity is assumed.
+    mass_interval : tuple of float, optional
+        Range of log10 halo mass values used for integration.
+    true_z_interval : tuple of float, optional
+        Redshift range used for integration.
+    proxy_grid_size : int, optional
+        Number of grid points in observable proxy (e.g., richness).
+    redshift_grid_size : int, optional
+        Number of grid points in redshift.
+    mass_grid_size : int, optional
+        Number of grid points in log-mass.
+
+    Attributes
+    ----------
+    log_mass_grid : numpy.ndarray
+        1D grid of log10 halo masses used for integration.
+    _hmf_grid : dict
+        Cache of halo mass function × volume grids.
+    _mass_richness_grid : dict
+        Cache of mass–richness probability grids.
+    _completeness_grid : dict
+        Cache of completeness grids.
+    _purity_grid : dict
+        Cache of purity grids.
+    _shear_grids : dict
+        Cache of shear profile grids.
     """
 
     def __init__(
@@ -64,7 +126,24 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
     ):
-        """Returns a null (=1) contribution to the integrand."""
+        """Return a trivial (unity) distribution.
+
+        This function is used as a fallback when no completeness or purity
+        model is provided. It returns an array of ones with the same broadcasted
+        shape as the inputs.
+
+        Parameters
+        ----------
+        log_mass : array_like
+            Logarithmic halo mass values.
+        z : array_like
+            Redshift values.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of ones matching the broadcasted shape of inputs.
+        """
         return 1.0 + 0 * log_mass * z
 
     def _setup_with_completeness(self):
@@ -82,7 +161,13 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             self._purity_distribution = self.purity.distribution
 
     def setup(self) -> None:
-        """Resets all internal dictionaries used for caching computed grids."""
+        """Reset all cached grids.
+
+        This method clears all internally stored grids used for caching intermediate
+        quantities (e.g., halo mass function, mass–richness relation, etc.). It
+        should be called whenever model parameters or cosmology are updated to
+        ensure consistency in subsequent computations.
+        """
         self._hmf_grid = {}
         self._mass_richness_grid = {}
         self._completeness_grid = {}
@@ -95,8 +180,26 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         sky_area: float,
         key,
     ):
-        """Compute HMF × comoving volume and store in the class."""
+        """Compute and cache the halo mass function multiplied by comoving volume.
 
+        This method evaluates the halo mass function over a 2D grid of redshift
+        and log-mass, multiplies it by the differential comoving volume, and stores
+        the result for reuse.
+
+        Parameters
+        ----------
+        z : numpy.ndarray
+            Array of redshift values.
+        sky_area : float
+            Survey area in square degrees.
+        key : hashable
+            Cache key identifying this grid configuration.
+
+        Returns
+        -------
+        numpy.ndarray
+            2D array of shape (n_z, n_mass) containing HMF × volume values.
+        """
         if key not in self._hmf_grid:
             # sizes
             n_m = len(self.log_mass_grid)
@@ -119,8 +222,25 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         log_proxy: npt.NDArray[np.float64],
         key,
     ):
-        """Compute mass-richness grid by vectorizing 1D inputs."""
+        """Compute and cache the mass–richness probability distribution grid.
 
+        This method evaluates the conditional probability of observable proxy
+        (e.g., richness) given halo mass and redshift, producing a 3D grid.
+
+        Parameters
+        ----------
+        z : numpy.ndarray
+            Redshift grid.
+        log_proxy : numpy.ndarray
+            Observable proxy grid (log-space).
+        key : hashable
+            Cache key identifying this configuration.
+
+        Returns
+        -------
+        numpy.ndarray
+            3D array of shape (n_proxy, n_z, n_mass).
+        """
         if key not in self._mass_richness_grid:
             # sizes
             n_z = len(z)
@@ -308,8 +428,28 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe using triple Simpson integration."""
+        """Compute predicted cluster number counts in a bin.
 
+        This method evaluates the expected number of clusters within specified
+        redshift and observable proxy bins by integrating the full cluster
+        abundance model.
+
+        Parameters
+        ----------
+        z_edges : tuple of float
+            Lower and upper bounds of the redshift bin.
+        log_proxy_edges : tuple of float
+            Bounds of the observable proxy bin (log-space).
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty or None, optional
+            Optional weighting of the observable (e.g., mass-weighted counts).
+
+        Returns
+        -------
+        float
+            Predicted number of clusters in the bin.
+        """
         ######################
         # grid arrays and keys
         ######################
@@ -361,10 +501,36 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         sky_area: float,
         average_on: None | ClusterProperty = None,
     ) -> float:
-        r"""Evaluate the theoretical prediction for the average lensing profile
-        (..:math:`\langle\Delta\Sigma(R)\rangle` or ..:math:`\langle g_t(R)\rangle`)
-        in the provided bin."""
+        r"""Compute the average cluster lensing profile in a bin.
 
+        This method evaluates the expected stacked lensing signal
+        (e.g., :math:`\langle \Delta\Sigma(R) \rangle` or
+        :math:`\langle g_t(R) \rangle`) by integrating the shear profile
+        over the cluster population.
+
+        Parameters
+        ----------
+        z_edges : tuple of float
+            Redshift bin boundaries.
+        log_proxy_edges : tuple of float
+            Observable proxy bin boundaries (log-space).
+        radius_centers : numpy.ndarray
+            Radial bins at which the lensing signal is evaluated.
+        sky_area : float
+            Survey area in square degrees.
+        average_on : ClusterProperty
+            Must include DELTASIGMA or SHEAR.
+
+        Returns
+        -------
+        numpy.ndarray
+            Radial profile of the stacked lensing signal.
+
+        Raises
+        ------
+        ValueError
+            If the required ClusterProperty flags are not set.
+        """
         if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
             # Raise a ValueError if the necessary flags are not present
             raise ValueError(

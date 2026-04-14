@@ -9,29 +9,45 @@ import numpy.typing as npt
 
 
 class TrueMass:
-    """The true mass kernel.
+    """True-mass kernel used in abundance integrals.
 
-    Assuming we measure the true mass, this will always be 1.
+    This kernel represents the case where the observed mass equals the true
+    halo mass. It therefore contributes a multiplicative factor of unity to
+    the abundance integrand and does not alter the mass distribution.
+
+    Notes
+    -----
+    The distribution method returns a NumPy array (dtype float) that can be
+    broadcast with other integrand factors.
     """
 
     def distribution(self) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the mass distribution contribution to the integrand.
+        """Evaluate and return the mass kernel contribution.
 
-        We have set this to 1.0 (i.e. it does not affect the mass distribution)
+        Returns
+        -------
+        numpy.ndarray
+            Array containing the value 1.0. This can be broadcast to the shape
+            required by the integrand and is provided as float64.
         """
         return np.atleast_1d(1.0)
 
 
 class SpectroscopicRedshift:
-    """The spec-z kernel.
+    """Spectroscopic-redshift kernel for abundance integrals.
 
-    Assuming the spectroscopic redshift has no uncertainties, this is akin to
-    multiplying by 1.
+    Represents the idealized case where cluster redshifts are known exactly
+    (spectroscopic precision). The kernel thus contributes a factor of unity
+    to the redshift part of the integrand.
     """
 
     def distribution(self) -> npt.NDArray[np.float64]:
-        """Evaluates and returns the z distribution contribution to the integrand.
+        """Evaluate and return the redshift kernel contribution.
 
-        We have set this to 1.0 (i.e. it does not affect the redshift distribution)
+        Returns
+        -------
+        numpy.ndarray
+            Array containing the value 1.0 (dtype float64). This is intended
+            to be broadcast with other integrand arrays.
         """
         return np.atleast_1d(1.0)

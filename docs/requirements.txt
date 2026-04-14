@@ -1,0 +1,8 @@
+sphinx
+sphinx-rtd-theme
+nbconvert
+ipython
+ipykernel
+jupyter
+numpy
+scipy
