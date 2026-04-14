@@ -321,20 +321,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
-        if distance_units.lower() == "arcmin":
-            distance_centers_rad = distance_centers * np.pi / (180.0 * 60.0)
-            z_bin_mean = (z_edges[1] + z_edges[0]) / 2.0
-            a = 1.0 / (1.0 + z_bin_mean)
-            radius_centers = (
-                self.cluster_theory.cosmo.angular_diameter_distance(a)
-                * distance_centers_rad
-            )
-        elif distance_units.lower() == "mpc":
-            radius_centers = distance_centers
-        else:
-            raise ValueError(
-                f"Unknown distance_units='{distance_units}'. Expected 'arcmin' or 'mpc'."
-            )
+        radius_centers = self.cluster_theory.get_radius_centers_mpc(
+            distance_centers, distance_units, z_edges
+        )
         if self.purity == None:
             self.integrator.integral_bounds = [
                 self.mass_interval,

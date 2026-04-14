@@ -223,6 +223,23 @@ class ClusterShearProfile(ClusterAbundance):
         )
         self.use_beta_s_interp = self.use_beta_s_interp
 
+    def get_radius_centers_mpc(self, distance_centers, distance_units, z_edges):
+        radius_centers = None
+        if distance_units.lower() == "arcmin":
+            distance_centers_rad = distance_centers * np.pi / (180.0 * 60.0)
+            z_bin_mean = (z_edges[1] + z_edges[0]) / 2.0
+            a = 1.0 / (1.0 + z_bin_mean)
+            radius_centers = (
+                self.cosmo.angular_diameter_distance(a) * distance_centers_rad
+            )
+        elif distance_units.lower() == "mpc":
+            radius_centers = distance_centers
+        else:
+            raise ValueError(
+                f"Unknown distance_units='{distance_units}'. Expected 'arcmin' or 'mpc'."
+            )
+        return radius_centers
+
     def compute_shear_profile(
         self,
         log_mass: npt.NDArray[np.float64],

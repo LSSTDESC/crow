@@ -365,20 +365,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         r"""Evaluate the theoretical prediction for the average lensing profile
         (..:math:`\langle\Delta\Sigma(R)\rangle` or ..:math:`\langle g_t(R)\rangle`)
         in the provided bin."""
-        if distance_units.lower() == "arcmin":
-            distance_centers_rad = distance_centers * np.pi / (180.0 * 60.0)
-            z_bin_mean = (z_edges[1] + z_edges[0]) / 2.0
-            a = 1.0 / (1.0 + z_bin_mean)
-            radius_centers = (
-                self.cluster_theory.cosmo.angular_diameter_distance(a)
-                * distance_centers_rad
-            )
-        elif distance_units.lower() == "mpc":
-            radius_centers = distance_centers
-        else:
-            raise ValueError(
-                f"Unknown distance_units='{distance_units}'. Expected 'arcmin' or 'mpc'."
-            )
+        radius_centers = self.cluster_theory.get_radius_centers_mpc(
+            distance_centers, distance_units, z_edges
+        )
         if not (average_on & (ClusterProperty.DELTASIGMA | ClusterProperty.SHEAR)):
             # Raise a ValueError if the necessary flags are not present
             raise ValueError(
