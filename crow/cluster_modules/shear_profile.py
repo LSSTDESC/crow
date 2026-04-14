@@ -496,7 +496,6 @@ class ClusterShearProfile(ClusterAbundance):
         float
             Halo concentration parameter.
         """
-        if self.cluster_concentration is not None:
         if self.cluster_concentration is not None and self.cluster_concentration > 0:
             return self.cluster_concentration
 
