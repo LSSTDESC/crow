@@ -1,7 +1,7 @@
 # CROW
 **C**luster **R**econstruction of **O**bservables **W**orkbench: **CROW**
 
-The LSST-DESC Cluster Reconstruction of Observables Workbench (CROW) code is a DESC tool consisting of a Python library for predicting galaxy cluster observabless.
+The LSST-DESC Cluster Reconstruction of Observables Workbench (CROW) code is a DESC tool consisting of a Python library for predicting galaxy cluster observabless. The code documentation can be found at https://lsstdesc.org/crow/.
 
 ## Table of contents
 1. [Installing CROW](#installing)
@@ -16,13 +16,13 @@ Crow can be installed with `pip` or `conda`.
 For a `pip` installation, run:
 
 ```bash
-    pip install lsstdesc-crow
+pip install lsstdesc-crow
 ```
 
 For a `conda` installation, run:
 
 ```bash
-    conda install -c conda-forge lsstdesc-crow
+conda install -c conda-forge lsstdesc-crow
 ```
 After, to use is in your code, just do 
 
@@ -76,6 +76,11 @@ your project and share feedback.
 
 You are welcome to contribute to the code. To do so, please make sure
 you use `isort` and `black` on your code and assure you provide unit tests.
+
+## Updating Public Documentation on lsstdesc.org <a name="updating_public_docs"></a>
+
+This is easy! Once you have merged all approved changes into `main`, you will want to update the public documentation.
+Just go to the `publish-docs` branch (`git checkout publish-docs`) and run the `./publish_docs` script.
 
 # Contact <a name="contact"></a>
 
