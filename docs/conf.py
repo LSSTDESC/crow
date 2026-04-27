@@ -1,14 +1,18 @@
 import os
+import subprocess
 import sys
 from unittest.mock import MagicMock
-import subprocess
+
 from sphinx.ext.apidoc import main as apidoc_main
+
 # ----------------------------------------------------------------------
 # Path setup (IMPORTANT)
 # ----------------------------------------------------------------------
 # Add repo root so Sphinx can import `crow`
 sys.path.insert(0, os.path.abspath("../crow"))
 sys.path.insert(0, os.path.abspath(".."))
+
+
 # ----------------------------------------------------------------------
 # Mock heavy / optional dependencies (EDIT if needed)
 # ----------------------------------------------------------------------
@@ -16,6 +20,8 @@ class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
         return MagicMock()
+
+
 for mod in [
     "pyccl",
     "pyccl.cosmology",
@@ -28,25 +34,22 @@ for mod in [
     "numcosmo_py",
     "clmm",
     "clmm.utils",
-    "clmm.utils.beta_lens"
+    "clmm.utils.beta_lens",
 ]:
     sys.modules[mod] = Mock()
 
 
-
 # --------------Run the makefile documentation--------
-#docs_dir = os.path.dirname(os.path.abspath(__file__))
-#apidoc_main([
+# docs_dir = os.path.dirname(os.path.abspath(__file__))
+# apidoc_main([
 #    "--separate",
 #    "--no-toc",
 #    "-f",
 #    "-M",
 #    "-o", os.path.join(docs_dir, "api"),
 #    os.path.join(docs_dir, "../crow"),
-#])
-#---------------------------------------------------
-
-
+# ])
+# ---------------------------------------------------
 
 
 # ----------------------------------------------------------------------
@@ -122,17 +125,17 @@ for entry in config:
         doc_files[key].append(entry)
 
 # -- Compile notebooks into rst ------------------------------------------
-#run_nb = False  # Set True to execute notebooks during build
+# run_nb = False  # Set True to execute notebooks during build
 
 outdir = "compiled-examples/"
-#nbconvert_opts = [
+# nbconvert_opts = [
 #    "--to rst",
 #    "--ExecutePreprocessor.kernel_name=python3",
 #    "--execute",
 #    f"--output-dir {outdir}",
-#]
+# ]
 
-#for lists in [v for k, v in doc_files.items() if k != "APIDOC"]:
+# for lists in [v for k, v in doc_files.items() if k != "APIDOC"]:
 #    for demo in lists:
 #        com = " ".join(["jupyter nbconvert"] + nbconvert_opts + [demo])
 #        if not run_nb:
@@ -146,15 +149,15 @@ doc_captions = {
     "OTHER": "Other",
 }
 index_toc = ""
-#for CASE in ("DEMO", "EXAMPLE", "OTHER"):
+# for CASE in ("DEMO", "EXAMPLE", "OTHER"):
 #    if not doc_files[CASE]:
 #        continue
 #    index_toc += f"""
-#.. toctree::
+# .. toctree::
 #   :maxdepth: 1
 #   :caption: {doc_captions[CASE]}
 #
-#"""
+# """
 #    for example in doc_files[CASE]:
 #        fname = "".join(example.split(".")[:-1]).split("/")[-1] + ".rst"
 #        index_toc += f"   {outdir}{fname}\n"
@@ -162,15 +165,13 @@ index_toc = ""
 subprocess.run("cp source/index_body.rst index.rst", shell=True)
 with open("index.rst", "a") as indexfile:
     indexfile.write(index_toc)
-    indexfile.write(
-        """
+    indexfile.write("""
 .. toctree::
    :maxdepth: 1
    :caption: Reference
 
    api
-"""
-    )
+""")
 
 # -- API table of contents -----------------------------------------------
 apitoc = """API Documentation

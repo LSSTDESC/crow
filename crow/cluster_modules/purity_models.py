@@ -63,6 +63,13 @@ REDMAPPER_DEFAULT_PARAMETERS = {
     "b_logm_piv": -0.4077,
 }
 
+REDMAPPER_DEFAULT_PARAMETERS_LN = {
+    "a_n": 1.98298628209,
+    "b_n": 0.81212176229,
+    "a_logm_piv": 2.2183,
+    "b_logm_piv": -0.6592,
+}
+
 
 class PurityAguena16(Purity):
     """Purity model following Aguena et al. (2016) parametrisation.
@@ -152,6 +159,70 @@ class PurityAguena16(Purity):
         """
 
         rich_norm_pow = (10**log_mass_proxy / self._mpiv(z)) ** self._nc(z)
+
+        purity = rich_norm_pow / (rich_norm_pow + 1.0)
+        assert isinstance(purity, np.ndarray)
+        return purity
+
+
+REDMAPPER_DEFAULT_PARAMETERS_LN = {
+    "a_n": 3.9193,
+    "b_n": -0.3323,
+    "a_logm_piv": 1.1839,
+    "b_logm_piv": -0.4077,
+}
+
+
+class PurityAguena16LnProxy(PurityAguena16):
+    """Purity model following Aguena et al. (2016) parametrisation.
+
+    The model computes a sigmoid-like purity as a function of a mass proxy
+    and redshift using a pivot mass and a redshift-dependent power-law index.
+    This class makes a smaller update on the previous model changing some
+    modeling parameters to Ln scale.
+
+    Attributes
+    ----------
+    parameters : Parameters
+        Container holding default parameters defined in
+        ``REDMAPPER_DEFAULT_PARAMETERS_LN``.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS_LN})
+
+    def distribution(
+        self,
+        log_mass_proxy: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Compute the purity fraction for given mass-proxy and redshift.
+        The purity is given by the sigmoid-like expression
+
+            p(M, z) = ( ( ln M / ln M_piv(z) ) ** n_c(z) ) / ( 1 + ( ln M / ln M_piv(z) ) ** n_c(z) ),
+
+        where M = 10**(log_mass_proxy), M_piv(z) = 10**(a_logm_piv + b_logm_piv*(1 + z))
+        and n_c(z) = a_n + b_n*(1 + z).
+
+        Parameters
+        ----------
+        log_mass_proxy : array_like
+            Array of log10 mass-proxy values.
+        z : array_like
+            Array of redshifts matching ``log_mass_proxy``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Purity values in the interval [0, 1] with shape matching the
+            broadcasted inputs. dtype is float64.
+        """
+        lnr = np.log(10) * log_mass_proxy
+        lnrc = np.log10(self._mpiv(z))
+
+        lnr_rescaled = lnr / lnrc
+        rich_norm_pow = lnr_rescaled ** self._nc(z)
 
         purity = rich_norm_pow / (rich_norm_pow + 1.0)
         assert isinstance(purity, np.ndarray)

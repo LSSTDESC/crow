@@ -32,6 +32,20 @@ def test_create_completeness_kernel():
     assert ck.parameters["b_n"] == 1.2634
 
 
+def test_create_purity_ln_kernel():
+    pk = purity_models.PurityAguena16LnProxy()
+    pk.parameters["a_n"] = 1.98298628209
+    pk.parameters["b_n"] = 0.81212176229
+    pk.parameters["a_logm_piv"] = 2.2183
+    pk.parameters["b_logm_piv"] = -0.6592
+
+    assert pk is not None
+    assert pk.parameters["a_n"] == 1.98298628209
+    assert pk.parameters["b_n"] == 0.81212176229
+    assert pk.parameters["a_logm_piv"] == 2.2183
+    assert pk.parameters["b_logm_piv"] == -0.6592
+
+
 def test_create_purity_kernel():
     pk = purity_models.PurityAguena16()
     pk.parameters["a_n"] = 3.9193
@@ -85,6 +99,47 @@ def test_purity_distribution():
     assert isinstance(purity_values, np.ndarray)
     for ref, true in zip(purity_values, truth):
         assert ref == pytest.approx(true, rel=1e-5, abs=0.0)
+
+
+@pytest.mark.precision_sensitive
+def test_purity_ln_distribution():
+    pk = purity_models.PurityAguena16LnProxy()
+
+    pk.parameters["a_n"] = 1.98298628209
+    pk.parameters["b_n"] = 0.81212176229
+    pk.parameters["a_logm_piv"] = 2.2183
+    pk.parameters["b_logm_piv"] = -0.6592
+
+    log_mass_proxy = np.linspace(0.0, 2.5, 10, dtype=np.float64)
+    z = np.array(
+        [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        dtype=np.float64,
+    )
+
+    # --- reference computation (explicit, no reuse of class methods) ---
+    a_n = pk.parameters["a_n"]
+    b_n = pk.parameters["b_n"]
+    a_logm_piv = pk.parameters["a_logm_piv"]
+    b_logm_piv = pk.parameters["b_logm_piv"]
+
+    nc = a_n + b_n * (1.0 + z)
+    log_mpiv = a_logm_piv + b_logm_piv * (1.0 + z)
+    mpiv = 10**log_mpiv
+
+    lnr = np.log(10) * log_mass_proxy
+    lnrc = np.log10(mpiv)
+
+    lnr_rescaled = lnr / lnrc
+    rich_norm_pow = lnr_rescaled**nc
+    truth = rich_norm_pow / (rich_norm_pow + 1.0)
+
+    # --- test ---
+    purity_values = pk.distribution(log_mass_proxy, z).flatten()
+
+    assert isinstance(purity_values, np.ndarray)
+
+    for ref, true in zip(purity_values, truth):
+        assert ref == pytest.approx(true, rel=1e-7, abs=0.0)
 
 
 @pytest.mark.precision_sensitive
