@@ -44,7 +44,7 @@ def test_create_purity_ln_kernel():
     assert pk.parameters["b_n"] == 0.81212176229
     assert pk.parameters["a_logm_piv"] == 2.2183
     assert pk.parameters["b_logm_piv"] == -0.6592
-
+    
 
 def test_create_purity_kernel():
     pk = purity_models.PurityAguena16()
@@ -130,10 +130,9 @@ def test_purity_ln_distribution():
     lnrc = np.log10(mpiv)
 
     lnr_rescaled = lnr / lnrc
-    rich_norm_pow = lnr_rescaled**nc
+    rich_norm_pow = lnr_rescaled ** nc
     truth = rich_norm_pow / (rich_norm_pow + 1.0)
 
-    # --- test ---
     purity_values = pk.distribution(log_mass_proxy, z).flatten()
 
     assert isinstance(purity_values, np.ndarray)
