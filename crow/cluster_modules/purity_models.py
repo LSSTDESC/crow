@@ -70,6 +70,7 @@ REDMAPPER_DEFAULT_PARAMETERS_LN = {
     "b_logm_piv": -0.6592,
 }
 
+
 class PurityAguena16(Purity):
     """Purity model following Aguena et al. (2016) parametrisation.
 
@@ -169,9 +170,9 @@ class PurityAguena16LnProxy(PurityAguena16):
 
     The model computes a sigmoid-like purity as a function of a mass proxy
     and redshift using a pivot mass and a redshift-dependent power-law index.
-    This class makes a smaller update on the previous model changing some 
+    This class makes a smaller update on the previous model changing some
     modeling parameters to Ln scale.
-    
+
     Attributes
     ----------
     parameters : Parameters
@@ -182,7 +183,6 @@ class PurityAguena16LnProxy(PurityAguena16):
     def __init__(self):
         super().__init__()
         self.parameters = Parameters({**REDMAPPER_DEFAULT_PARAMETERS_LN})
-
 
     def distribution(
         self,
@@ -219,4 +219,3 @@ class PurityAguena16LnProxy(PurityAguena16):
         purity = rich_norm_pow / (rich_norm_pow + 1.0)
         assert isinstance(purity, np.ndarray)
         return purity
-
