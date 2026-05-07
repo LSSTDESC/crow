@@ -283,8 +283,8 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z: npt.NDArray[np.float64],
         distance_centers,
-        distance_units,
         key,
+        distance_units: str = "mpc",
     ):
         """Compute shear grid for a specific radius and store in the class."""
 
@@ -555,15 +555,15 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         ########
 
         radius_centers = self.cluster_theory.get_radius_centers_mpc(
-            distance_centers, distance_units, z_edges
+            distance_centers, distance_units, np.mean(z_edges)
         )
 
         # shape: (n_z, n_mass, n_radius)
         shear_grid = self._get_shear_grid(
             integ_arrays["redshift"]["points"],
             radius_centers,
-            "mpc",
             shear_key,
+            "mpc",
         )
         # re-shape it: (1, n_z, n_mass, n_radius)
         probe_kernel = shear_grid[np.newaxis, ...]

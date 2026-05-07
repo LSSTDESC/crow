@@ -293,23 +293,65 @@ class ClusterShearProfile(ClusterAbundance):
         )
         self.use_beta_s_interp = self.use_beta_s_interp
 
-    def get_radius_centers_mpc(self, distance_centers, distance_units, z_edges):
-        radius_centers = None
+    def get_radius_centers_mpc(
+        self,
+        distance_centers: npt.NDArray[np.float64],
+        distance_units: str,
+        z_edges: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Convert radial bin centers to physical Mpc units.
+
+        Parameters
+        ----------
+        distance_centers : numpy.ndarray
+            Array of radial bin centers.
+
+        distance_units : str
+            Units of the input radial distances.
+            Supported values are:
+                - ``"mpc"`` : physical Mpc
+                - ``"arcmin"`` : angular arcminutes
+
+        z_edges : numpy.ndarray
+            Array of redshift values associated with each radial bin center.
+            Must have the same shape as ``distance_centers`` when
+            ``distance_units="arcmin"``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of radial bin centers converted to physical Mpc units.
+
+        Raises
+        ------
+        ValueError
+            If ``distance_units`` is not ``"mpc"`` or ``"arcmin"``.
+
+        Notes
+        -----
+        For angular distances in arcminutes, the conversion is performed using:
+
+        .. math::
+
+            R = D_A(z) \\, \\theta
+
+        where :math:`D_A(z)` is the angular diameter distance and
+        :math:`\\theta` is the angular separation in radians.
+        """
+
         if distance_units.lower() == "mpc":
             return distance_centers
 
         if distance_units.lower() == "arcmin":
-            if isinstance(z_edges, (list, np.ndarray)) and len(z_edges) == 2:
-                z = np.mean(z_edges)
-            else:
-                z = z_edges
 
             distance_centers_rad = distance_centers * np.pi / (180.0 * 60.0)
-            a = 1.0 / (1.0 + z)
+
+            a = 1.0 / (1.0 + z_edges)
+
             return self.cosmo.angular_diameter_distance(a) * distance_centers_rad
 
         raise ValueError(
-            f"Unknown distance_units='{distance_units}'. Expected 'arcmin' or 'mpc'."
+            f"Unknown distance_units='{distance_units}'. " "Expected 'arcmin' or 'mpc'."
         )
 
     def compute_shear_profile(
