@@ -50,8 +50,8 @@ class Completeness:
 
 
 REDMAPPER_DEFAULT_PARAMETERS = {
-    "a_n": 0.38,
-    "b_n": 1.2634,
+    "a_n": 1.1321,
+    "b_n": 0.7751,
     "a_logm_piv": 13.31,
     "b_logm_piv": 0.2025,
 }
