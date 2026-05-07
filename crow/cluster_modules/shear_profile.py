@@ -308,9 +308,7 @@ class ClusterShearProfile(ClusterAbundance):
 
         distance_units : str
             Units of the input radial distances.
-            Supported values are:
-                - ``"mpc"`` : physical Mpc
-                - ``"arcmin"`` : angular arcminutes
+            Supported options are ``"mpc"`` and ``"arcmin"``.
 
         z_edges : numpy.ndarray
             Array of redshift values associated with each radial bin center.
