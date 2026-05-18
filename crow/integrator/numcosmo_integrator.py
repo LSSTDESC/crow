@@ -15,8 +15,8 @@ try:
     from numcosmo_py import Ncm
 
     HAS_NUMCOSMO = True
-except ImportError:
-    HAS_NUMCOSMO = False  # pragma: no cover
+except ImportError:  # pragma: no cover
+    HAS_NUMCOSMO = False
 
 if HAS_NUMCOSMO:
 
