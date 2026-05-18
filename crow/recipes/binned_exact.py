@@ -324,7 +324,8 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 prediction *= self.cluster_theory.compute_shear_profile(
                     log_mass=mass,
                     z=z,
-                    radius_center=radius_center,
+                    distance_center=radius_center,
+                    distance_units="Mpc",
                 )
                 if self.purity == None:
                     assert (
@@ -351,6 +352,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                 npt.NDArray[np.float64],
                 float,
                 float,
+                str,
             ],
             npt.NDArray[np.float64],
         ],
@@ -385,9 +387,10 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         self,
         z_edges,
         log_proxy_edges,
-        radius_centers,
+        distance_centers,
         sky_area: float,
         average_on: None | ClusterProperty = None,
+        distance_units: str = "mpc",
     ) -> float:
         """
         Compute the predicted stacked lensing (shear) profile.
@@ -406,10 +409,12 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             Redshift bin limits.
         log_proxy_edges : array-like of shape (2,)
             Mass proxy bin limits in log10 space.
-        radius_centers : array-like
+        distance_centers : array-like
             Radii at which the shear profile is evaluated.
         sky_area : float
             Survey area in square degrees.
+        distance_units : str
+            Units of radial bins, must be ``mpc`` or ``arcmin``.
         average_on : ClusterProperty, optional
             Observable defining the weighting of the prediction.
             Must include shear-related properties.
@@ -429,7 +434,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         """
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
-
+        radius_centers = self.cluster_theory.get_radius_centers_mpc(
+            distance_centers, distance_units, np.mean(z_edges)
+        )
         if self.purity == None:
             self.integrator.integral_bounds = [
                 self.mass_interval,

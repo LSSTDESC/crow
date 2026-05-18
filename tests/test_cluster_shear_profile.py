@@ -148,6 +148,38 @@ def test_shear_profile_returns_value(
         _check_delta_sigma_output(result)
 
 
+def test_shear_profile_different_bins(
+    cluster_deltasigma_profile: ClusterShearProfile,
+    cluster_reduced_profile: ClusterShearProfile,
+):
+    cosmo = pyccl.CosmologyVanillaLCDM()
+    log_mass = np.linspace(13, 17, 5, dtype=np.float64)
+    redshifts = np.linspace(0.1, 1, 5, dtype=np.float64)
+    radius = 5.0
+
+    for cluster in [cluster_deltasigma_profile, cluster_reduced_profile]:
+        cluster.cosmo = cosmo
+        for redshift in redshifts:
+            a = 1.0 / (1.0 + redshift)
+            angular_center_arcmin = (
+                radius
+                / cluster.cosmo.angular_diameter_distance(a)
+                * 180.0
+                / np.pi
+                * 60.0
+            )
+            result_mpc = cluster.compute_shear_profile(
+                log_mass, np.array([redshift]), radius
+            )
+            result_arcmin = cluster.compute_shear_profile(
+                log_mass,
+                np.array([redshift]),
+                angular_center_arcmin,
+                distance_units="arcmin",
+            )
+            np.testing.assert_allclose(result_mpc, result_arcmin, rtol=1e-12)
+
+
 def test_shear_profile_returns_value_interp(
     cluster_reduced_interp_profile: ClusterShearProfile,
     cluster_reduced_profile: ClusterShearProfile,

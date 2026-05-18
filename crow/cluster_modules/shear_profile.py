@@ -293,11 +293,71 @@ class ClusterShearProfile(ClusterAbundance):
         )
         self.use_beta_s_interp = self.use_beta_s_interp
 
+    def get_radius_centers_mpc(
+        self,
+        distance_centers: npt.NDArray[np.float64],
+        distance_units: str,
+        z_edges: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Convert radial bin centers to physical Mpc units.
+
+        Parameters
+        ----------
+        distance_centers : numpy.ndarray
+            Array of radial bin centers.
+
+        distance_units : str
+            Units of the input radial distances.
+            Supported options are ``"mpc"`` and ``"arcmin"``.
+
+        z_edges : numpy.ndarray
+            Array of redshift values associated with each radial bin center.
+            Must have the same shape as ``distance_centers`` when
+            ``distance_units="arcmin"``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of radial bin centers converted to physical Mpc units.
+
+        Raises
+        ------
+        ValueError
+            If ``distance_units`` is not ``"mpc"`` or ``"arcmin"``.
+
+        Notes
+        -----
+        For angular distances in arcminutes, the conversion is performed using:
+
+        .. math::
+
+            R = D_A(z) \\, \\theta
+
+        where :math:`D_A(z)` is the angular diameter distance and
+        :math:`\\theta` is the angular separation in radians.
+        """
+
+        if distance_units.lower() == "mpc":
+            return distance_centers
+
+        if distance_units.lower() == "arcmin":
+
+            distance_centers_rad = distance_centers * np.pi / (180.0 * 60.0)
+
+            a = 1.0 / (1.0 + z_edges)
+
+            return self.cosmo.angular_diameter_distance(a) * distance_centers_rad
+
+        raise ValueError(
+            f"Unknown distance_units='{distance_units}'. " "Expected 'arcmin' or 'mpc'."
+        )
+
     def compute_shear_profile(
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
-        radius_center: np.float64,
+        distance_center: np.float64,
+        distance_units: str = "mpc",
     ) -> npt.NDArray[np.float64]:
         """Compute DeltaSigma (or reduced shear) for a list of cluster masses/redshifts.
 
@@ -307,8 +367,10 @@ class ClusterShearProfile(ClusterAbundance):
             Array of log10(mass) values for clusters.
         z : numpy.ndarray
             Array of cluster redshifts (same length as `log_mass`).
-        radius_center : float
+        distance_center : float
             Radius (single value) at which the profile is evaluated [same units used by CLMM Modeling].
+        distance_units : str
+            Units of radial bins, must be ``mpc`` or ``arcmin``.
 
         Returns
         -------
@@ -334,6 +396,9 @@ class ClusterShearProfile(ClusterAbundance):
             # pylint: disable=protected-access
             moo.set_concentration(self._get_concentration(log_m, redshift))
             moo.set_mass(10**log_m)
+            radius_center = self.get_radius_centers_mpc(
+                distance_center, distance_units, redshift
+            )
             val = self._one_halo_contribution(
                 moo,
                 radius_center,
@@ -350,7 +415,8 @@ class ClusterShearProfile(ClusterAbundance):
         self,
         log_mass: npt.NDArray[np.float64],
         z: npt.NDArray[np.float64],
-        radius_center: npt.NDArray[np.float64],
+        distance_center: npt.NDArray[np.float64],
+        distance_units: str = "mpc",
     ) -> npt.NDArray[np.float64]:
         """Vectorized evaluation of the cluster profile when inputs are arrays.
 
@@ -360,8 +426,8 @@ class ClusterShearProfile(ClusterAbundance):
             Array (or scalar) of log10(mass) values.
         z : numpy.ndarray
             Array (or scalar) of redshifts.
-        radius_center : numpy.ndarray
-            Radii at which to evaluate the profile (can be 1D array).
+        distance_center : numpy.ndarray
+            Radii/angle at which to evaluate the profile (can be 1D array).
 
         Returns
         -------
@@ -385,6 +451,7 @@ class ClusterShearProfile(ClusterAbundance):
         moo.z_inf = np.full_like(z, 10.0)
         moo.set_concentration(self._get_concentration(log_mass, z))
         moo.set_mass(10**log_mass)
+        radius_center = self.get_radius_centers_mpc(distance_center, distance_units, z)
         return_vals = self._one_halo_contribution(moo, radius_center, z)
         if self.two_halo_term:
             return_vals += moo.eval_excess_surface_density_2h(radius_center, z)
