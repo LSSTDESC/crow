@@ -16,7 +16,7 @@ try:
 
     HAS_NUMCOSMO = True
 except ImportError:
-    HAS_NUMCOSMO = False
+    HAS_NUMCOSMO = False  # pragma: no cover
 
 if HAS_NUMCOSMO:
 
@@ -38,7 +38,7 @@ if HAS_NUMCOSMO:
             ],
             args: npt.NDArray[np.float64],
         ) -> None:
-            if not HAS_NUMCOSMO:
+            if not HAS_NUMCOSMO:  # pragma: no cover
                 raise ImportError(
                     "numcosmo is required for NumcosmoIntegrator. "
                     "Install it with: conda install -c conda-forge numcosmo"
@@ -66,7 +66,7 @@ if HAS_NUMCOSMO:
             x_array = np.array(x.dup_array()).reshape(npoints, dim)
             fval.set_array(list(self.fun(x_array, self.extra_args)))
 
-else:
+else:  # pragma: no cover
     NumCosmoIntegralMethod = None
     CountsIntegralND = None
 
@@ -80,7 +80,7 @@ class NumCosmoIntegrator(Integrator):
         relative_tolerance: float = 1e-4,
         absolute_tolerance: float = 1e-12,
     ) -> None:
-        if not HAS_NUMCOSMO:
+        if not HAS_NUMCOSMO:  # pragma: no cover
             raise ImportError(
                 "numcosmo is required for NumcosmoIntegrator. "
                 "Install it with: conda install -c conda-forge numcosmo"
