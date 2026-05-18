@@ -10,9 +10,11 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis.strategies import floats
 
 from crow import ClusterAbundance, kernel, mass_proxy, purity_models
-from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_parent import BinnedClusterRecipe
+
+pytest.importorskip("numcosmo_py")
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 # from firecrown.models.cluster import ClusterProperty
 

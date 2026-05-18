@@ -90,6 +90,7 @@ def _check_delta_sigma_output(result):
     assert np.all(result > 0)
 
 
+@pytest.mark.numcosmo
 def _check_miscentering_behavior(
     cluster, log_mass, redshifts, radius, miscentering_frac, pdf=None
 ):
@@ -198,6 +199,7 @@ def test_shear_profile_returns_value_twoh_boost(
     _check_delta_sigma_output(result)
 
 
+@pytest.mark.numcosmo
 def test_shear_profile_miscentering_fast(cluster_reduced_profile):
     cosmo = pyccl.CosmologyVanillaLCDM()
     log_mass = np.linspace(13, 17, 1)
