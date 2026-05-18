@@ -165,13 +165,15 @@ index_toc = ""
 subprocess.run("cp source/index_body.rst index.rst", shell=True)
 with open("index.rst", "a") as indexfile:
     indexfile.write(index_toc)
-    indexfile.write("""
+    indexfile.write(
+        """
 .. toctree::
    :maxdepth: 1
    :caption: Reference
 
    api
-""")
+"""
+    )
 
 # -- API table of contents -----------------------------------------------
 apitoc = """API Documentation

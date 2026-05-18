@@ -9,6 +9,19 @@ import sys
 
 import pytest
 
+try:
+    import numcosmo_py  # noqa: F401
+
+    HAS_NUMCOSMO = True
+except ImportError:
+    HAS_NUMCOSMO = False
+
+
+NUMCOSMO_MARK = pytest.mark.skipif(
+    not HAS_NUMCOSMO,
+    reason="numcosmo_py is not installed",
+)
+
 # Ensure we can import from the main crow/ package
 
 
@@ -37,6 +50,7 @@ def pytest_configure(config):
     the --runslow flag to the pytest program.
     """
     config.addinivalue_line("markers", "slow: mark test as slow to run")
+    config.addinivalue_line("markers", "numcosmo: mark tests requiring numcosmo_py")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -47,6 +61,11 @@ def pytest_collection_modifyitems(config, items):
 
     if not config.getoption("--runslow"):
         _skip_tests(items, "slow", "need --runslow option to run")
+    if not HAS_NUMCOSMO:
+        skip = pytest.mark.skip(reason="numcosmo_py is not installed")
+        for item in items:
+            if "numcosmo" in item.keywords:
+                item.add_marker(skip)
 
 
 def _skip_tests(items, keyword, reason):

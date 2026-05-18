@@ -15,10 +15,12 @@ from crow import (
     mass_proxy,
     purity_models,
 )
-from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.properties import ClusterProperty
 from crow.recipes.binned_exact import ExactBinnedClusterRecipe
 from crow.recipes.binned_grid import GridBinnedClusterRecipe
+
+pytest.importorskip("numcosmo_py")
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 # from firecrown.models.cluster import ClusterProperty
 

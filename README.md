@@ -42,7 +42,14 @@ Crow has the following dependencies:
 - [SciPy](https://scipy.org/) (v1.12 or later)
 - [Pyccl](https://ccl.readthedocs.io/en/latest/index.html)
 - [CLMM](https://lsstdesc.org/CLMM/)
-- [NumCosmo](https://numcosmo.readthedocs.io/en/latest/)
+
+### Optional Dependencies <a name="optional-dependencies"></a>
+- [NumCosmo](https://numcosmo.readthedocs.io/en/latest/) — required only for
+  the `NumCosmoIntegrator`. If not installed, all other functionality remains
+  available. NumCosmo is only available via conda, not pip:
+```bash
+  conda install -c conda-forge numcosmo
+```
 
 # Using Crow <a name="using"></a>
 

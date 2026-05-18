@@ -23,7 +23,6 @@ classifiers = [
 ]
 dependencies = [
     "clmm",
-    "numcosmo_py>=0.21.1",
     "numpy>=2.0",
     "pyccl>=2.8.0",
     "scipy>=1.12",
@@ -50,3 +49,7 @@ profile = "black"
 
 [tool.setuptools.dynamic]
 version = {attr = "crow.__version__"}
+
+[project.optional-dependencies]
+numcosmo = ["numcosmo_py>=0.21.1"]
+all = ["numcosmo_py>=0.21.1"]

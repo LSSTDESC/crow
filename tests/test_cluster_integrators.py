@@ -7,8 +7,10 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 from crow.integrator.scipy_integrator import ScipyIntegrator
+
+pytest.importorskip("numcosmo_py")
+from crow.integrator.numcosmo_integrator import NumCosmoIntegrator
 
 
 def test_numcosmo_integrator_integrate():
