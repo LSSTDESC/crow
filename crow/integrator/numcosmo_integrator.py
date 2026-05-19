@@ -3,6 +3,8 @@
 This module holds the NumCosmo implementation of the integrator classes
 """
 
+from __future__ import annotations
+
 from enum import Enum
 from typing import Callable
 
