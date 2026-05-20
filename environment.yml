@@ -12,6 +12,6 @@ dependencies:
   - pyccl >= 2.8.0
   - pytest
   - pytest-cov
-  - python >= 3.11
+  - python >= 3.10
   - python-build
   - scipy >= 1.12
