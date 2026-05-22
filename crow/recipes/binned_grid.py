@@ -268,6 +268,18 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             )
         return self._completeness_grid[key]
 
+    def _get_richtrue_richobs_grid(self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key):
+        """Compute projection effect (rich_true vs rich_obs) grid and store in the class."""
+        if key not in self._projection_grid:
+            # Here we call the distribution function from the projection module (e.g., CostanziModel)
+            # which we assume is set as self.projection_distribution
+            self._projection_grid[key] = self._projection_distribution(
+                rich_obs=log_proxy[:, np.newaxis], 
+                rich_tru=self.log_mass_grid[np.newaxis, :]  # Usually derived from mass
+            )
+        return self._projection_grid[key]
+
+
     def _get_purity_grid(
         self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key
     ):
