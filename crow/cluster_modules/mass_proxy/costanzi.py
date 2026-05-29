@@ -1,25 +1,65 @@
 import math
-
 import numpy as np
-
-# from typing import Union
 import numpy.typing as npt
 import scipy.special as spc
 
-# define arrayLike
-# arrayLike = Union[int, float, npt.NDArray[np.floating], npt.NDArray[np.integer]]
+from ..parameters import Parameters
+# Import the Gaussian protocol/base class, similar to Murata
+from .gaussian_protocol import MassRichnessGaussian
+
+# Type alias for functions accepting scalars or array-like inputs
 arrayLike = int | float | npt.ArrayLike
 
+# 1. Define default parameter values.
+COSTANZI_DEFAULT_PARAMETERS = {
+    # Baseline Mass-Richness scaling parameters (placeholders, similar to Murata)
+    "mu0": 3.0, "mu1": 0.8, "mu2": -0.3,
+    "sigma0": 0.3, "sigma1": 0.0, "sigma2": 0.0,
+    
+    # Costanzi-specific projection effect parameters from the test script
+    "tau": 0.10,
+    "delta_mu": -2.0,
+    "sig_pure_scatter": 0.15,  # Percentage of rich_tru (0.15 * rich_tru)
+    "fprj": 0.95,
+    "fmsk": 0.05,
+}
 
-class CostanziModel:
+
+
+class CostanziBaseModel:
     """
     Projection effects model from Costanzi+19.
     Implemented as a CROW module.
     """
 
-    def __init__(self):
-        # Initialize fixed parameters here if needed in the future
-        pass
+
+    def __init__(self, pivot_log_mass: float, pivot_redshift: float):
+        super().__init__()
+        self.pivot_redshift = pivot_redshift
+        self.pivot_ln_mass = pivot_log_mass * np.log(10.0)
+        self.log1p_pivot_redshift = np.log1p(self.pivot_redshift)
+        # Manage parameters collectively using the Parameters object
+        self.parameters = Parameters({**COSTANZI_DEFAULT_PARAMETERS})
+
+     # Linear calculation helper as a function of mass and redshift, identical to MurataModel
+    @staticmethod
+    def observed_value(p, log_mass, z, pivot_ln_mass, log1p_pivot_redshift):
+        ln_mass = log_mass * np.log(10)
+        delta_ln_mass = ln_mass - pivot_ln_mass
+        delta_z = np.log1p(z) - log1p_pivot_redshift
+        return p[0] + p[1] * delta_ln_mass + p[2] * delta_z
+
+    def get_ln_mass_proxy_mean(self, log_mass, z):
+        return self.observed_value(
+            (self.parameters["mu0"], self.parameters["mu1"], self.parameters["mu2"]),
+            log_mass, z, self.pivot_ln_mass, self.log1p_pivot_redshift
+        )
+
+    def get_ln_mass_proxy_sigma(self, log_mass, z):
+        return self.observed_value(
+            (self.parameters["sigma0"], self.parameters["sigma1"], self.parameters["sigma2"]),
+            log_mass, z, self.pivot_ln_mass, self.log1p_pivot_redshift
+        )
 
     @staticmethod
     def prob_richobs_at_richtru(
@@ -224,7 +264,7 @@ class CostanziModel:
         rich_obs_digit = np.digitize(rich_obs_bins, bins=rich_obs_eds)
 
         # calc
-        prob_obs = CostanziModel.prob_richobs_at_richtru(
+        prob_obs = CostanziBaseModel.prob_richobs_at_richtru(
             rich_obs=rich_obs_bins,
             rich_tru=rich_tru,
             tau=tau,
@@ -245,3 +285,45 @@ class CostanziModel:
             ]
         )
         return Sprob_obs
+    
+
+
+class CostanziBinned(CostanziBaseModel, MassRichnessGaussian):
+    """
+    Costanzi model implementation for binned data vectors.
+    """
+    def distribution(
+        self,
+        log_mass: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+        log_mass_proxy_limits: tuple[float, float],
+    ) -> npt.NDArray[np.float64]:
+
+        # Retrieve model parameters
+        tau = self.parameters["tau"]
+        delta_mu = self.parameters["delta_mu"]
+        sig_pure_scatter = self.parameters["sig_pure_scatter"]
+        fprj = self.parameters["fprj"]
+        fmsk = self.parameters["fmsk"]
+
+        # Convert observed richness bin edges from log10 space to linear space
+        rich_obs_eds = [10**log_mass_proxy_limits[0], 10**log_mass_proxy_limits[1]]
+
+        # Grid for true richness defined based on the supervisor's test script (1E-2 to 250)
+        rich_tru_grid = np.geomspace(1E-2, 250, 100)
+
+        # Calculate sig_pure dynamically as it scales with rich_tru
+        sig_pure = sig_pure_scatter * rich_tru_grid
+
+        # Call integration logic using the resolution from the supervisor's script (0.015)
+        # Note: Depending on the pipeline requirement, rich_tru_grid may need adjustment
+        sprob = self.Sprob_at_richtru(
+            rich_obs_eds=rich_obs_eds,
+            rich_obs_res=0.015,
+            rich_tru=rich_tru_grid,
+            tau=tau, delta_mu=delta_mu, sig_pure=sig_pure, fprj=fprj, fmsk=fmsk
+        )
+
+        # TODO: Implement the final marginalization layer over rich_tru_grid
+        # Currently returning a dummy array to allow initial testing of imports
+        return np.ones_like(log_mass) * 0.1
