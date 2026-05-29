@@ -5,7 +5,7 @@ import pytest
 
 from crow.cluster_modules.mass_proxy.costanzi import CostanziBaseModel, CostanziBinned
 
-# Pivot values (Murataのテストと同じ基準値を使用)
+# Pivot values (Using the same pivot values as the Murata test)
 PIVOT_Z = 0.6
 PIVOT_MASS = 14.625862906
 
@@ -42,14 +42,16 @@ def test_costanzi_base_model_core_math():
     supervisor's original face values and grid configurations.
     """
     # 1. Setup the mesh grids
+    # richness between 0.01 and 300
     rich_obs_edges = np.geomspace(1E-2, 300, 201)
     rich_obs_bins = np.sqrt(rich_obs_edges[1:] * rich_obs_edges[:-1])
     rich_tru = np.geomspace(1E-2, 250, 100)
+    # redshift between 0.01 and 1.5
     redshift = np.geomspace(1.0 + 1E-2, 1.0 + 1.5, 30) - 1.0
-    
+    # mesh
     rich_tru_mesh, _ = np.meshgrid(rich_tru, redshift, indexing='ij')
 
-    # Parameters based on the supervisor's script
+    # Parameters - face values from Costanzi
     tau = 0.10 * np.ones_like(rich_tru_mesh)
     delta_mu = -2.0 * np.ones_like(rich_tru_mesh)
     sig_pure = 0.15 * rich_tru_mesh
@@ -73,6 +75,7 @@ def test_costanzi_base_model_core_math():
     assert np.all(prob >= 0.0)
 
     # 3. Test Sprob_at_richtru (Integration)
+    # define integrals
     rich_obs_eds = [10.0, 15.0, 20.0, 30.0, 60.0, 100.0]
     Sprob = CostanziBaseModel.Sprob_at_richtru(
         rich_obs_eds=rich_obs_eds,
