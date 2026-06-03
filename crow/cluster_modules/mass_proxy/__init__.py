@@ -6,4 +6,3 @@ implementations of Kernels.
 """
 
 from .murata import MurataBinned, MurataUnbinned
-from .costanzi import CostanziBaseModel, CostanziBinned
