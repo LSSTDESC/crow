@@ -517,6 +517,10 @@ def test_setup_clears_caches(binned_grid: GridBinnedClusterRecipe):
     )
     assert binned_grid._mass_richness_grid
 
+    # Fill projection cache
+    binned_grid._projection_grid["projection"] = {"cached": True}
+    assert binned_grid._projection_grid
+
     binned_grid.setup()
 
     # Assert all caches are empty
@@ -524,6 +528,7 @@ def test_setup_clears_caches(binned_grid: GridBinnedClusterRecipe):
     assert not binned_grid._mass_richness_grid
     assert not binned_grid._completeness_grid
     assert not binned_grid._purity_grid
+    assert not binned_grid._projection_grid
     assert not binned_grid._shear_grids
 
 
@@ -573,6 +578,91 @@ def test_get_mass_richness_grid(binned_grid: GridBinnedClusterRecipe):
         z_points, proxy_grid_size, key
     )
     assert np.all(recalled_mr_grid == 0.0)
+
+
+def test_get_projection_effects_grid(binned_grid: GridBinnedClusterRecipe):
+    """Test projection-effect recipe grid construction with a placeholder model.
+
+    The placeholder mass distribution isolates the recipe behavior: defining
+    observed/true richness grids, passing arguments into compute_probabilities,
+    storing returned arrays, and using the projection cache. The CostanziBinned
+    probability calculations are tested separately in tests/test_proj.py.
+    """
+    binned_grid.setup()
+
+    class PlaceholderProjectedMassDistribution:
+        parameters = {
+            "tau": 0.10,
+            "delta_mu": -2.0,
+            "sig_pure_scatter": 0.15,
+            "fprj": 0.95,
+            "fmsk": 0.05,
+        }
+
+        @staticmethod
+        def compute_probabilities(
+            rich_obs_eds,
+            rich_obs_res,
+            log_rich_tru,
+            log_mass,
+            z,
+            *,
+            tau,
+            delta_mu,
+            sig_pure,
+            fprj,
+            fmsk,
+        ):
+            n_obs = len(rich_obs_eds) - 1
+            n_tru = len(log_rich_tru)
+            if len(log_mass) != len(z):
+                prob_shape = (len(z), len(log_mass))
+            else:
+                prob_shape = (len(log_mass),)
+            return {
+                "Sprob_richobs_richtru": np.ones((n_obs, n_tru)),
+                "prob_richtru_mass_redshift": np.ones((n_tru,) + prob_shape),
+                "Sprob_richobs_mass_redshift": np.ones((n_obs,) + prob_shape),
+            }
+
+    binned_grid.mass_distribution = PlaceholderProjectedMassDistribution()
+    z_points = np.linspace(0.1, 1.0, 5)
+    log_proxy_edges = (1.0, 2.0)
+    grids = binned_grid._get_projection_effects_grid(z_points, log_proxy_edges)
+
+    assert grids["log_rich_obs"].shape == (binned_grid.proxy_grid_size,)
+    assert grids["rich_obs"].shape == (binned_grid.proxy_grid_size,)
+    assert grids["log_rich_obs_edges"].shape == (binned_grid.proxy_grid_size + 1,)
+    assert grids["rich_obs_edges"].shape == (binned_grid.proxy_grid_size + 1,)
+    assert grids["log_rich_tru"].shape == (binned_grid.tru_proxy_grid_size,)
+    assert grids["rich_tru"].shape == (binned_grid.tru_proxy_grid_size,)
+    assert grids["Sprob_richobs_richtru"].shape == (
+        binned_grid.proxy_grid_size,
+        binned_grid.tru_proxy_grid_size,
+    )
+    assert grids["prob_richtru_mass_redshift"].shape == (
+        binned_grid.tru_proxy_grid_size,
+        len(z_points),
+        len(binned_grid.log_mass_grid),
+    )
+    assert grids["Sprob_richobs_mass_redshift"].shape == (
+        binned_grid.proxy_grid_size,
+        len(z_points),
+        len(binned_grid.log_mass_grid),
+    )
+
+    assert grids["log_rich_obs_edges"][0] == pytest.approx(log_proxy_edges[0])
+    assert grids["log_rich_obs_edges"][-1] == pytest.approx(log_proxy_edges[1])
+    assert grids["log_rich_tru"][0] < log_proxy_edges[0]
+    assert grids["log_rich_tru"][-1] > log_proxy_edges[1]
+    assert np.allclose(grids["rich_obs"], 10.0 ** grids["log_rich_obs"])
+    assert np.allclose(grids["rich_tru"], 10.0 ** grids["log_rich_tru"])
+    assert np.all(grids["Sprob_richobs_richtru"] >= 0.0)
+    assert np.all(grids["prob_richtru_mass_redshift"] >= 0.0)
+    assert np.all(grids["Sprob_richobs_mass_redshift"] >= 0.0)
+
+    recalled_grids = binned_grid._get_projection_effects_grid(z_points, log_proxy_edges)
+    assert recalled_grids is grids
 
 
 def test_get_completeness_grid(binned_grid: GridBinnedClusterRecipe):

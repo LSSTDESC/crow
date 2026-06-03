@@ -99,6 +99,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         proxy_grid_size: int = 30,
         redshift_grid_size: int = 30,
         mass_grid_size: int = 30,
+        tru_proxy_grid_size: int | None = None,
+        tru_proxy_log_padding: float = 0.5,
+        projection_richness_resolution: float = 0.015,
     ) -> None:
         super().__init__(
             cluster_theory=cluster_theory,
@@ -112,6 +115,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self.proxy_grid_size = proxy_grid_size
         self.redshift_grid_size = redshift_grid_size
         self.mass_grid_size = mass_grid_size
+        self.tru_proxy_grid_size = tru_proxy_grid_size or proxy_grid_size
+        self.tru_proxy_log_padding = tru_proxy_log_padding
+        self.projection_richness_resolution = projection_richness_resolution
         self.log_mass_grid = np.linspace(
             mass_interval[0], mass_interval[1], self.mass_grid_size
         )
@@ -119,6 +125,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._mass_richness_grid = {}  # (n_proxy, n_z, n_mass)
         self._completeness_grid = {}  # (n_z, n_mass)
         self._purity_grid = {}  # (n_proxy, n_z)
+        self._projection_grid = {}  # Projection-effect grids and probabilities
         self._shear_grids = {}  # (n_z, n_mass)
 
     def _flat_distribution(
@@ -172,6 +179,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self._mass_richness_grid = {}
         self._completeness_grid = {}
         self._purity_grid = {}
+        self._projection_grid = {}
         self._shear_grids = {}
 
     def _get_hmf_grid(
@@ -268,17 +276,83 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             )
         return self._completeness_grid[key]
 
-    def _get_richtrue_richobs_grid(self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key):
-        """Compute projection effect (rich_true vs rich_obs) grid and store in the class."""
-        if key not in self._projection_grid:
-            # Here we call the distribution function from the projection module (e.g., CostanziModel)
-            # which we assume is set as self.projection_distribution
-            self._projection_grid[key] = self._projection_distribution(
-                rich_obs=log_proxy[:, np.newaxis], 
-                rich_tru=self.log_mass_grid[np.newaxis, :]  # Usually derived from mass
-            )
-        return self._projection_grid[key]
+    def _get_projection_effects_grid(
+        self,
+        z: npt.NDArray[np.float64],
+        log_proxy_edges: tuple[float, float],
+        key=None,
+    ):
+        """Compute and cache projection-effect richness grids and probabilities.
 
+        The observed-richness grid follows the native CROW proxy grid style:
+        uniform bins in log10 richness over the requested observed bin.  The
+        true-richness grid uses the same style, but pads the log10 interval on
+        both sides to reduce boundary effects in the projection convolution.
+        """
+        if not hasattr(self.mass_distribution, "compute_probabilities"):
+            raise ValueError(
+                "mass_distribution must implement compute_probabilities "
+                "for projection effects."
+            )
+
+        z = np.asarray(z, dtype=float)
+        log_proxy_edges = np.asarray(log_proxy_edges, dtype=float)
+        if z.ndim != 1:
+            raise ValueError("z must be a 1D array.")
+        if log_proxy_edges.shape != (2,):
+            raise ValueError("log_proxy_edges must contain exactly two values.")
+        if log_proxy_edges[1] <= log_proxy_edges[0]:
+            raise ValueError("log_proxy_edges must be monotonically increasing.")
+
+        if key is None:
+            key = (
+                tuple(z),
+                tuple(log_proxy_edges),
+                self.tru_proxy_grid_size,
+                self.tru_proxy_log_padding,
+            )
+        if key in self._projection_grid:
+            return self._projection_grid[key]
+
+        log_rich_obs_edges = np.linspace(
+            log_proxy_edges[0], log_proxy_edges[1], self.proxy_grid_size + 1
+        )
+        log_rich_obs = 0.5 * (log_rich_obs_edges[:-1] + log_rich_obs_edges[1:])
+        rich_obs_edges = 10.0**log_rich_obs_edges
+        rich_obs = 10.0**log_rich_obs
+
+        log_rich_tru = np.linspace(
+            log_proxy_edges[0] - self.tru_proxy_log_padding,
+            log_proxy_edges[1] + self.tru_proxy_log_padding,
+            self.tru_proxy_grid_size,
+        )
+        rich_tru = 10.0**log_rich_tru
+
+        projection_parameters = self.mass_distribution.parameters
+        projection_probabilities = self.mass_distribution.compute_probabilities(
+            rich_obs_eds=rich_obs_edges,
+            rich_obs_res=self.projection_richness_resolution,
+            log_rich_tru=log_rich_tru,
+            log_mass=self.log_mass_grid,
+            z=z,
+            tau=projection_parameters["tau"],
+            delta_mu=projection_parameters["delta_mu"],
+            sig_pure=projection_parameters["sig_pure_scatter"] * rich_tru,
+            fprj=projection_parameters["fprj"],
+            fmsk=projection_parameters["fmsk"],
+        )
+
+        self._projection_grid[key] = {
+            "log_rich_obs_edges": log_rich_obs_edges,
+            "log_rich_obs": log_rich_obs,
+            "rich_obs_edges": rich_obs_edges,
+            "rich_obs": rich_obs,
+            "log_rich_tru": log_rich_tru,
+            "rich_tru": rich_tru,
+            **projection_probabilities,
+            "key": key,
+        }
+        return self._projection_grid[key]
 
     def _get_purity_grid(
         self, z: npt.NDArray[np.float64], log_proxy: npt.NDArray[np.float64], key
