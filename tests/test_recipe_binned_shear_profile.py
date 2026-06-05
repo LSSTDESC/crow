@@ -468,6 +468,10 @@ def test_shear_respects_completeness_and_purity_effects(
     with_comp = get_base_binned_grid(comp_dist, None, True)
     print("with_comp:", with_comp)
     with_pur = get_base_binned_grid(None, pur_dist, True)
+    ## For now purity is a placeholder. Adding purity for the grid does nothing
+    exact_pur = get_base_binned_exact(None, pur_dist, True)
+    ## Here we force the purity computation for the exact
+    exact_pur.shear_purity = True
     z_edges = (0.5, 0.8)
     mass_proxy_edges = (2, 5)
     radii = np.atleast_1d(1.5)
@@ -483,6 +487,9 @@ def test_shear_respects_completeness_and_purity_effects(
     pur_val = with_pur.evaluate_theory_prediction_lensing_profile(
         z_edges, mass_proxy_edges, radii, sky_area, average_on
     )
+    pur_val_exact = exact_pur.evaluate_theory_prediction_lensing_profile(
+        z_edges, mass_proxy_edges, radii, sky_area, average_on
+    )
 
     # completeness should not increase the predicted average shear (it reduces effective counts/kernel)
     assert comp_val <= base_val + 1e-12
@@ -492,3 +499,4 @@ def test_shear_respects_completeness_and_purity_effects(
 
     assert np.isfinite(pur_val)
     assert pur_val >= 0.0
+    assert pur_val_exact >= 0.0
