@@ -2,11 +2,11 @@ coverage:
   status:
     project:
       default:
-        threshold: 1%    # allow up to 1% drop without failing
+        threshold: 0.1%    # allow up to 1% drop without failing
     patch:
       default:
         target: auto     # compare patch coverage to base, not project total
-        threshold: 1%
+        threshold: 0.1%
 
 ignore:
   - "docs/**"

@@ -468,6 +468,8 @@ def test_shear_respects_completeness_and_purity_effects(
     with_comp = get_base_binned_grid(comp_dist, None, True)
     print("with_comp:", with_comp)
     with_pur = get_base_binned_grid(None, pur_dist, True)
+    ## For now purity is a placeholder for shear and we force here for checks
+    with_pur.shear_purity = True
     z_edges = (0.5, 0.8)
     mass_proxy_edges = (2, 5)
     radii = np.atleast_1d(1.5)
