@@ -46,6 +46,7 @@ class BinnedClusterRecipe:
         mass_distribution,
         completeness: Completeness = None,
         purity: Purity = None,
+        lensing_profile_correction=None,
         mass_interval: tuple[float, float] = (11.0, 17.0),
         true_z_interval: tuple[float, float] = (0.0, 5.0),
     ) -> None:
@@ -53,10 +54,47 @@ class BinnedClusterRecipe:
         self.cluster_theory = cluster_theory
         self.redshift_distribution = redshift_distribution
         self.mass_distribution = mass_distribution
+        self.lensing_profile_correction = lensing_profile_correction
         self.completeness = completeness
         self.purity = purity
         self.mass_interval = mass_interval
         self.true_z_interval = true_z_interval
+
+    def _apply_lensing_profile_correction(
+        self,
+        lensing_profile: npt.NDArray[np.float64],
+        radius_centers: npt.ArrayLike,
+        average_on: None | ClusterProperty,
+    ) -> npt.NDArray[np.float64]:
+        """Apply an optional post-stacking lensing profile correction."""
+        if self.lensing_profile_correction is None:
+            return lensing_profile
+
+        if average_on is None or not (average_on & ClusterProperty.DELTASIGMA):
+            raise ValueError(
+                "lensing_profile_correction is currently supported only for "
+                "DeltaSigma predictions."
+            )
+
+        is_delta_sigma = getattr(self.cluster_theory, "is_delta_sigma", True)
+        if not is_delta_sigma:
+            raise ValueError(
+                "lensing_profile_correction is currently calibrated for "
+                "DeltaSigma predictions, not reduced shear."
+            )
+
+        cosmo_h = None
+        if getattr(self.cluster_theory, "cosmo", None) is not None:
+            cosmo_h = self.cluster_theory.cosmo["h"]
+
+        correction = self.lensing_profile_correction.distribution(
+            np.asarray(radius_centers, dtype=float),
+            cosmo_h=cosmo_h,
+        )
+        corrected_profile = correction * lensing_profile
+        if correction.shape[0] == 1 and np.asarray(lensing_profile).ndim == 1:
+            return corrected_profile[0]
+        return corrected_profile
 
     def _setup_with_completeness(self):
         """Additional setup of class with the completeness"""

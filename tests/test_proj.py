@@ -8,6 +8,10 @@ from crow.cluster_modules.projection_effects.costanzi import (
     CostanziBinned,
     CostanziUnBinned,
 )
+from crow.cluster_modules.projection_effects.lensing_bias import (
+    CostanziLensingBias,
+    bsel,
+)
 
 # Pivot values (Using the same pivot values as the Murata test)
 PIVOT_Z = 0.6
@@ -59,6 +63,68 @@ def test_create_costanzi_kernel():
     assert cb.parameters["tau"] == 0.10
     assert cb.parameters["delta_mu"] == -2.0
     assert cb.parameters["fprj"] == 0.95
+
+
+def test_costanzi_lensing_bias_constant_correction():
+    """Test the Costanzi lensing bias helper for a simple constant correction."""
+    radius = np.array([0.5, 1.0, 2.0])
+    correction = bsel(
+        Rcmv=radius,
+        A_sel=1.0,
+        alpha_sel=0.0,
+        beta_sel=0.0,
+        gamma_sel=1.0,
+        R0_sel=1.0,
+    )
+
+    assert correction.shape == (1, len(radius))
+    np.testing.assert_allclose(correction, 2.0)
+
+
+def test_costanzi_lensing_bias_physical_radius_conversion():
+    """Test explicit physical-Mpc to comoving-Mpc/h radius conversion."""
+    radius_physical = np.array([1.0, 2.0])
+    model = CostanziLensingBias(
+        A_sel=1.0,
+        alpha_sel=0.0,
+        beta_sel=0.0,
+        gamma_sel=1.0,
+        R0_sel=1.0,
+        radius_is_comoving_mpc_over_h=False,
+        reference_redshift=0.5,
+    )
+
+    correction = model.distribution(radius_physical, cosmo_h=0.7)
+
+    assert correction.shape == (1, len(radius_physical))
+    np.testing.assert_allclose(correction, 2.0)
+
+
+def test_costanzi_lensing_bias_requires_matching_parameter_shapes():
+    """Each selection-bias parameter entry corresponds to one bin."""
+    with pytest.raises(ValueError, match="same length"):
+        bsel(
+            Rcmv=np.array([0.5, 1.0]),
+            A_sel=np.array([1.0, 1.0]),
+            alpha_sel=0.0,
+            beta_sel=np.array([0.0, 0.0]),
+            gamma_sel=np.array([1.0, 1.0]),
+            R0_sel=np.array([1.0, 1.0]),
+        )
+
+
+def test_costanzi_lensing_bias_requires_matching_reference_redshift_shape():
+    """The radius-conversion redshift has the same per-bin axis."""
+    with pytest.raises(ValueError, match="reference_redshift"):
+        CostanziLensingBias(
+            A_sel=np.array([1.0, 1.0]),
+            alpha_sel=np.array([0.0, 0.0]),
+            beta_sel=np.array([0.0, 0.0]),
+            gamma_sel=np.array([1.0, 1.0]),
+            R0_sel=np.array([1.0, 1.0]),
+            radius_is_comoving_mpc_over_h=False,
+            reference_redshift=0.5,
+        )
 
 
 def test_costanzi_base_model_core_math():
@@ -210,6 +276,21 @@ def test_cluster_costanzi_binned_distribution_execution(
 
     assert isinstance(result, np.ndarray)
     assert result.shape == mass.shape
+
+
+def test_cluster_costanzi_binned_distribution_is_finite_for_broad_bin():
+    """Projected binned probabilities stay finite for wide richness bins."""
+    model = CostanziBinned(PIVOT_MASS, PIVOT_Z, tru_proxy_grid_size=30)
+    mass = np.array([13.5, 14.0, 14.5])
+    z = np.array([0.5, 0.5, 0.5])
+    mass_proxy_limits = (2.0, 5.0)
+
+    result = model.distribution(mass, z, mass_proxy_limits)
+
+    assert isinstance(result, np.ndarray)
+    assert result.shape == mass.shape
+    assert np.all(np.isfinite(result))
+    assert np.all(result >= 0.0)
 
 
 def test_cluster_costanzi_binned_distribution_broadcasts():

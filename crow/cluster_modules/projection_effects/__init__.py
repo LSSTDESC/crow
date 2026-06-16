@@ -5,3 +5,4 @@ that can be included in the richness-mass relation.
 """
 
 from .costanzi import CostanziBaseModel, CostanziBinned, CostanziUnBinned
+from .lensing_bias import CostanziLensingBias, bsel

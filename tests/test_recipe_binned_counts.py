@@ -15,6 +15,7 @@ from crow import (
     completeness_models,
     kernel,
     mass_proxy,
+    projection_effects,
     purity_models,
 )
 from crow.properties import ClusterProperty
@@ -74,6 +75,51 @@ def get_base_binned_grid(completeness, purity) -> GridBinnedClusterRecipe:
     cluster_recipe.mass_distribution.parameters["sigma1"] = 0.7
     cluster_recipe.mass_distribution.parameters["sigma2"] = 0.0
     return cluster_recipe
+
+
+def get_projected_binned_exact(completeness) -> ExactBinnedClusterRecipe:
+    """Return an exact recipe using projected binned observed richness."""
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    return ExactBinnedClusterRecipe(
+        cluster_theory=ClusterAbundance(
+            cosmo=pyccl.CosmologyVanillaLCDM(),
+            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        ),
+        redshift_distribution=kernel.SpectroscopicRedshift(),
+        mass_distribution=projection_effects.CostanziBinned(
+            pivot_mass,
+            pivot_redshift,
+            tru_proxy_grid_size=30,
+        ),
+        completeness=completeness,
+        purity=None,
+        mass_interval=(13, 17),
+        true_z_interval=(0, 2),
+    )
+
+
+def get_projected_binned_grid(completeness) -> GridBinnedClusterRecipe:
+    """Return a grid recipe using projected unbinned observed richness."""
+    pivot_mass, pivot_redshift = 14.625862906, 0.6
+    return GridBinnedClusterRecipe(
+        cluster_theory=ClusterAbundance(
+            cosmo=pyccl.CosmologyVanillaLCDM(),
+            halo_mass_function=pyccl.halos.MassFuncTinker08(mass_def="200c"),
+        ),
+        redshift_distribution=kernel.SpectroscopicRedshift(),
+        mass_distribution=projection_effects.CostanziUnBinned(
+            pivot_mass,
+            pivot_redshift,
+            tru_proxy_grid_size=30,
+        ),
+        completeness=completeness,
+        purity=None,
+        mass_interval=(13, 17),
+        true_z_interval=(0, 2),
+        redshift_grid_size=10,
+        mass_grid_size=20,
+        proxy_grid_size=10,
+    )
 
 
 @pytest.fixture(name="binned_exact")
@@ -351,6 +397,64 @@ def test_evaluates_theory_prediction_with_completeness(
     assert np.abs(prediction_grid / prediction - 1.0) <= 1.0e-4
     assert prediction_grid >= prediction_grid_w_comp
     assert np.abs(prediction_grid_w_comp / prediction_w_comp - 1.0) <= 1.0e-4
+
+
+def test_exact_counts_with_projected_richness_selection():
+    """Exact counts can use C(M,z) * P_proj(rich_obs bin | M,z)."""
+    mass_proxy_edges = (2, 5)
+    z_edges = (0.5, 1)
+    sky_area = 360**2
+
+    projected_recipe = get_projected_binned_exact(None)
+    projected_recipe_w_comp = get_projected_binned_exact(
+        completeness_models.CompletenessAguena16()
+    )
+
+    prediction = projected_recipe.evaluate_theory_prediction_counts(
+        z_edges,
+        mass_proxy_edges,
+        sky_area,
+    )
+    prediction_w_comp = projected_recipe_w_comp.evaluate_theory_prediction_counts(
+        z_edges,
+        mass_proxy_edges,
+        sky_area,
+    )
+
+    assert np.isfinite(prediction)
+    assert np.isfinite(prediction_w_comp)
+    assert prediction > 0.0
+    assert prediction_w_comp > 0.0
+    assert prediction >= prediction_w_comp
+
+
+def test_grid_counts_with_projected_richness_selection():
+    """Grid counts can integrate C(M,z) * P_proj(ln rich_obs | M,z)."""
+    mass_proxy_edges = (2, 5)
+    z_edges = (0.5, 1)
+    sky_area = 360**2
+
+    projected_recipe = get_projected_binned_grid(None)
+    projected_recipe_w_comp = get_projected_binned_grid(
+        completeness_models.CompletenessAguena16()
+    )
+
+    prediction = projected_recipe.evaluate_theory_prediction_counts(
+        z_edges,
+        mass_proxy_edges,
+        sky_area,
+    )
+    prediction_w_comp = projected_recipe_w_comp.evaluate_theory_prediction_counts(
+        z_edges,
+        mass_proxy_edges,
+        sky_area,
+    )
+
+    assert np.isfinite(prediction)
+    assert np.isfinite(prediction_w_comp)
+    assert prediction > 0.0
+    assert prediction_w_comp > 0.0
+    assert prediction >= prediction_w_comp
 
 
 def test_evaluates_theory_prediction_assertions(

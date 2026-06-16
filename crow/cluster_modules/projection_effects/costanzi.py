@@ -37,6 +37,32 @@ class CostanziBaseModel:
     """
 
     @staticmethod
+    def _exp_times_erfc(
+        log_factor: npt.NDArray[np.float64],
+        erfc_arg: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Evaluate exp(log_factor) * erfc(erfc_arg) without overflow.
+
+        The Costanzi projection model contains terms of the form
+        ``exp(x) * erfc(y)``.  For high true-richness grid points, ``exp(x)``
+        can overflow even when the product is finite because ``erfc(y)`` is
+        exponentially small.  For positive ``y`` we rewrite the expression with
+        ``erfcx(y) = exp(y**2) * erfc(y)``.
+        """
+        log_factor = np.asarray(log_factor, dtype=float)
+        erfc_arg = np.asarray(erfc_arg, dtype=float)
+        result = np.empty_like(log_factor, dtype=float)
+
+        positive_arg = erfc_arg >= 0.0
+        result[positive_arg] = np.exp(
+            log_factor[positive_arg] - erfc_arg[positive_arg] ** 2
+        ) * spc.erfcx(erfc_arg[positive_arg])
+        result[~positive_arg] = np.exp(log_factor[~positive_arg]) * spc.erfc(
+            erfc_arg[~positive_arg]
+        )
+        return result
+
+    @staticmethod
     def prob_richobs_at_richtru(
         rich_obs: arrayLike,
         rich_tru: arrayLike,
@@ -119,8 +145,8 @@ class CostanziBaseModel:
         erfc_arg4 = (mu + tau * sig2_l - rich_obs - rich_tru) / np.sqrt(
             2.0 * sig2_l
         )  # (n_obs, n_tru,)
-        exptau = np.exp(
-            0.5 * tau * (2.0 * mu + tau * sig2_l - 2.0 * rich_obs)
+        log_exptau = 0.5 * tau * (
+            2.0 * mu + tau * sig2_l - 2.0 * rich_obs
         )  # (n_obs, n_tru,)
 
         gauss = (
@@ -131,17 +157,17 @@ class CostanziBaseModel:
         ) * 2.0  # (n_obs, n_tru,)
         term1 = (
             ((1.0 - fmsk) * fprj * tau + fmsk * fprj / rich_tru)
-            * exptau
-            * spc.erfc(erfc_arg1)
+            * CostanziBaseModel._exp_times_erfc(log_exptau, erfc_arg1)
         )
         term23 = fmsk / rich_tru * (spc.erfc(erfc_arg2) - spc.erfc(erfc_arg3))
         term4 = (
             fmsk
             * fprj
             / rich_tru
-            * np.exp(-tau * rich_tru)
-            * exptau
-            * spc.erfc(erfc_arg4)
+            * CostanziBaseModel._exp_times_erfc(
+                log_exptau - tau * rich_tru,
+                erfc_arg4,
+            )
         )
         pdf = 0.5 * (gauss + term1 + term23 - term4)  # (n_obs, n_tru,)
         return pdf
