@@ -5,5 +5,5 @@ that can be included in the cluster abundance integrand.  These are
 implementations of Kernels.
 """
 
-from .murata import MurataBinned, MurataUnbinned
 from .costanzi19 import CostanziModel
+from .murata import MurataBinned, MurataUnbinned
