@@ -145,8 +145,8 @@ class CostanziBaseModel:
         erfc_arg4 = (mu + tau * sig2_l - rich_obs - rich_tru) / np.sqrt(
             2.0 * sig2_l
         )  # (n_obs, n_tru,)
-        log_exptau = 0.5 * tau * (
-            2.0 * mu + tau * sig2_l - 2.0 * rich_obs
+        log_exptau = (
+            0.5 * tau * (2.0 * mu + tau * sig2_l - 2.0 * rich_obs)
         )  # (n_obs, n_tru,)
 
         gauss = (
@@ -156,9 +156,8 @@ class CostanziBaseModel:
             / np.sqrt(2.0 * math.pi * sig2_l)
         ) * 2.0  # (n_obs, n_tru,)
         term1 = (
-            ((1.0 - fmsk) * fprj * tau + fmsk * fprj / rich_tru)
-            * CostanziBaseModel._exp_times_erfc(log_exptau, erfc_arg1)
-        )
+            (1.0 - fmsk) * fprj * tau + fmsk * fprj / rich_tru
+        ) * CostanziBaseModel._exp_times_erfc(log_exptau, erfc_arg1)
         term23 = fmsk / rich_tru * (spc.erfc(erfc_arg2) - spc.erfc(erfc_arg3))
         term4 = (
             fmsk
