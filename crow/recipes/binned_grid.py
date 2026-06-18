@@ -416,6 +416,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         probe_kernel,  # must be (n_proxy, n_z, n_mass, ...)
         integ_arrays,
         sky_area: float,
+        ignore_purity: bool = False,
     ) -> float:
         """Evaluate the theory prediction for this cluster recipe using triple Simpson integration."""
         """
@@ -470,13 +471,17 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             integ_arrays["log_proxy"]["points"],
             purity_key,
         )
+        if ignore_purity:
+            purity_factor = 1.0
+        else:
+            purity_factor = purity_grid[:, :, np.newaxis]
 
         # main kernel: (n_proxy, n_z, n_mass)
         main_kernel_grid = (
             hmf_grid[np.newaxis, :, :]
             * mass_richness_grid
             * completeness_grid[np.newaxis, :, :]
-            / purity_grid[:, :, np.newaxis]
+            / purity_factor
         )
 
         # reshape it to match probe_kernel
@@ -648,10 +653,13 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         # integrate
         ###########
 
+        # TODO: Handle purity in shear computation properly
+        # For now, always ignore purity
         shear = self._evaluate_theory_prediction_generic(
             probe_kernel,
             integ_arrays,
             sky_area,
+            ignore_purity=True,
         )
         return self._apply_lensing_profile_correction(
             shear,

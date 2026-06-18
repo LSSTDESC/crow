@@ -14,4 +14,4 @@ from .recipes.binned_exact import ExactBinnedClusterRecipe
 from .recipes.binned_grid import GridBinnedClusterRecipe
 from .recipes.binned_parent import BinnedClusterRecipe
 
-__version__ = "1.0.9"
+__version__ = "1.0.10"

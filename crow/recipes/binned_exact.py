@@ -68,6 +68,9 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
 
         self.integrator = NumCosmoIntegrator()
 
+        # placeholder: always ignore purity for shear computations
+        self.shear_purity = None
+
     def setup(self):
         pass
 
@@ -326,11 +329,13 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
                     z=z,
                     radius_center=radius_center,
                 )
-                if self.purity == None:
+                # TODO: Handle purity in shear computation properly
+                # For now, always ignore purity (self.shear_purity = None by default)
+                if self.shear_purity is None:
                     assert (
                         len(mass_proxy) == 2
                     ), "mass_proxy with no purity should be size 2"
-                    prediction *= self._mass_distribution_distribution(
+                    prediction *= self.mass_distribution.distribution(
                         mass, z, (mass_proxy[0], mass_proxy[1])
                     )
                 else:
@@ -368,7 +373,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             mass = int_args[:, 0]
             z = int_args[:, 1]
 
-            if self.purity == None:
+            if self.shear_purity is None:
                 mass_proxy = np.array([extra_args[0], extra_args[1]])
                 sky_area = extra_args[2]
                 radius_center = extra_args[3]
@@ -430,7 +435,7 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
         assert len(log_proxy_edges) == 2, "log_proxy_edges should be size 2"
         assert len(z_edges) == 2, "z_edges should be size 2"
 
-        if self.purity == None:
+        if self.shear_purity is None:
             self.integrator.integral_bounds = [
                 self.mass_interval,
                 z_edges,
