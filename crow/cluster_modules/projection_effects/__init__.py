@@ -4,5 +4,5 @@ This module holds the classes that define the projection effects
 that can be included in the richness-mass relation.
 """
 
-from .costanzi import CostanziBaseModel, CostanziBinned, CostanziUnBinned
 from .lensing_bias import CostanziLensingBias, bsel
+from .richness_bias import CostanziRichnessBias
