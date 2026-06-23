@@ -87,7 +87,7 @@ class BinnedClusterRecipe:
         if getattr(self.cluster_theory, "cosmo", None) is not None:
             cosmo_h = self.cluster_theory.cosmo["h"]
 
-        correction = self.lensing_profile_correction.distribution(
+        correction = self.lensing_profile_correction.bsel(
             np.asarray(radius_centers, dtype=float),
             cosmo_h=cosmo_h,
         )

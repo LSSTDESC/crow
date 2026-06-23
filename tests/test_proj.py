@@ -5,10 +5,7 @@ import math
 import numpy as np
 import pytest
 
-from crow.cluster_modules.projection_effects.lensing_bias import (
-    CostanziLensingBias,
-    bsel,
-)
+from crow.cluster_modules.projection_effects.lensing_bias import CostanziLensingBias
 from crow.cluster_modules.projection_effects.richness_bias import (
     COSTANZI_DEFAULT_PARAMETERS,
     CostanziRichnessBias,
@@ -178,16 +175,16 @@ def test_costanzi_observed_bin_probability_validates_bin_edges():
 
 
 def test_costanzi_lensing_bias_constant_correction():
-    """Test the Costanzi lensing bias helper for a simple constant correction."""
+    """Test the Costanzi lensing bias model for a simple constant correction."""
     radius = np.array([0.5, 1.0, 2.0])
-    correction = bsel(
-        Rcmv=radius,
+    model = CostanziLensingBias(
         A_sel=1.0,
         alpha_sel=0.0,
         beta_sel=0.0,
         gamma_sel=1.0,
         R0_sel=1.0,
     )
+    correction = model.bsel(radius)
 
     assert correction.shape == (1, len(radius))
     np.testing.assert_allclose(correction, 2.0)
@@ -196,18 +193,34 @@ def test_costanzi_lensing_bias_constant_correction():
 def test_costanzi_lensing_bias_multiple_parameter_sets():
     """Test multiple selection-bias parameter sets on a shared radius grid."""
     radius = np.array([0.5, 1.0, 2.0])
-    correction = bsel(
-        Rcmv=radius,
+    model = CostanziLensingBias(
         A_sel=np.array([1.0, 2.0]),
         alpha_sel=np.array([0.0, 0.0]),
         beta_sel=np.array([0.0, 0.0]),
         gamma_sel=np.array([1.0, 1.0]),
         R0_sel=np.array([1.0, 1.0]),
     )
+    correction = model.bsel(radius)
 
     assert correction.shape == (2, len(radius))
     np.testing.assert_allclose(correction[0], 2.0)
     np.testing.assert_allclose(correction[1], 3.0)
+
+
+def test_costanzi_lensing_bias_uses_parameters_container():
+    """Updated calibration parameters are used by the lensing correction."""
+    model = CostanziLensingBias(
+        A_sel=1.0,
+        alpha_sel=0.0,
+        beta_sel=0.0,
+        gamma_sel=1.0,
+        R0_sel=1.0,
+    )
+    model.parameters["A_sel"] = 2.0
+
+    correction = model.bsel(np.array([0.5, 1.0, 2.0]))
+
+    np.testing.assert_allclose(correction, 3.0)
 
 
 def test_costanzi_lensing_bias_physical_radius_conversion():
@@ -223,7 +236,7 @@ def test_costanzi_lensing_bias_physical_radius_conversion():
         reference_redshift=0.5,
     )
 
-    correction = model.distribution(radius_physical, cosmo_h=0.7)
+    correction = model.bsel(radius_physical, cosmo_h=0.7)
 
     assert correction.shape == (1, len(radius_physical))
     np.testing.assert_allclose(correction, 2.0)
@@ -232,8 +245,7 @@ def test_costanzi_lensing_bias_physical_radius_conversion():
 def test_costanzi_lensing_bias_requires_matching_parameter_shapes():
     """Each selection-bias parameter entry corresponds to one bin."""
     with pytest.raises(ValueError, match="same length"):
-        bsel(
-            Rcmv=np.array([0.5, 1.0]),
+        CostanziLensingBias(
             A_sel=np.array([1.0, 1.0]),
             alpha_sel=0.0,
             beta_sel=np.array([0.0, 0.0]),
@@ -269,4 +281,4 @@ def test_costanzi_lensing_bias_requires_cosmo_h_for_physical_radius():
     )
 
     with pytest.raises(ValueError, match="cosmo_h is required"):
-        model.distribution(np.array([1.0]))
+        model.bsel(np.array([1.0]))
