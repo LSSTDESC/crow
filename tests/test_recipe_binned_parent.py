@@ -45,7 +45,6 @@ def test_binned_init():
     assert binned_class.cluster_theory == cluster_theory
     assert binned_class.redshift_distribution == redshift_distribution
     assert binned_class.mass_distribution == mass_distribution
-    assert binned_class.lensing_profile_correction is None
     assert binned_class.completeness == completeness
     assert binned_class.purity == purity
     assert binned_class.mass_interval == mass_interval

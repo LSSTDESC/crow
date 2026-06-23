@@ -23,7 +23,6 @@ class CostanziLensingBias:
         gamma_sel: npt.ArrayLike,
         R0_sel: npt.ArrayLike,
         *,
-        radius_is_comoving_mpc_over_h: bool = True,
         reference_redshift: npt.ArrayLike | None = None,
     ) -> None:
         """
@@ -34,15 +33,11 @@ class CostanziLensingBias:
         A_sel, alpha_sel, beta_sel, gamma_sel, R0_sel
             Parameters of ``Bsel(R)``.  These must be all scalars for one
             richness-redshift bin, or all one-dimensional arrays with the same
-            length for multiple bins.
-        radius_is_comoving_mpc_over_h
-            If True, radii passed to :meth:`bsel` are already in
-            comoving Mpc/h.  If False, radii are interpreted as physical Mpc and
-            converted as ``R_comoving[Mpc/h] = R_physical[Mpc] * (1 + z_ref) * h``.
+            length for multiple bins. ``R0_sel`` is in comoving Mpc/h.
         reference_redshift
             Redshift used for the physical-Mpc to comoving-Mpc/h conversion.
-            Required when ``radius_is_comoving_mpc_over_h`` is False.  It must
-            be a scalar for one parameter set, or a one-dimensional array with
+            Required when :meth:`bsel` receives ``radial_units="Mpc"``. It must
+            be a scalar for one parameter set or a one-dimensional array with
             the same length as the selection-bias parameters.
         """
         parameter_values = {
@@ -64,7 +59,6 @@ class CostanziLensingBias:
             )
 
         self.parameters = Parameters(parameter_values)
-        self.radius_is_comoving_mpc_over_h = radius_is_comoving_mpc_over_h
 
         self.reference_redshift = None
         if reference_redshift is not None:
@@ -84,24 +78,32 @@ class CostanziLensingBias:
     def _radius_to_comoving_mpc_over_h(
         self,
         radius: npt.ArrayLike,
+        radial_units: str,
         cosmo_h: float | None,
     ) -> npt.NDArray[np.floating]:
         radius = np.asarray(radius, dtype=float)
         if radius.ndim != 1:
             raise ValueError("radius must be a 1D array.")
 
-        if self.radius_is_comoving_mpc_over_h:
+        if radial_units == "Mpc/h":
             return radius
+
+        if radial_units != "Mpc":
+            raise ValueError(
+                "radial_units must be 'Mpc' for physical radii or 'Mpc/h' "
+                "for comoving radii."
+            )
 
         if self.reference_redshift is None:
             raise ValueError(
-                "reference_redshift is required when "
-                "radius_is_comoving_mpc_over_h is False."
+                "reference_redshift is required when radial_units is 'Mpc'."
             )
         if cosmo_h is None:
             raise ValueError(
                 "cosmo_h is required to convert physical Mpc to comoving Mpc/h."
             )
+        if cosmo_h <= 0.0:
+            raise ValueError("cosmo_h must be positive.")
 
         return (
             radius[np.newaxis, :]
@@ -113,6 +115,7 @@ class CostanziLensingBias:
         self,
         radius: npt.ArrayLike,
         *,
+        radial_units: str,
         cosmo_h: float | None = None,
     ) -> npt.NDArray[np.floating]:
         """
@@ -124,8 +127,11 @@ class CostanziLensingBias:
         Parameters
         ----------
         radius
-            Radius array.  Units are controlled by
-            ``radius_is_comoving_mpc_over_h``.
+            One-dimensional radius array.
+        radial_units
+            Units and coordinate convention of ``radius``. Use ``"Mpc/h"``
+            for comoving Mpc/h or ``"Mpc"`` for physical Mpc. Other units,
+            including angular units, are not supported.
         cosmo_h
             Dimensionless Hubble parameter.  Required only when converting from
             physical Mpc to comoving Mpc/h.
@@ -134,8 +140,18 @@ class CostanziLensingBias:
         -------
         ndarray
             Multiplicative correction with shape ``(n_set, n_rad)``.
+
+        Raises
+        ------
+        ValueError
+            If ``radial_units`` is not ``"Mpc"`` or ``"Mpc/h"``, or if the
+            physical-Mpc conversion lacks ``reference_redshift`` or ``cosmo_h``.
         """
-        radius_comoving = self._radius_to_comoving_mpc_over_h(radius, cosmo_h)
+        radius_comoving = self._radius_to_comoving_mpc_over_h(
+            radius,
+            radial_units,
+            cosmo_h,
+        )
         if np.any(radius_comoving <= 0.0):
             raise ValueError("radius must contain only positive values.")
 

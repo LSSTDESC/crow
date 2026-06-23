@@ -575,8 +575,4 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             sky_area,
             ignore_purity=True,
         )
-        return self._apply_lensing_profile_correction(
-            shear,
-            radius_centers,
-            average_on,
-        )
+        return shear

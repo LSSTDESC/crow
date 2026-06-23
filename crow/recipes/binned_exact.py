@@ -461,9 +461,4 @@ class ExactBinnedClusterRecipe(BinnedClusterRecipe):
             )
             deltasigma = self.integrator.integrate(prediction_wrapper)
             deltasigma_list.append(deltasigma)
-        lensing_profile = np.array(deltasigma_list).flatten()
-        return self._apply_lensing_profile_correction(
-            lensing_profile,
-            radius_centers,
-            average_on,
-        )
+        return np.array(deltasigma_list).flatten()

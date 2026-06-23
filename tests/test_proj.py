@@ -186,7 +186,7 @@ def test_costanzi_lensing_bias_constant_correction():
         gamma_sel=1.0,
         R0_sel=1.0,
     )
-    correction = model.bsel(radius)
+    correction = model.bsel(radius, radial_units="Mpc/h")
 
     assert correction.shape == (1, len(radius))
     np.testing.assert_allclose(correction, 2.0)
@@ -202,7 +202,7 @@ def test_costanzi_lensing_bias_multiple_parameter_sets():
         gamma_sel=np.array([1.0, 1.0]),
         R0_sel=np.array([1.0, 1.0]),
     )
-    correction = model.bsel(radius)
+    correction = model.bsel(radius, radial_units="Mpc/h")
 
     assert correction.shape == (2, len(radius))
     np.testing.assert_allclose(correction[0], 2.0)
@@ -220,7 +220,10 @@ def test_costanzi_lensing_bias_uses_parameters_container():
     )
     model.parameters["A_sel"] = 2.0
 
-    correction = model.bsel(np.array([0.5, 1.0, 2.0]))
+    correction = model.bsel(
+        np.array([0.5, 1.0, 2.0]),
+        radial_units="Mpc/h",
+    )
 
     np.testing.assert_allclose(correction, 3.0)
 
@@ -230,18 +233,25 @@ def test_costanzi_lensing_bias_physical_radius_conversion():
     radius_physical = np.array([1.0, 2.0])
     model = CostanziLensingBias(
         A_sel=1.0,
-        alpha_sel=0.0,
-        beta_sel=0.0,
+        alpha_sel=1.0,
+        beta_sel=1.0,
         gamma_sel=1.0,
         R0_sel=1.0,
-        radius_is_comoving_mpc_over_h=False,
         reference_redshift=0.5,
     )
 
-    correction = model.bsel(radius_physical, cosmo_h=0.7)
+    correction = model.bsel(
+        radius_physical,
+        radial_units="Mpc",
+        cosmo_h=0.7,
+    )
 
     assert correction.shape == (1, len(radius_physical))
-    np.testing.assert_allclose(correction, 2.0)
+    expected_radius_comoving = radius_physical * (1.0 + 0.5) * 0.7
+    np.testing.assert_allclose(
+        correction,
+        1.0 + expected_radius_comoving[np.newaxis, :],
+    )
 
 
 def test_costanzi_lensing_bias_requires_matching_parameter_shapes():
@@ -265,7 +275,6 @@ def test_costanzi_lensing_bias_requires_matching_reference_redshift_shape():
             beta_sel=np.array([0.0, 0.0]),
             gamma_sel=np.array([1.0, 1.0]),
             R0_sel=np.array([1.0, 1.0]),
-            radius_is_comoving_mpc_over_h=False,
             reference_redshift=0.5,
         )
 
@@ -278,9 +287,36 @@ def test_costanzi_lensing_bias_requires_cosmo_h_for_physical_radius():
         beta_sel=0.0,
         gamma_sel=1.0,
         R0_sel=1.0,
-        radius_is_comoving_mpc_over_h=False,
         reference_redshift=0.5,
     )
 
     with pytest.raises(ValueError, match="cosmo_h is required"):
-        model.bsel(np.array([1.0]))
+        model.bsel(np.array([1.0]), radial_units="Mpc")
+
+
+def test_costanzi_lensing_bias_requires_reference_redshift_for_physical_radius():
+    """Physical-Mpc radius conversion requires a reference redshift."""
+    model = CostanziLensingBias(
+        A_sel=1.0,
+        alpha_sel=0.0,
+        beta_sel=0.0,
+        gamma_sel=1.0,
+        R0_sel=1.0,
+    )
+
+    with pytest.raises(ValueError, match="reference_redshift is required"):
+        model.bsel(np.array([1.0]), radial_units="Mpc", cosmo_h=0.7)
+
+
+def test_costanzi_lensing_bias_rejects_unsupported_radial_units():
+    """Angular and other unsupported radius units fail explicitly."""
+    model = CostanziLensingBias(
+        A_sel=1.0,
+        alpha_sel=0.0,
+        beta_sel=0.0,
+        gamma_sel=1.0,
+        R0_sel=1.0,
+    )
+
+    with pytest.raises(ValueError, match="radial_units must be"):
+        model.bsel(np.array([1.0]), radial_units="arcmin")

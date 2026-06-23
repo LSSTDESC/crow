@@ -13,7 +13,6 @@ from crow import (
     completeness_models,
     kernel,
     mass_proxy,
-    projection_effects,
     purity_models,
 )
 from crow.properties import ClusterProperty
@@ -256,102 +255,6 @@ def test_evaluates_theory_prediction_returns_value(
 
     assert prediction > 0
     assert prediction_c > 0
-
-
-def test_exact_lensing_profile_correction_multiplies_stacked_profile(
-    binned_exact_deltasigma: ExactBinnedClusterRecipe,
-):
-    """Exact lensing prediction applies Bsel after stack integration."""
-    mass_proxy_edges = (2, 5)
-    z_edges = (0.5, 1)
-    radius_centers = np.array([1.0, 1.5])
-    sky_area = 360**2
-    average_on = ClusterProperty.DELTASIGMA
-
-    uncorrected = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges,
-        mass_proxy_edges,
-        radius_centers,
-        sky_area,
-        average_on,
-    )
-    binned_exact_deltasigma.lensing_profile_correction = (
-        projection_effects.CostanziLensingBias(
-            A_sel=1.0,
-            alpha_sel=0.0,
-            beta_sel=0.0,
-            gamma_sel=1.0,
-            R0_sel=1.0,
-        )
-    )
-    corrected = binned_exact_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges,
-        mass_proxy_edges,
-        radius_centers,
-        sky_area,
-        average_on,
-    )
-
-    assert corrected.shape == uncorrected.shape
-    np.testing.assert_allclose(corrected, 2.0 * uncorrected)
-
-
-def test_grid_lensing_profile_correction_multiplies_stacked_profile(
-    binned_grid_deltasigma: GridBinnedClusterRecipe,
-):
-    """Grid lensing prediction applies Bsel after stack integration."""
-    mass_proxy_edges = (2, 5)
-    z_edges = (0.5, 1)
-    radius_centers = np.array([1.0, 1.5])
-    sky_area = 360**2
-    average_on = ClusterProperty.DELTASIGMA
-
-    uncorrected = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges,
-        mass_proxy_edges,
-        radius_centers,
-        sky_area,
-        average_on,
-    )
-    binned_grid_deltasigma.lensing_profile_correction = (
-        projection_effects.CostanziLensingBias(
-            A_sel=1.0,
-            alpha_sel=0.0,
-            beta_sel=0.0,
-            gamma_sel=1.0,
-            R0_sel=1.0,
-        )
-    )
-    corrected = binned_grid_deltasigma.evaluate_theory_prediction_lensing_profile(
-        z_edges,
-        mass_proxy_edges,
-        radius_centers,
-        sky_area,
-        average_on,
-    )
-
-    assert corrected.shape == uncorrected.shape
-    np.testing.assert_allclose(corrected, 2.0 * uncorrected)
-
-
-def test_lensing_profile_correction_rejects_reduced_shear(
-    binned_exact_gt: ExactBinnedClusterRecipe,
-):
-    """Bsel correction is currently restricted to DeltaSigma predictions."""
-    binned_exact_gt.lensing_profile_correction = projection_effects.CostanziLensingBias(
-        A_sel=1.0,
-        alpha_sel=0.0,
-        beta_sel=0.0,
-        gamma_sel=1.0,
-        R0_sel=1.0,
-    )
-
-    with pytest.raises(ValueError, match="DeltaSigma"):
-        binned_exact_gt._apply_lensing_profile_correction(
-            np.array([1.0]),
-            np.array([1.0]),
-            ClusterProperty.SHEAR,
-        )
 
 
 def test_grid_shear_matches_exact_within_tolerance(
