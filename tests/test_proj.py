@@ -12,25 +12,32 @@ from crow.cluster_modules.projection_effects.richness_bias import (
 )
 
 
-def costanzi_parameters(rich_tru):
-    """Return the default Costanzi parameters on a true-richness grid."""
-    rich_tru = np.asarray(rich_tru, dtype=float)
-    return {
-        "tau": COSTANZI_DEFAULT_PARAMETERS["tau"],
-        "delta_mu": COSTANZI_DEFAULT_PARAMETERS["delta_mu"],
-        "sig_pure": COSTANZI_DEFAULT_PARAMETERS["sig_pure_scatter"] * rich_tru,
-        "fprj": COSTANZI_DEFAULT_PARAMETERS["fprj"],
-        "fmsk": COSTANZI_DEFAULT_PARAMETERS["fmsk"],
-    }
-
-
 def test_costanzi_default_parameters():
     """Test the default Costanzi projection parameters."""
-    assert COSTANZI_DEFAULT_PARAMETERS["tau"] == 0.10
-    assert COSTANZI_DEFAULT_PARAMETERS["delta_mu"] == -2.0
-    assert COSTANZI_DEFAULT_PARAMETERS["sig_pure_scatter"] == 0.15
-    assert COSTANZI_DEFAULT_PARAMETERS["fprj"] == 0.95
-    assert COSTANZI_DEFAULT_PARAMETERS["fmsk"] == 0.05
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+
+    assert model.parameters["tau"] == 0.10
+    assert model.parameters["delta_mu"] == -2.0
+    assert model.parameters["fractional_sig_pure"] == 0.15
+    assert model.parameters["fprj"] == 0.95
+    assert model.parameters["fmsk"] == 0.05
+
+
+def test_costanzi_parameters_are_required():
+    """A richness-bias object requires an explicit calibration."""
+    with pytest.raises(TypeError):
+        CostanziRichnessBias()
+
+
+def test_costanzi_parameters_are_independent_between_instances():
+    """Each richness-bias object owns an independent calibration."""
+    first_model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    second_model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+
+    first_model.parameters["tau"] = 0.20
+
+    assert first_model.parameters["tau"] == 0.20
+    assert second_model.parameters["tau"] == 0.10
 
 
 def test_costanzi_exp_times_erfc_matches_direct_expression():
@@ -51,16 +58,11 @@ def test_costanzi_probability_shape_positivity_and_finiteness():
     rich_tru = np.geomspace(1e-2, 250.0, 100)
     redshift = np.geomspace(1.0 + 1e-2, 1.0 + 1.5, 30) - 1.0
     rich_tru_mesh, _ = np.meshgrid(rich_tru, redshift, indexing="ij")
-    parameters = costanzi_parameters(rich_tru_mesh)
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
 
-    prob = CostanziRichnessBias.prob_richobs_at_richtru(
+    prob = model.prob_richobs_at_richtru(
         rich_obs=rich_obs,
         rich_tru=rich_tru_mesh.flatten(),
-        tau=parameters["tau"],
-        delta_mu=parameters["delta_mu"],
-        sig_pure=parameters["sig_pure"].flatten(),
-        fprj=parameters["fprj"],
-        fmsk=parameters["fmsk"],
     )
     prob = prob.reshape(rich_obs.shape + rich_tru_mesh.shape)
 
@@ -73,15 +75,20 @@ def test_costanzi_probability_accepts_parameter_arrays():
     """Projection parameters can vary along the rich_tru axis."""
     rich_obs = np.array([10.0, 20.0, 40.0])
     rich_tru = np.array([15.0, 30.0, 60.0])
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model.parameters.update(
+        {
+            "tau": np.array([0.08, 0.10, 0.12]),
+            "delta_mu": np.array([-1.0, -2.0, -3.0]),
+            "fractional_sig_pure": np.array([0.12, 0.15, 0.18]),
+            "fprj": np.array([0.80, 0.90, 0.95]),
+            "fmsk": np.array([0.01, 0.03, 0.05]),
+        }
+    )
 
-    prob = CostanziRichnessBias.prob_richobs_at_richtru(
+    prob = model.prob_richobs_at_richtru(
         rich_obs=rich_obs,
         rich_tru=rich_tru,
-        tau=np.array([0.08, 0.10, 0.12]),
-        delta_mu=np.array([-1.0, -2.0, -3.0]),
-        sig_pure=0.15 * rich_tru,
-        fprj=np.array([0.80, 0.90, 0.95]),
-        fmsk=np.array([0.01, 0.03, 0.05]),
     )
 
     assert prob.shape == (len(rich_obs), len(rich_tru))
@@ -95,17 +102,12 @@ def test_costanzi_observed_bin_probability_shape_positivity_and_finiteness():
     rich_tru = np.geomspace(1e-2, 250.0, 100)
     redshift = np.geomspace(1.0 + 1e-2, 1.0 + 1.5, 30) - 1.0
     rich_tru_mesh, _ = np.meshgrid(rich_tru, redshift, indexing="ij")
-    parameters = costanzi_parameters(rich_tru_mesh)
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
 
-    sprob = CostanziRichnessBias.Sprob_at_richtru(
+    sprob = model.Sprob_at_richtru(
         rich_obs_eds=rich_obs_eds,
         rich_obs_res=0.015,
         rich_tru=rich_tru_mesh.flatten(),
-        tau=parameters["tau"],
-        delta_mu=parameters["delta_mu"],
-        sig_pure=parameters["sig_pure"].flatten(),
-        fprj=parameters["fprj"],
-        fmsk=parameters["fmsk"],
     )
     sprob = sprob.reshape((len(rich_obs_eds) - 1,) + rich_tru_mesh.shape)
 
@@ -117,19 +119,17 @@ def test_costanzi_observed_bin_probability_shape_positivity_and_finiteness():
 def test_costanzi_observed_bin_probability_is_smaller_than_total_probability():
     """A finite observed-richness bin should not exceed the broad-bin integral."""
     rich_tru = np.geomspace(10.0, 100.0, 12)
-    parameters = costanzi_parameters(rich_tru)
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
 
-    narrow = CostanziRichnessBias.Sprob_at_richtru(
+    narrow = model.Sprob_at_richtru(
         rich_obs_eds=np.array([20.0, 40.0]),
         rich_obs_res=0.01,
         rich_tru=rich_tru,
-        **parameters,
     )
-    broad = CostanziRichnessBias.Sprob_at_richtru(
+    broad = model.Sprob_at_richtru(
         rich_obs_eds=np.array([1.0, 300.0]),
         rich_obs_res=0.01,
         rich_tru=rich_tru,
-        **parameters,
     )
 
     assert narrow.shape == broad.shape == (1, len(rich_tru))
@@ -140,7 +140,11 @@ def test_costanzi_observed_bin_probability_is_smaller_than_total_probability():
     ("parameter", "value", "match"),
     [
         ("tau", -0.1, "tau can only be positive"),
-        ("sig_pure", -1.0, "sig_pure can only be positive"),
+        (
+            "fractional_sig_pure",
+            -0.1,
+            "fractional_sig_pure can only be positive",
+        ),
         ("fprj", 1.1, "fprj can only be between 0 and 1"),
         ("fmsk", -0.1, "fmsk can only be between 0 and 1"),
     ],
@@ -149,28 +153,26 @@ def test_costanzi_probability_validates_parameters(parameter, value, match):
     """Invalid projection parameters should fail explicitly."""
     rich_obs = np.array([10.0, 20.0])
     rich_tru = np.array([20.0, 40.0])
-    parameters = costanzi_parameters(rich_tru)
-    parameters[parameter] = value
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model.parameters[parameter] = value
 
-    with pytest.raises(AssertionError, match=match):
-        CostanziRichnessBias.prob_richobs_at_richtru(
+    with pytest.raises(ValueError, match=match):
+        model.prob_richobs_at_richtru(
             rich_obs=rich_obs,
             rich_tru=rich_tru,
-            **parameters,
         )
 
 
 def test_costanzi_observed_bin_probability_validates_bin_edges():
     """Observed-richness bin edges must be 1D and monotonically increasing."""
     rich_tru = np.array([20.0, 40.0])
-    parameters = costanzi_parameters(rich_tru)
+    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
 
-    with pytest.raises(AssertionError, match="monotonically increasing"):
-        CostanziRichnessBias.Sprob_at_richtru(
+    with pytest.raises(ValueError, match="monotonically increasing"):
+        model.Sprob_at_richtru(
             rich_obs_eds=np.array([20.0, 10.0]),
             rich_obs_res=0.01,
             rich_tru=rich_tru,
-            **parameters,
         )
 
 

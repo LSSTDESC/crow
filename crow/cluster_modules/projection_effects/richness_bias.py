@@ -4,13 +4,12 @@ import numpy as np
 import numpy.typing as npt
 import scipy.special as spc
 
-# Type alias for functions accepting scalars or array-like inputs
-arrayLike = int | float | npt.ArrayLike
+from ..parameters import Parameters
 
 COSTANZI_DEFAULT_PARAMETERS = {
     "tau": 0.10,
     "delta_mu": -2.0,
-    "sig_pure_scatter": 0.15,  # Percentage of rich_tru (0.15 * rich_tru)
+    "fractional_sig_pure": 0.15,
     "fprj": 0.95,
     "fmsk": 0.05,
 }
@@ -19,8 +18,51 @@ COSTANZI_DEFAULT_PARAMETERS = {
 class CostanziRichnessBias:
     """
     Projection effects model from Costanzi+19.
+
+    Each instance owns one calibration in ``parameters``. Parameter values may
+    be scalars or one-dimensional arrays broadcastable to the true-richness
+    grid. ``fractional_sig_pure`` is the dimensionless fractional scatter,
+    such that ``sig_pure = fractional_sig_pure * rich_tru``.
+
     Implemented as a CROW module.
     """
+
+    def __init__(
+        self,
+        tau: npt.ArrayLike,
+        delta_mu: npt.ArrayLike,
+        fractional_sig_pure: npt.ArrayLike,
+        fprj: npt.ArrayLike,
+        fmsk: npt.ArrayLike,
+    ) -> None:
+        """Initialize the Costanzi projection model.
+
+        Parameters
+        ----------
+        tau : float or 1d array
+            The projection effect parameter.
+        delta_mu : float or 1d array
+            The bias in the mean projected richness relative to the true richness,
+            as ``delta_mu = mu - rich_tru``, where ``mu`` is the mean projected
+            richness.
+        fractional_sig_pure : float or 1d array
+            The fractional scatter of the projected richness. The absolute scatter
+            is ``sig_pure = fractional_sig_pure * rich_tru``, with projected
+            richness distributed as ``rich_tru + N(delta_mu, sig_pure)``.
+        fprj : float or 1d array
+            The fraction of clusters affected by projection.
+        fmsk : float or 1d array
+            The fraction of clusters being masked by others.
+        """
+        self.parameters = Parameters(
+            {
+                "tau": tau,
+                "delta_mu": delta_mu,
+                "fractional_sig_pure": fractional_sig_pure,
+                "fprj": fprj,
+                "fmsk": fmsk,
+            }
+        )
 
     @staticmethod
     def _exp_times_erfc(
@@ -48,17 +90,11 @@ class CostanziRichnessBias:
         )
         return result
 
-    @staticmethod
     def prob_richobs_at_richtru(
-        rich_obs: arrayLike,
-        rich_tru: arrayLike,
-        *,
-        tau: arrayLike,
-        delta_mu: arrayLike,
-        sig_pure: arrayLike,
-        fprj: arrayLike,
-        fmsk: arrayLike,
-    ) -> arrayLike:
+        self,
+        rich_obs: npt.ArrayLike,
+        rich_tru: npt.ArrayLike,
+    ) -> npt.NDArray[np.floating]:
         """
         Calculate the probability of observing the observed richness given the true richness.
         Equation 15 in Costanzi+19.
@@ -69,18 +105,11 @@ class CostanziRichnessBias:
             The observed richness
         rich_tru: 1d array
             The true richness
-        tau: float or 1d array
-            The projection effect parameter
-        delta_mu: float or 1d array
-            The bias in the mean of the projected richness w.r.t. the true richness,
-            as delta_mu = mu - rich_true, where mu is the mean projected richness
-        sig_pure: float or 1d array
-            The scatter of the projected richness,
-            as the projected richness ~ rich_true + N(delta_mu, sig_pure)
-        fprj: float or 1d array
-            The fraction of clusters affected by projection
-        fmsk: float or 1d array
-            The fraction of clusters being masked by others
+
+        Notes
+        -----
+        This calculation uses ``tau``, ``delta_mu``, ``fractional_sig_pure``,
+        ``fprj``, and ``fmsk`` from :attr:`parameters`.
 
         Return:
         ----------------------------------------------------------
@@ -92,22 +121,36 @@ class CostanziRichnessBias:
         rich_obs = np.asarray(rich_obs)
         rich_tru = np.asarray(rich_tru)
 
-        # Broadcast arrays
-        tau = np.broadcast_to(np.asarray(tau, dtype=float), rich_tru.shape)
-        delta_mu = np.broadcast_to(np.asarray(delta_mu, dtype=float), rich_tru.shape)
-        sig_pure = np.broadcast_to(np.asarray(sig_pure, dtype=float), rich_tru.shape)
-        fprj = np.broadcast_to(np.asarray(fprj, dtype=float), rich_tru.shape)
-        fmsk = np.broadcast_to(np.asarray(fmsk, dtype=float), rich_tru.shape)
+        # Broadcast model parameters over the true-richness grid.
+        tau = np.broadcast_to(
+            np.asarray(self.parameters["tau"], dtype=float), rich_tru.shape
+        )
+        delta_mu = np.broadcast_to(
+            np.asarray(self.parameters["delta_mu"], dtype=float), rich_tru.shape
+        )
+        fractional_sig_pure = np.broadcast_to(
+            np.asarray(self.parameters["fractional_sig_pure"], dtype=float),
+            rich_tru.shape,
+        )
+        sig_pure = fractional_sig_pure * rich_tru
+        fprj = np.broadcast_to(
+            np.asarray(self.parameters["fprj"], dtype=float), rich_tru.shape
+        )
+        fmsk = np.broadcast_to(
+            np.asarray(self.parameters["fmsk"], dtype=float), rich_tru.shape
+        )
 
         # Safety checks
-        assert np.all(tau > 0.0), "tau can only be positive."
-        assert np.all(sig_pure > 0.0), "sig_pure can only be positive."
-        assert np.all(
-            (fprj >= 0.0) & (fprj <= 1.0)
-        ), "fprj can only be between 0 and 1."
-        assert np.all(
-            (fmsk >= 0.0) & (fmsk <= 1.0)
-        ), "fmsk can only be between 0 and 1."
+        if not np.all(tau > 0.0):
+            raise ValueError("tau can only be positive.")
+        if not np.all(fractional_sig_pure > 0.0):
+            raise ValueError("fractional_sig_pure can only be positive.")
+        if not np.all(sig_pure > 0.0):
+            raise ValueError("sig_pure can only be positive.")
+        if not np.all((fprj >= 0.0) & (fprj <= 1.0)):
+            raise ValueError("fprj can only be between 0 and 1.")
+        if not np.all((fmsk >= 0.0) & (fmsk <= 1.0)):
+            raise ValueError("fmsk can only be between 0 and 1.")
 
         # Forcing the shapes in (n_obs,1,) or (1,n_tru,)
         rich_obs = rich_obs[:, np.newaxis]
@@ -157,18 +200,12 @@ class CostanziRichnessBias:
         pdf = 0.5 * (gauss + term1 + term23 - term4)  # (n_obs, n_tru,)
         return pdf
 
-    @staticmethod
     def Sprob_at_richtru(
-        rich_obs_eds: arrayLike,
-        rich_obs_res: arrayLike,
-        rich_tru: arrayLike,
-        *,
-        tau: arrayLike,
-        delta_mu: arrayLike,
-        sig_pure: arrayLike,
-        fprj: arrayLike,
-        fmsk: arrayLike,
-    ) -> arrayLike:
+        self,
+        rich_obs_eds: npt.ArrayLike,
+        rich_obs_res: npt.ArrayLike,
+        rich_tru: npt.ArrayLike,
+    ) -> npt.NDArray[np.floating]:
         """
         Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
 
@@ -185,18 +222,6 @@ class CostanziRichnessBias:
             Smaller rich_obs_res means higher resolutions.
         rich_tru: 1d array
             The true richness
-        tau: float or 1d array
-            The projection effect parameter
-        delta_mu: float or 1d array
-            The bias in the mean of the projected richness w.r.t. the true richness,
-            as delta_mu = mu - rich_true, where mu is the mean projected richness
-        sig_pure: float or 1d array
-            The scatter of the projected richness,
-            as the projected richness ~ rich_true + N(delta_mu, sig_pure)
-        fprj: float or 1d array
-            The fraction of clusters affected by projection
-        fmsk: float or 1d array
-            The fraction of clusters being masked by others
 
         Return:
         ----------------------------------------------------------
@@ -209,20 +234,16 @@ class CostanziRichnessBias:
         rich_obs_res = np.asarray(rich_obs_res)
         rich_tru = np.asarray(rich_tru)
 
-        # Broadcast arrays
-        tau = np.broadcast_to(np.asarray(tau, dtype=float), rich_tru.shape)
-        delta_mu = np.broadcast_to(np.asarray(delta_mu, dtype=float), rich_tru.shape)
-        sig_pure = np.broadcast_to(np.asarray(sig_pure, dtype=float), rich_tru.shape)
-        fprj = np.broadcast_to(np.asarray(fprj, dtype=float), rich_tru.shape)
-        fmsk = np.broadcast_to(np.asarray(fmsk, dtype=float), rich_tru.shape)
-
         # define integral boundaries
-        assert (
-            rich_obs_eds.ndim == 1
-        ), "The array rich_obs_eds ndim is not 1. Integral boundaries cannot be defined."
-        assert np.all(
-            np.diff(rich_obs_eds) > 0
-        ), "The array rich_obs_eds has to be monotonically increasing."
+        if rich_obs_eds.ndim != 1:
+            raise ValueError(
+                "The array rich_obs_eds ndim is not 1. "
+                "Integral boundaries cannot be defined."
+            )
+        if not np.all(np.diff(rich_obs_eds) > 0):
+            raise ValueError(
+                "The array rich_obs_eds has to be monotonically increasing."
+            )
 
         rich_obs_low = rich_obs_eds[:-1]
         rich_obs_hgh = rich_obs_eds[1:]
@@ -250,14 +271,9 @@ class CostanziRichnessBias:
         rich_obs_digit = np.digitize(rich_obs_bins, bins=rich_obs_eds)
 
         # calc
-        prob_obs = CostanziRichnessBias.prob_richobs_at_richtru(
+        prob_obs = self.prob_richobs_at_richtru(
             rich_obs=rich_obs_bins,
             rich_tru=rich_tru,
-            tau=tau,
-            delta_mu=delta_mu,
-            sig_pure=sig_pure,
-            fprj=fprj,
-            fmsk=fmsk,
         )
 
         Sprob_obs = np.array(
