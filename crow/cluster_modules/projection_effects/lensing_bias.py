@@ -5,6 +5,14 @@ import numpy.typing as npt
 
 from ..parameters import Parameters
 
+LENSING_BIAS_DEFAULT_PARAMETERS = {
+    "A_sel": 0.0,
+    "alpha_sel": 0.0,
+    "beta_sel": 0.0,
+    "gamma_sel": 1.0,
+    "R0_sel": 1.0,
+}
+
 
 class CostanziLensingBias:
     """
@@ -17,13 +25,13 @@ class CostanziLensingBias:
 
     def __init__(
         self,
-        A_sel: npt.ArrayLike,
-        alpha_sel: npt.ArrayLike,
-        beta_sel: npt.ArrayLike,
-        gamma_sel: npt.ArrayLike,
-        R0_sel: npt.ArrayLike,
+        A_sel: npt.NDArray[np.float64] | None = None,
+        alpha_sel: npt.NDArray[np.float64] | None = None,
+        beta_sel: npt.NDArray[np.float64] | None = None,
+        gamma_sel: npt.NDArray[np.float64] | None = None,
+        R0_sel: npt.NDArray[np.float64] | None = None,
         *,
-        reference_redshift: npt.ArrayLike | None = None,
+        reference_redshift: npt.NDArray[np.float64] | None = None,
     ) -> None:
         """
         Initialize the lensing selection-bias correction.
@@ -31,21 +39,40 @@ class CostanziLensingBias:
         Parameters
         ----------
         A_sel, alpha_sel, beta_sel, gamma_sel, R0_sel
-            Parameters of ``Bsel(R)``.  These must be all scalars for one
-            richness-redshift bin, or all one-dimensional arrays with the same
-            length for multiple bins. ``R0_sel`` is in comoving Mpc/h.
+            Parameters of ``Bsel(R)``. These must be one-dimensional arrays with
+            the same length. ``R0_sel`` is in comoving Mpc/h. If None, use the
+            default value. The default parameters give a neutral correction,
+            ``Bsel(R) = 1``.
         reference_redshift
             Redshift used for the physical-Mpc to comoving-Mpc/h conversion.
-            Required when :meth:`bsel` receives ``radial_units="Mpc"``. It must
-            be a scalar for one parameter set or a one-dimensional array with
-            the same length as the selection-bias parameters.
+            Required when :meth:`bsel` receives ``radial_units="Mpc"``. It must be
+            a one-dimensional array with the same length as the selection-bias
+            parameters.
         """
+        self.parameters = Parameters({**LENSING_BIAS_DEFAULT_PARAMETERS})
+        if A_sel is not None:
+            self.parameters["A_sel"] = A_sel
+        if alpha_sel is not None:
+            self.parameters["alpha_sel"] = alpha_sel
+        if beta_sel is not None:
+            self.parameters["beta_sel"] = beta_sel
+        if gamma_sel is not None:
+            self.parameters["gamma_sel"] = gamma_sel
+        if R0_sel is not None:
+            self.parameters["R0_sel"] = R0_sel
+
         parameter_values = {
-            "A_sel": np.atleast_1d(np.asarray(A_sel, dtype=float)),
-            "alpha_sel": np.atleast_1d(np.asarray(alpha_sel, dtype=float)),
-            "beta_sel": np.atleast_1d(np.asarray(beta_sel, dtype=float)),
-            "gamma_sel": np.atleast_1d(np.asarray(gamma_sel, dtype=float)),
-            "R0_sel": np.atleast_1d(np.asarray(R0_sel, dtype=float)),
+            "A_sel": np.atleast_1d(np.asarray(self.parameters["A_sel"], dtype=float)),
+            "alpha_sel": np.atleast_1d(
+                np.asarray(self.parameters["alpha_sel"], dtype=float)
+            ),
+            "beta_sel": np.atleast_1d(
+                np.asarray(self.parameters["beta_sel"], dtype=float)
+            ),
+            "gamma_sel": np.atleast_1d(
+                np.asarray(self.parameters["gamma_sel"], dtype=float)
+            ),
+            "R0_sel": np.atleast_1d(np.asarray(self.parameters["R0_sel"], dtype=float)),
         }
         if any(parameter.ndim != 1 for parameter in parameter_values.values()):
             raise ValueError(
@@ -57,8 +84,6 @@ class CostanziLensingBias:
                 "A_sel, alpha_sel, beta_sel, gamma_sel, and R0_sel must all be "
                 "scalars or all be 1D arrays with the same length."
             )
-
-        self.parameters = Parameters(parameter_values)
 
         self.reference_redshift = None
         if reference_redshift is not None:
@@ -77,7 +102,7 @@ class CostanziLensingBias:
 
     def _radius_to_comoving_mpc_over_h(
         self,
-        radius: npt.ArrayLike,
+        radius: npt.NDArray[np.float64],
         radial_units: str,
         cosmo_h: float | None,
     ) -> npt.NDArray[np.floating]:
@@ -113,7 +138,7 @@ class CostanziLensingBias:
 
     def bsel(
         self,
-        radius: npt.ArrayLike,
+        radius: npt.NDArray[np.float64],
         *,
         radial_units: str,
         cosmo_h: float | None = None,

@@ -6,7 +6,7 @@ import scipy.special as spc
 
 from ..parameters import Parameters
 
-COSTANZI_DEFAULT_PARAMETERS = {
+RICHNESS_BIAS_DEFAULT_PARAMETERS = {
     "tau": 0.10,
     "delta_mu": -2.0,
     "fractional_sig_pure": 0.15,
@@ -29,40 +29,45 @@ class CostanziRichnessBias:
 
     def __init__(
         self,
-        tau: npt.ArrayLike,
-        delta_mu: npt.ArrayLike,
-        fractional_sig_pure: npt.ArrayLike,
-        fprj: npt.ArrayLike,
-        fmsk: npt.ArrayLike,
+        tau: npt.NDArray[np.float64] | None = None,
+        delta_mu: npt.NDArray[np.float64] | None = None,
+        fractional_sig_pure: npt.NDArray[np.float64] | None = None,
+        fprj: npt.NDArray[np.float64] | None = None,
+        fmsk: npt.NDArray[np.float64] | None = None,
     ) -> None:
         """Initialize the Costanzi projection model.
 
         Parameters
         ----------
-        tau : float or 1d array
-            The projection effect parameter.
-        delta_mu : float or 1d array
+        tau : ndarray
+            The projection effect parameter. If None, use the default value.
+        delta_mu : ndarray
             The bias in the mean projected richness relative to the true richness,
             as ``delta_mu = mu - rich_tru``, where ``mu`` is the mean projected
-            richness.
-        fractional_sig_pure : float or 1d array
+            richness. If None, use the default value.
+        fractional_sig_pure : ndarray
             The fractional scatter of the projected richness. The absolute scatter
             is ``sig_pure = fractional_sig_pure * rich_tru``, with projected
-            richness distributed as ``rich_tru + N(delta_mu, sig_pure)``.
-        fprj : float or 1d array
-            The fraction of clusters affected by projection.
-        fmsk : float or 1d array
-            The fraction of clusters being masked by others.
+            richness distributed as ``rich_tru + N(delta_mu, sig_pure)``. If None,
+            use the default value.
+        fprj : ndarray
+            The fraction of clusters affected by projection. If None, use the
+            default value.
+        fmsk : ndarray
+            The fraction of clusters being masked by others. If None, use the
+            default value.
         """
-        self.parameters = Parameters(
-            {
-                "tau": tau,
-                "delta_mu": delta_mu,
-                "fractional_sig_pure": fractional_sig_pure,
-                "fprj": fprj,
-                "fmsk": fmsk,
-            }
-        )
+        self.parameters = Parameters({**RICHNESS_BIAS_DEFAULT_PARAMETERS})
+        if tau is not None:
+            self.parameters["tau"] = tau
+        if delta_mu is not None:
+            self.parameters["delta_mu"] = delta_mu
+        if fractional_sig_pure is not None:
+            self.parameters["fractional_sig_pure"] = fractional_sig_pure
+        if fprj is not None:
+            self.parameters["fprj"] = fprj
+        if fmsk is not None:
+            self.parameters["fmsk"] = fmsk
 
     @staticmethod
     def _exp_times_erfc(
@@ -92,8 +97,8 @@ class CostanziRichnessBias:
 
     def prob_richobs_at_richtru(
         self,
-        rich_obs: npt.ArrayLike,
-        rich_tru: npt.ArrayLike,
+        rich_obs: npt.NDArray[np.float64],
+        rich_tru: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.floating]:
         """
         Calculate the probability of observing the observed richness given the true richness.
@@ -101,9 +106,9 @@ class CostanziRichnessBias:
 
         Parameters:
         ----------------------------------------------------------
-        rich_obs: 1d array
+        rich_obs: ndarray
             The observed richness
-        rich_tru: 1d array
+        rich_tru: ndarray
             The true richness
 
         Notes
@@ -202,25 +207,25 @@ class CostanziRichnessBias:
 
     def Sprob_at_richtru(
         self,
-        rich_obs_eds: npt.ArrayLike,
-        rich_obs_res: npt.ArrayLike,
-        rich_tru: npt.ArrayLike,
+        rich_obs_eds: npt.NDArray[np.float64],
+        rich_obs_res: npt.NDArray[np.float64],
+        rich_tru: npt.NDArray[np.float64],
     ) -> npt.NDArray[np.floating]:
         """
         Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
 
         Parameters:
         ----------------------------------------------------------
-        rich_obs_eds: 1d array
+        rich_obs_eds: ndarray
             The boundaries defining the richness intervals.
             It has a dimension of 1 and length at least 2.
-        rich_obs_res: 1d array
+        rich_obs_res: ndarray
             The resolution used in the integration over each richness integral.
             If a constant is provided, all richness integrals use the same resolution.
             If an array provided, it has a dimension of 1 and length exactly of len(rich_obs_eds) - 1.
             The resolution is defined as the fractional increase of 1 + rich_obs_res.
             Smaller rich_obs_res means higher resolutions.
-        rich_tru: 1d array
+        rich_tru: ndarray
             The true richness
 
         Return:

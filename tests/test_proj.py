@@ -5,34 +5,45 @@ import math
 import numpy as np
 import pytest
 
-from crow.cluster_modules.projection_effects.lensing_bias import CostanziLensingBias
+from crow.cluster_modules.projection_effects.lensing_bias import (
+    LENSING_BIAS_DEFAULT_PARAMETERS,
+    CostanziLensingBias,
+)
 from crow.cluster_modules.projection_effects.richness_bias import (
-    COSTANZI_DEFAULT_PARAMETERS,
+    RICHNESS_BIAS_DEFAULT_PARAMETERS,
     CostanziRichnessBias,
 )
 
 
 def test_costanzi_default_parameters():
     """Test the default Costanzi projection parameters."""
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
 
-    assert model.parameters["tau"] == 0.10
-    assert model.parameters["delta_mu"] == -2.0
-    assert model.parameters["fractional_sig_pure"] == 0.15
-    assert model.parameters["fprj"] == 0.95
-    assert model.parameters["fmsk"] == 0.05
+    for key, value in RICHNESS_BIAS_DEFAULT_PARAMETERS.items():
+        assert model.parameters[key] == value
 
 
-def test_costanzi_parameters_are_required():
-    """A richness-bias object requires an explicit calibration."""
-    with pytest.raises(TypeError):
-        CostanziRichnessBias()
+def test_costanzi_constructor_overrides_default_parameters():
+    """Constructor arguments override the default richness-bias calibration."""
+    model = CostanziRichnessBias(
+        tau=np.array([0.2]),
+        delta_mu=np.array([-1.5]),
+        fractional_sig_pure=np.array([0.2]),
+        fprj=np.array([0.8]),
+        fmsk=np.array([0.1]),
+    )
+
+    np.testing.assert_allclose(model.parameters["tau"], np.array([0.2]))
+    np.testing.assert_allclose(model.parameters["delta_mu"], np.array([-1.5]))
+    np.testing.assert_allclose(model.parameters["fractional_sig_pure"], np.array([0.2]))
+    np.testing.assert_allclose(model.parameters["fprj"], np.array([0.8]))
+    np.testing.assert_allclose(model.parameters["fmsk"], np.array([0.1]))
 
 
 def test_costanzi_parameters_are_independent_between_instances():
     """Each richness-bias object owns an independent calibration."""
-    first_model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
-    second_model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    first_model = CostanziRichnessBias()
+    second_model = CostanziRichnessBias()
 
     first_model.parameters["tau"] = 0.20
 
@@ -58,7 +69,7 @@ def test_costanzi_probability_shape_positivity_and_finiteness():
     rich_tru = np.geomspace(1e-2, 250.0, 100)
     redshift = np.geomspace(1.0 + 1e-2, 1.0 + 1.5, 30) - 1.0
     rich_tru_mesh, _ = np.meshgrid(rich_tru, redshift, indexing="ij")
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
 
     prob = model.prob_richobs_at_richtru(
         rich_obs=rich_obs,
@@ -75,7 +86,7 @@ def test_costanzi_probability_accepts_parameter_arrays():
     """Projection parameters can vary along the rich_tru axis."""
     rich_obs = np.array([10.0, 20.0, 40.0])
     rich_tru = np.array([15.0, 30.0, 60.0])
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
     model.parameters.update(
         {
             "tau": np.array([0.08, 0.10, 0.12]),
@@ -102,7 +113,7 @@ def test_costanzi_observed_bin_probability_shape_positivity_and_finiteness():
     rich_tru = np.geomspace(1e-2, 250.0, 100)
     redshift = np.geomspace(1.0 + 1e-2, 1.0 + 1.5, 30) - 1.0
     rich_tru_mesh, _ = np.meshgrid(rich_tru, redshift, indexing="ij")
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
 
     sprob = model.Sprob_at_richtru(
         rich_obs_eds=rich_obs_eds,
@@ -119,7 +130,7 @@ def test_costanzi_observed_bin_probability_shape_positivity_and_finiteness():
 def test_costanzi_observed_bin_probability_is_smaller_than_total_probability():
     """A finite observed-richness bin should not exceed the broad-bin integral."""
     rich_tru = np.geomspace(10.0, 100.0, 12)
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
 
     narrow = model.Sprob_at_richtru(
         rich_obs_eds=np.array([20.0, 40.0]),
@@ -153,7 +164,7 @@ def test_costanzi_probability_validates_parameters(parameter, value, match):
     """Invalid projection parameters should fail explicitly."""
     rich_obs = np.array([10.0, 20.0])
     rich_tru = np.array([20.0, 40.0])
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
     model.parameters[parameter] = value
 
     with pytest.raises(ValueError, match=match):
@@ -166,7 +177,7 @@ def test_costanzi_probability_validates_parameters(parameter, value, match):
 def test_costanzi_observed_bin_probability_validates_bin_edges():
     """Observed-richness bin edges must be 1D and monotonically increasing."""
     rich_tru = np.array([20.0, 40.0])
-    model = CostanziRichnessBias(**COSTANZI_DEFAULT_PARAMETERS)
+    model = CostanziRichnessBias()
 
     with pytest.raises(ValueError, match="monotonically increasing"):
         model.Sprob_at_richtru(
@@ -174,6 +185,20 @@ def test_costanzi_observed_bin_probability_validates_bin_edges():
             rich_obs_res=0.01,
             rich_tru=rich_tru,
         )
+
+
+def test_costanzi_lensing_bias_default_parameters():
+    """Test the default Costanzi lensing-bias parameters."""
+    radius = np.array([0.5, 1.0, 2.0])
+    model = CostanziLensingBias()
+
+    for key, value in LENSING_BIAS_DEFAULT_PARAMETERS.items():
+        assert model.parameters[key] == value
+
+    correction = model.bsel(radius, radial_units="Mpc/h")
+
+    assert correction.shape == (1, len(radius))
+    np.testing.assert_allclose(correction, 1.0)
 
 
 def test_costanzi_lensing_bias_constant_correction():
