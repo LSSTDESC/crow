@@ -101,27 +101,27 @@ def _check_miscentering_behavior(
         cluster.approx = None
 
     reset_cluster()
-    cluster.set_beta_parameters(10.0, approx="order1")
+    cluster.set_beta_parameters(10.0, approx="type1")
     baseline = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
     reset_cluster()
-    cluster.set_beta_parameters(10.0, approx="order2")
+    cluster.set_beta_parameters(10.0, approx="type2")
     baseline2 = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
     reset_cluster()
     cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
-    cluster.set_beta_parameters(10.0, approx="order1")
+    cluster.set_beta_parameters(10.0, approx="type1")
     result_mis = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
     reset_cluster()
     cluster.set_miscentering(0.0, miscentering_distribution_function=pdf)
-    cluster.set_beta_parameters(10.0, approx="order1")
+    cluster.set_beta_parameters(10.0, approx="type1")
     result_right_center = cluster.compute_shear_profile(log_mass, redshifts, radius)
     np.testing.assert_allclose(result_right_center, baseline, rtol=1e-12)
 
     reset_cluster()
     cluster.set_miscentering(miscentering_frac, miscentering_distribution_function=pdf)
-    cluster.set_beta_parameters(10.0, approx="order2")
+    cluster.set_beta_parameters(10.0, approx="type2")
     result_mis_order2 = cluster.compute_shear_profile(log_mass, redshifts, radius)
 
     assert result_mis.shape == baseline.shape
