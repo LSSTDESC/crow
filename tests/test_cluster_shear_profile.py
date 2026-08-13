@@ -68,6 +68,33 @@ def test_cluster_update_ingredients(
         assert cluster._hmf_cache == {}  # pylint: disable=protected-access
 
 
+def test_cluster_shear_profile_cosmo_update_refreshes_clmm_cosmo(
+    cluster_deltasigma_profile: ClusterShearProfile,
+):
+    """cosmo reassignment must propagate to the internal CLMM cosmology.
+
+    Regression test: `_clmm_cosmo` used to be built once in `__init__` and
+    never refreshed when `.cosmo` was reassigned later (e.g. by a sampler),
+    so delta sigma predictions silently kept using the construction-time
+    cosmology no matter what was sampled.
+    """
+    new_cosmo = pyccl.Cosmology(
+        Omega_c=0.22,
+        Omega_b=0.0448,
+        h=0.71,
+        sigma8=0.8,
+        n_s=0.963,
+    )
+    assert new_cosmo["Omega_c"] != _TEST_COSMO["Omega_c"]
+
+    cluster_deltasigma_profile.cosmo = new_cosmo
+
+    # pylint: disable=protected-access
+    assert cluster_deltasigma_profile._clmm_cosmo.be_cosmo["Omega_c"] == pytest.approx(
+        new_cosmo["Omega_c"]
+    )
+
+
 def test_cluster_deltasigma_profile_init(
     cluster_deltasigma_profile: ClusterShearProfile,
 ):
