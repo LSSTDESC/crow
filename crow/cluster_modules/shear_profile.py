@@ -48,6 +48,25 @@ class ClusterShearProfile(ClusterAbundance):
     shear integrand.
     """
 
+    @property
+    def cosmo(self) -> Cosmology | None:
+        """The cosmology used to predict the cluster shear profile."""
+        return self._cosmo
+
+    @cosmo.setter
+    def cosmo(self, cosmo: Cosmology) -> None:
+        """Update the shear profile calculation with a new cosmology.
+
+        Overrides `ClusterAbundance.cosmo` to also refresh the CLMM-wrapped
+        cosmology used internally for the delta sigma / shear calculations.
+        Without this, `_clmm_cosmo` stays pinned to whatever cosmology was
+        passed at construction time, so predictions silently ignore any
+        cosmology update (e.g. from a sampler) after the object is created.
+        """
+        self._cosmo = cosmo
+        self._hmf_cache: dict[tuple[float, float], float] = {}
+        self._clmm_cosmo = clmm.Cosmology(be_cosmo=cosmo, validate_input=False)
+
     def __init__(
         self,
         cosmo: Cosmology,
@@ -88,8 +107,6 @@ class ClusterShearProfile(ClusterAbundance):
 
         self.two_halo_term = two_halo_term
         self.boost_factor = boost_factor
-
-        self._clmm_cosmo = clmm.Cosmology(be_cosmo=self._cosmo, validate_input=False)
 
         self._beta_parameters = None
         self._beta_s_mean_interp = None
