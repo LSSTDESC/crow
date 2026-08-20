@@ -159,7 +159,7 @@ class ClusterShearProfile(ClusterAbundance):
         delta_z_cut=0.1,
         zmin=None,
         z_distrib_func=None,
-        approx="order1",
+        approx="type1",
     ):
         r"""Set parameters to comput mean value of the geometric lensing efficicency
 
@@ -185,7 +185,7 @@ class ClusterShearProfile(ClusterAbundance):
         approx : str, optional
             Type of computation to be made for reduced tangential shears, options are:
 
-                * 'order1' : Same approach as in Weighing the Giants - III (equation 6 in
+                * 'type1' : Same approach as in Weighing the Giants - III (equation 6 in
                   Applegate et al. 2014; https://arxiv.org/abs/1208.0605). `z_src_info` must be
                   'beta':
 
@@ -193,7 +193,7 @@ class ClusterShearProfile(ClusterAbundance):
                       g_t\approx\frac{\left<\beta_s\right>\gamma_{\infty}}
                       {1-\left<\beta_s\right>\kappa_{\infty}}
 
-                * 'order2' : Same approach as in Cluster Mass Calibration at High
+                * 'type2' : Same approach as in Cluster Mass Calibration at High
                   Redshift (equation 12 in Schrabback et al. 2017;
                   https://arxiv.org/abs/1611.03866).
                   `z_src_info` must be 'beta':
@@ -599,7 +599,7 @@ class ClusterShearProfile(ClusterAbundance):
         beta_s_mean : float or None
             Mean beta_s if using reduced shear; None if computing DeltaSigma.
         beta_s_square_mean : float or None
-            Mean beta_s^2 for order2 approx; None if not used.
+            Mean beta_s^2 for type2 approx; None if not used.
 
         Returns
         -------
@@ -653,7 +653,7 @@ class ClusterShearProfile(ClusterAbundance):
                 esd_vals = (beta_s_mean * esd_vals) / (
                     sigma_c_inf - beta_s_mean * sigma_mis_vals
                 )
-                if self.approx == "order2":
+                if self.approx == "type2":
                     esd_vals = esd_vals * (
                         1.0
                         + (beta_s_square_mean / beta_s_mean**2 - 1.0)

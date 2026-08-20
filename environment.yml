@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - black
-  - clmm
+  - clmm >= 1.17.0
   - hypothesis
   - isort
   - numcosmo >= 0.21.1
