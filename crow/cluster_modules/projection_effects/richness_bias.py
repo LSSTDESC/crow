@@ -205,12 +205,12 @@ class CostanziRichnessBias:
         pdf = 0.5 * (gauss + term1 + term23 - term4)  # (n_obs, n_tru,)
         return pdf
 
-    #def Sprob_at_richtru(
+    # def Sprob_at_richtru(
     #    self,
     #    rich_obs_eds: npt.NDArray[np.float64],
     #    rich_obs_res: npt.NDArray[np.float64],
     #    rich_tru: npt.NDArray[np.float64],
-    #) -> npt.NDArray[np.floating]:
+    # ) -> npt.NDArray[np.floating]:
     #    """
     #    Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
 
