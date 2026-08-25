@@ -13,6 +13,7 @@ Subpackages
    :maxdepth: 4
 
    crow.cluster_modules.mass_proxy
+   crow.cluster_modules.projection_effects
 
 Submodules
 ----------

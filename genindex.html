@@ -53,6 +53,11 @@
 <li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.projection_effects.html">crow.cluster_modules.projection_effects package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.projection_effects.lensing_bias.html">crow.cluster_modules.projection_effects.lensing_bias module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/crow.cluster_modules.projection_effects.richness_bias.html">crow.cluster_modules.projection_effects.richness_bias module</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
@@ -130,6 +135,10 @@
       <li><a href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe">BinnedClusterRecipe (class in crow.recipes.binned_parent)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/crow.cluster_modules.projection_effects.lensing_bias.html#crow.cluster_modules.projection_effects.lensing_bias.CostanziLensingBias.bsel">bsel() (crow.cluster_modules.projection_effects.lensing_bias.CostanziLensingBias method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
@@ -158,6 +167,14 @@
       <li><a href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.compute_shear_profile_vectorized">compute_shear_profile_vectorized() (crow.cluster_modules.shear_profile.ClusterShearProfile method)</a>
 </li>
       <li><a href="api/crow.cluster_modules.abundance.html#crow.cluster_modules.abundance.ClusterAbundance.cosmo">cosmo (crow.cluster_modules.abundance.ClusterAbundance property)</a>
+
+      <ul>
+        <li><a href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.cosmo">(crow.cluster_modules.shear_profile.ClusterShearProfile property)</a>
+</li>
+      </ul></li>
+      <li><a href="api/crow.cluster_modules.projection_effects.lensing_bias.html#crow.cluster_modules.projection_effects.lensing_bias.CostanziLensingBias">CostanziLensingBias (class in crow.cluster_modules.projection_effects.lensing_bias)</a>
+</li>
+      <li><a href="api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias">CostanziRichnessBias (class in crow.cluster_modules.projection_effects.richness_bias)</a>
 </li>
       <li><a href="api/crow.properties.html#crow.properties.ClusterProperty.COUNTS">COUNTS (crow.properties.ClusterProperty attribute)</a>
 </li>
@@ -203,8 +220,6 @@
         <li><a href="api/crow.cluster_modules.mass_proxy.gaussian_protocol.html#module-crow.cluster_modules.mass_proxy.gaussian_protocol">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     crow.cluster_modules.mass_proxy.murata
 
@@ -212,11 +227,34 @@
         <li><a href="api/crow.cluster_modules.mass_proxy.murata.html#module-crow.cluster_modules.mass_proxy.murata">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     crow.cluster_modules.parameters
 
       <ul>
         <li><a href="api/crow.cluster_modules.parameters.html#module-crow.cluster_modules.parameters">module</a>
+</li>
+      </ul></li>
+      <li>
+    crow.cluster_modules.projection_effects
+
+      <ul>
+        <li><a href="api/crow.cluster_modules.projection_effects.html#module-crow.cluster_modules.projection_effects">module</a>
+</li>
+      </ul></li>
+      <li>
+    crow.cluster_modules.projection_effects.lensing_bias
+
+      <ul>
+        <li><a href="api/crow.cluster_modules.projection_effects.lensing_bias.html#module-crow.cluster_modules.projection_effects.lensing_bias">module</a>
+</li>
+      </ul></li>
+      <li>
+    crow.cluster_modules.projection_effects.richness_bias
+
+      <ul>
+        <li><a href="api/crow.cluster_modules.projection_effects.richness_bias.html#module-crow.cluster_modules.projection_effects.richness_bias">module</a>
 </li>
       </ul></li>
       <li>
@@ -320,6 +358,8 @@
         <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity.distribution">(crow.cluster_modules.purity_models.Purity method)</a>
 </li>
         <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16.distribution">(crow.cluster_modules.purity_models.PurityAguena16 method)</a>
+</li>
+        <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16LnProxy.distribution">(crow.cluster_modules.purity_models.PurityAguena16LnProxy method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -446,6 +486,12 @@
 </li>
         <li><a href="api/crow.cluster_modules.parameters.html#module-crow.cluster_modules.parameters">crow.cluster_modules.parameters</a>
 </li>
+        <li><a href="api/crow.cluster_modules.projection_effects.html#module-crow.cluster_modules.projection_effects">crow.cluster_modules.projection_effects</a>
+</li>
+        <li><a href="api/crow.cluster_modules.projection_effects.lensing_bias.html#module-crow.cluster_modules.projection_effects.lensing_bias">crow.cluster_modules.projection_effects.lensing_bias</a>
+</li>
+        <li><a href="api/crow.cluster_modules.projection_effects.richness_bias.html#module-crow.cluster_modules.projection_effects.richness_bias">crow.cluster_modules.projection_effects.richness_bias</a>
+</li>
         <li><a href="api/crow.cluster_modules.purity_models.html#module-crow.cluster_modules.purity_models">crow.cluster_modules.purity_models</a>
 </li>
         <li><a href="api/crow.cluster_modules.shear_profile.html#module-crow.cluster_modules.shear_profile">crow.cluster_modules.shear_profile</a>
@@ -511,6 +557,8 @@
 </li>
       <li><a href="api/crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters">Parameters (class in crow.cluster_modules.parameters)</a>
 </li>
+      <li><a href="api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias.prob_richobs_at_richtru">prob_richobs_at_richtru() (crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.Purity">Purity (class in crow.cluster_modules.purity_models)</a>
@@ -518,6 +566,8 @@
       <li><a href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.purity">purity (crow.recipes.binned_parent.BinnedClusterRecipe property)</a>
 </li>
       <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16">PurityAguena16 (class in crow.cluster_modules.purity_models)</a>
+</li>
+      <li><a href="api/crow.cluster_modules.purity_models.html#crow.cluster_modules.purity_models.PurityAguena16LnProxy">PurityAguena16LnProxy (class in crow.cluster_modules.purity_models)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -541,8 +591,6 @@
 </li>
       <li><a href="api/crow.cluster_modules.shear_profile.html#crow.cluster_modules.shear_profile.ClusterShearProfile.set_miscentering">set_miscentering() (crow.cluster_modules.shear_profile.ClusterShearProfile method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/crow.recipes.binned_exact.html#crow.recipes.binned_exact.ExactBinnedClusterRecipe.setup">setup() (crow.recipes.binned_exact.ExactBinnedClusterRecipe method)</a>
 
       <ul>
@@ -551,9 +599,13 @@
         <li><a href="api/crow.recipes.binned_parent.html#crow.recipes.binned_parent.BinnedClusterRecipe.setup">(crow.recipes.binned_parent.BinnedClusterRecipe method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/crow.properties.html#crow.properties.ClusterProperty.SHEAR">SHEAR (crow.properties.ClusterProperty attribute)</a>
 </li>
       <li><a href="api/crow.cluster_modules.kernel.html#crow.cluster_modules.kernel.SpectroscopicRedshift">SpectroscopicRedshift (class in crow.cluster_modules.kernel)</a>
+</li>
+      <li><a href="api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias.Sprob_at_richtru">Sprob_at_richtru() (crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias method)</a>
 </li>
   </ul></td>
 </tr></table>

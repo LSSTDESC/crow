@@ -1,0 +1,7 @@
+crow.cluster\_modules.projection\_effects.lensing\_bias module
+==============================================================
+
+.. automodule:: crow.cluster_modules.projection_effects.lensing_bias
+   :members:
+   :show-inheritance:
+   :undoc-members:

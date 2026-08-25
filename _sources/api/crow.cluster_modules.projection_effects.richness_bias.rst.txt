@@ -1,0 +1,7 @@
+crow.cluster\_modules.projection\_effects.richness\_bias module
+===============================================================
+
+.. automodule:: crow.cluster_modules.projection_effects.richness_bias
+   :members:
+   :show-inheritance:
+   :undoc-members:

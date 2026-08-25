@@ -53,6 +53,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.projection_effects.html">crow.cluster_modules.projection_effects package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/crow.cluster_modules.projection_effects.lensing_bias.html">crow.cluster_modules.projection_effects.lensing_bias module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/crow.cluster_modules.projection_effects.richness_bias.html">crow.cluster_modules.projection_effects.richness_bias module</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
@@ -110,6 +115,7 @@
 <span class="sd">functions that produce those predictions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">clmm</span>  <span class="c1"># pylint: disable=import-error</span>
@@ -154,6 +160,25 @@
 <span class="sd">    shear integrand.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Cosmology</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The cosmology used to predict the cluster shear profile.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span>
+
+    <span class="nd">@cosmo</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cosmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the shear profile calculation with a new cosmology.</span>
+
+<span class="sd">        Overrides `ClusterAbundance.cosmo` to also refresh the CLMM-wrapped</span>
+<span class="sd">        cosmology used internally for the delta sigma / shear calculations.</span>
+<span class="sd">        Without this, `_clmm_cosmo` stays pinned to whatever cosmology was</span>
+<span class="sd">        passed at construction time, so predictions silently ignore any</span>
+<span class="sd">        cosmology update (e.g. from a sampler) after the object is created.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span> <span class="o">=</span> <span class="n">cosmo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hmf_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clmm_cosmo</span> <span class="o">=</span> <span class="n">clmm</span><span class="o">.</span><span class="n">Cosmology</span><span class="p">(</span><span class="n">be_cosmo</span><span class="o">=</span><span class="n">cosmo</span><span class="p">,</span> <span class="n">validate_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cosmo</span><span class="p">:</span> <span class="n">Cosmology</span><span class="p">,</span>
@@ -195,8 +220,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">two_halo_term</span> <span class="o">=</span> <span class="n">two_halo_term</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boost_factor</span> <span class="o">=</span> <span class="n">boost_factor</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_clmm_cosmo</span> <span class="o">=</span> <span class="n">clmm</span><span class="o">.</span><span class="n">Cosmology</span><span class="p">(</span><span class="n">be_cosmo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cosmo</span><span class="p">,</span> <span class="n">validate_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta_parameters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta_s_mean_interp</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta_s_square_mean_interp</span> <span class="o">=</span> <span class="kc">None</span>
@@ -214,8 +237,13 @@
     <span class="nd">@cluster_concentration</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cluster_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the cluster concentration parameter.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The concentration value &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39; results in the&quot;</span>
+                <span class="s2">&quot;Bhattacharya13 mass-concentration model being used.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;cluster_concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
@@ -615,7 +643,7 @@
 <span class="sd">        float</span>
 <span class="sd">            Halo concentration parameter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_concentration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_concentration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_concentration</span>
 
         <span class="n">conc_model</span> <span class="o">=</span> <span class="n">pyccl</span><span class="o">.</span><span class="n">halos</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">ConcentrationBhattacharya13</span><span class="p">(</span>

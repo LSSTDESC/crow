@@ -1,0 +1,443 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>crow.cluster_modules.projection_effects.richness_bias &mdash; Crow  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Crow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/crow.cluster_modules.html">crow.cluster_modules package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.mass_proxy.html">crow.cluster_modules.mass_proxy package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/crow.cluster_modules.mass_proxy.gaussian_protocol.html">crow.cluster_modules.mass_proxy.gaussian_protocol module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.projection_effects.html">crow.cluster_modules.projection_effects package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/crow.cluster_modules.projection_effects.lensing_bias.html">crow.cluster_modules.projection_effects.lensing_bias module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/crow.cluster_modules.projection_effects.richness_bias.html">crow.cluster_modules.projection_effects.richness_bias module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.parameters.html">crow.cluster_modules.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.purity_models.html">crow.cluster_modules.purity_models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.cluster_modules.shear_profile.html">crow.cluster_modules.shear_profile module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/crow.integrator.html">crow.integrator package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.integrator.integrator.html">crow.integrator.integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.integrator.numcosmo_integrator.html">crow.integrator.numcosmo_integrator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.integrator.scipy_integrator.html">crow.integrator.scipy_integrator module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/crow.recipes.html">crow.recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.recipes.binned_exact.html">crow.recipes.binned_exact module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.recipes.binned_grid.html">crow.recipes.binned_grid module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/crow.recipes.binned_parent.html">crow.recipes.binned_parent module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/crow.properties.html">crow.properties module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Crow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">crow.cluster_modules.projection_effects.richness_bias</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for crow.cluster_modules.projection_effects.richness_bias</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spc</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parameters</span>
+
+<span class="n">RICHNESS_BIAS_DEFAULT_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;tau&quot;</span><span class="p">:</span> <span class="mf">0.10</span><span class="p">,</span>
+    <span class="s2">&quot;delta_mu&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="s2">&quot;fractional_sig_pure&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+    <span class="s2">&quot;fprj&quot;</span><span class="p">:</span> <span class="mf">0.95</span><span class="p">,</span>
+    <span class="s2">&quot;fmsk&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="CostanziRichnessBias">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CostanziRichnessBias</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Projection effects model from Costanzi+19.</span>
+
+<span class="sd">    Each instance owns one calibration in ``parameters``. Parameter values may</span>
+<span class="sd">    be scalars or one-dimensional arrays broadcastable to the true-richness</span>
+<span class="sd">    grid. ``fractional_sig_pure`` is the dimensionless fractional scatter,</span>
+<span class="sd">    such that ``sig_pure = fractional_sig_pure * rich_tru``.</span>
+
+<span class="sd">    Implemented as a CROW module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tau</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delta_mu</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fractional_sig_pure</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fprj</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fmsk</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Costanzi projection model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tau : ndarray</span>
+<span class="sd">            The projection effect parameter. If None, use the default value.</span>
+<span class="sd">        delta_mu : ndarray</span>
+<span class="sd">            The bias in the mean projected richness relative to the true richness,</span>
+<span class="sd">            as ``delta_mu = mu - rich_tru``, where ``mu`` is the mean projected</span>
+<span class="sd">            richness. If None, use the default value.</span>
+<span class="sd">        fractional_sig_pure : ndarray</span>
+<span class="sd">            The fractional scatter of the projected richness. The absolute scatter</span>
+<span class="sd">            is ``sig_pure = fractional_sig_pure * rich_tru``, with projected</span>
+<span class="sd">            richness distributed as ``rich_tru + N(delta_mu, sig_pure)``. If None,</span>
+<span class="sd">            use the default value.</span>
+<span class="sd">        fprj : ndarray</span>
+<span class="sd">            The fraction of clusters affected by projection. If None, use the</span>
+<span class="sd">            default value.</span>
+<span class="sd">        fmsk : ndarray</span>
+<span class="sd">            The fraction of clusters being masked by others. If None, use the</span>
+<span class="sd">            default value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">({</span><span class="o">**</span><span class="n">RICHNESS_BIAS_DEFAULT_PARAMETERS</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">tau</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tau</span>
+        <span class="k">if</span> <span class="n">delta_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;delta_mu&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_mu</span>
+        <span class="k">if</span> <span class="n">fractional_sig_pure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fractional_sig_pure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fractional_sig_pure</span>
+        <span class="k">if</span> <span class="n">fprj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fprj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fprj</span>
+        <span class="k">if</span> <span class="n">fmsk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fmsk&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fmsk</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_exp_times_erfc</span><span class="p">(</span>
+        <span class="n">log_factor</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">erfc_arg</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate exp(log_factor) * erfc(erfc_arg) without overflow.</span>
+
+<span class="sd">        The Costanzi projection model contains terms of the form</span>
+<span class="sd">        ``exp(x) * erfc(y)``.  For high true-richness grid points, ``exp(x)``</span>
+<span class="sd">        can overflow even when the product is finite because ``erfc(y)`` is</span>
+<span class="sd">        exponentially small.  For positive ``y`` we rewrite the expression with</span>
+<span class="sd">        ``erfcx(y) = exp(y**2) * erfc(y)``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">log_factor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">erfc_arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">erfc_arg</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">log_factor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">positive_arg</span> <span class="o">=</span> <span class="n">erfc_arg</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">positive_arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="n">log_factor</span><span class="p">[</span><span class="n">positive_arg</span><span class="p">]</span> <span class="o">-</span> <span class="n">erfc_arg</span><span class="p">[</span><span class="n">positive_arg</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">erfcx</span><span class="p">(</span><span class="n">erfc_arg</span><span class="p">[</span><span class="n">positive_arg</span><span class="p">])</span>
+        <span class="n">result</span><span class="p">[</span><span class="o">~</span><span class="n">positive_arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_factor</span><span class="p">[</span><span class="o">~</span><span class="n">positive_arg</span><span class="p">])</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">erfc</span><span class="p">(</span>
+            <span class="n">erfc_arg</span><span class="p">[</span><span class="o">~</span><span class="n">positive_arg</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="CostanziRichnessBias.prob_richobs_at_richtru">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias.prob_richobs_at_richtru">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prob_richobs_at_richtru</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rich_obs</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">rich_tru</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the probability of observing the observed richness given the true richness.</span>
+<span class="sd">        Equation 15 in Costanzi+19.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rich_obs : ndarray</span>
+<span class="sd">            The observed richness</span>
+<span class="sd">        rich_tru : ndarray</span>
+<span class="sd">            The true richness</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This calculation uses ``tau``, ``delta_mu``, ``fractional_sig_pure``,</span>
+<span class="sd">        ``fprj``, and ``fmsk`` from :attr:`parameters`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prob : ndarray</span>
+<span class="sd">            The probability of P(rich_obs | rich_tru).</span>
+<span class="sd">            The shape is (len(rich_obs), len(rich_tru))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># sanitize</span>
+        <span class="n">rich_obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_obs</span><span class="p">)</span>
+        <span class="n">rich_tru</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_tru</span><span class="p">)</span>
+
+        <span class="c1"># Broadcast model parameters over the true-richness grid.</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">rich_tru</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">delta_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;delta_mu&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">rich_tru</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">fractional_sig_pure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fractional_sig_pure&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+            <span class="n">rich_tru</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sig_pure</span> <span class="o">=</span> <span class="n">fractional_sig_pure</span> <span class="o">*</span> <span class="n">rich_tru</span>
+        <span class="n">fprj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fprj&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">rich_tru</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">fmsk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;fmsk&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">rich_tru</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Safety checks</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">tau</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tau can only be positive.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">fractional_sig_pure</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fractional_sig_pure can only be positive.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sig_pure</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sig_pure can only be positive.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">fprj</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">fprj</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fprj can only be between 0 and 1.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">fmsk</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">fmsk</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fmsk can only be between 0 and 1.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Forcing the shapes in (n_obs,1,) or (1,n_tru,)</span>
+        <span class="n">rich_obs</span> <span class="o">=</span> <span class="n">rich_obs</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">rich_tru</span> <span class="o">=</span> <span class="n">rich_tru</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">delta_mu</span> <span class="o">=</span> <span class="n">delta_mu</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">sig_pure</span> <span class="o">=</span> <span class="n">sig_pure</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">fprj</span> <span class="o">=</span> <span class="n">fprj</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">fmsk</span> <span class="o">=</span> <span class="n">fmsk</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># Calculation logic</span>
+        <span class="n">sig2_l</span> <span class="o">=</span> <span class="n">sig_pure</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># (n_tru,)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">rich_tru</span> <span class="o">+</span> <span class="n">delta_mu</span>  <span class="c1"># (n_tru,)</span>
+        <span class="n">erfc_arg1</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">sig2_l</span> <span class="o">-</span> <span class="n">rich_obs</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="mf">2.0</span> <span class="o">*</span> <span class="n">sig2_l</span>
+        <span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="n">erfc_arg2</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="n">rich_obs</span> <span class="o">-</span> <span class="n">rich_tru</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="mf">2.0</span> <span class="o">*</span> <span class="n">sig2_l</span>
+        <span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="n">erfc_arg3</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="n">rich_obs</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">sig2_l</span><span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="n">erfc_arg4</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">sig2_l</span> <span class="o">-</span> <span class="n">rich_obs</span> <span class="o">-</span> <span class="n">rich_tru</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="mf">2.0</span> <span class="o">*</span> <span class="n">sig2_l</span>
+        <span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="n">log_exptau</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">0.5</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">sig2_l</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">rich_obs</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+
+        <span class="n">gauss</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fmsk</span><span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fprj</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">rich_obs</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">sig2_l</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">sig2_l</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fmsk</span><span class="p">)</span> <span class="o">*</span> <span class="n">fprj</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">+</span> <span class="n">fmsk</span> <span class="o">*</span> <span class="n">fprj</span> <span class="o">/</span> <span class="n">rich_tru</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">CostanziRichnessBias</span><span class="o">.</span><span class="n">_exp_times_erfc</span><span class="p">(</span><span class="n">log_exptau</span><span class="p">,</span> <span class="n">erfc_arg1</span><span class="p">)</span>
+        <span class="n">term23</span> <span class="o">=</span> <span class="n">fmsk</span> <span class="o">/</span> <span class="n">rich_tru</span> <span class="o">*</span> <span class="p">(</span><span class="n">spc</span><span class="o">.</span><span class="n">erfc</span><span class="p">(</span><span class="n">erfc_arg2</span><span class="p">)</span> <span class="o">-</span> <span class="n">spc</span><span class="o">.</span><span class="n">erfc</span><span class="p">(</span><span class="n">erfc_arg3</span><span class="p">))</span>
+        <span class="n">term4</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">fmsk</span>
+            <span class="o">*</span> <span class="n">fprj</span>
+            <span class="o">/</span> <span class="n">rich_tru</span>
+            <span class="o">*</span> <span class="n">CostanziRichnessBias</span><span class="o">.</span><span class="n">_exp_times_erfc</span><span class="p">(</span>
+                <span class="n">log_exptau</span> <span class="o">-</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">rich_tru</span><span class="p">,</span>
+                <span class="n">erfc_arg4</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">gauss</span> <span class="o">+</span> <span class="n">term1</span> <span class="o">+</span> <span class="n">term23</span> <span class="o">-</span> <span class="n">term4</span><span class="p">)</span>  <span class="c1"># (n_obs, n_tru,)</span>
+        <span class="k">return</span> <span class="n">pdf</span></div>
+
+
+<div class="viewcode-block" id="CostanziRichnessBias.Sprob_at_richtru">
+<a class="viewcode-back" href="../../../../api/crow.cluster_modules.projection_effects.richness_bias.html#crow.cluster_modules.projection_effects.richness_bias.CostanziRichnessBias.Sprob_at_richtru">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Sprob_at_richtru</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">rich_obs_eds</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">rich_obs_res</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+        <span class="n">rich_tru</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rich_obs_eds : ndarray</span>
+<span class="sd">            The boundaries defining the richness intervals.</span>
+<span class="sd">            It has a dimension of 1 and length at least 2.</span>
+<span class="sd">        rich_obs_res : ndarray</span>
+<span class="sd">            The resolution used in the integration over each richness integral.</span>
+<span class="sd">            If a constant is provided, all richness integrals use the same resolution.</span>
+<span class="sd">            If an array provided, it has a dimension of 1 and length exactly of len(rich_obs_eds) - 1.</span>
+<span class="sd">            The resolution is defined as the fractional increase of 1 + rich_obs_res.</span>
+<span class="sd">            Smaller rich_obs_res means higher resolutions.</span>
+<span class="sd">        rich_tru : ndarray</span>
+<span class="sd">            The true richness</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sprob_at_richtru : ndarray</span>
+<span class="sd">            The probability of \\int drich_obs P(rich_obs | rich_tru).</span>
+<span class="sd">            The shape is (len(rich_obs_eds) - 1, len(rich_tru))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># sanitize</span>
+        <span class="n">rich_obs_eds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_obs_eds</span><span class="p">)</span>
+        <span class="n">rich_obs_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_obs_res</span><span class="p">)</span>
+        <span class="n">rich_tru</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_tru</span><span class="p">)</span>
+
+        <span class="c1"># define integral boundaries</span>
+        <span class="k">if</span> <span class="n">rich_obs_eds</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The array rich_obs_eds ndim is not 1. &quot;</span>
+                <span class="s2">&quot;Integral boundaries cannot be defined.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">rich_obs_eds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The array rich_obs_eds has to be monotonically increasing.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">rich_obs_low</span> <span class="o">=</span> <span class="n">rich_obs_eds</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">rich_obs_hgh</span> <span class="o">=</span> <span class="n">rich_obs_eds</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># define integral resolution</span>
+        <span class="n">rich_obs_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rich_obs_res</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">rich_obs_low</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+
+        <span class="n">rich_obs_nst</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rich_obs_hgh</span> <span class="o">/</span> <span class="n">rich_obs_low</span><span class="p">)</span> <span class="o">/</span> <span class="n">rich_obs_res</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">rich_obs_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">rich_obs_low</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rich_obs_hgh</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rich_obs_nst</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span>
+                        <span class="n">rich_obs_low</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rich_obs_hgh</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">rich_obs_nst</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                    <span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rich_obs_low</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">rich_obs_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rich_obs_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">rich_obs_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">rich_obs_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">rich_obs_edges</span><span class="p">)</span>
+        <span class="n">rich_obs_digit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">rich_obs_bins</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">rich_obs_eds</span><span class="p">)</span>
+
+        <span class="c1"># calc</span>
+        <span class="n">prob_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob_richobs_at_richtru</span><span class="p">(</span>
+            <span class="n">rich_obs</span><span class="o">=</span><span class="n">rich_obs_bins</span><span class="p">,</span>
+            <span class="n">rich_tru</span><span class="o">=</span><span class="n">rich_tru</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">Sprob_obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                    <span class="n">rich_obs_steps</span><span class="p">[</span><span class="n">rich_obs_digit</span> <span class="o">==</span> <span class="n">ith</span><span class="p">][:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                    <span class="o">*</span> <span class="n">prob_obs</span><span class="p">[</span><span class="n">rich_obs_digit</span> <span class="o">==</span> <span class="n">ith</span><span class="p">],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">ith</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rich_obs_eds</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Sprob_obs</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, LSST DESC CROW Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

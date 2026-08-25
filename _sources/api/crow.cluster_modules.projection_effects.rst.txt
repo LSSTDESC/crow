@@ -1,0 +1,16 @@
+crow.cluster\_modules.projection\_effects package
+=================================================
+
+.. automodule:: crow.cluster_modules.projection_effects
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   crow.cluster_modules.projection_effects.lensing_bias
+   crow.cluster_modules.projection_effects.richness_bias

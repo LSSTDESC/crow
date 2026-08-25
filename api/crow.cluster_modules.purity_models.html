@@ -56,6 +56,11 @@
 <li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.mass_proxy.murata.html">crow.cluster_modules.mass_proxy.murata module</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.projection_effects.html">crow.cluster_modules.projection_effects package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.projection_effects.lensing_bias.html">crow.cluster_modules.projection_effects.lensing_bias module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="crow.cluster_modules.projection_effects.richness_bias.html">crow.cluster_modules.projection_effects.richness_bias module</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.abundance.html">crow.cluster_modules.abundance module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.completeness_models.html">crow.cluster_modules.completeness_models module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="crow.cluster_modules.kernel.html">crow.cluster_modules.kernel module</a></li>
@@ -178,6 +183,50 @@ subclass' signature when invoking the concrete implementation.</p>
 The purity is given by the sigmoid-like expression</p>
 <blockquote>
 <div><p>p(M, z) = ( (M / M_piv(z))**(n_c(z)) ) / ( 1 + (M / M_piv(z))**(n_c(z)) ),</p>
+</div></blockquote>
+<p>where M = 10**(log_mass_proxy), M_piv(z) = 10**(a_logm_piv + b_logm_piv*(1 + z))
+and n_c(z) = a_n + b_n*(1 + z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_mass_proxy</strong> (<em>array_like</em>) -- Array of log10 mass-proxy values.</p></li>
+<li><p><strong>z</strong> (<em>array_like</em>) -- Array of redshifts matching <code class="docutils literal notranslate"><span class="pre">log_mass_proxy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Purity values in the interval [0, 1] with shape matching the
+broadcasted inputs. dtype is float64.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="crow.cluster_modules.purity_models.PurityAguena16LnProxy">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">crow.cluster_modules.purity_models.</span></span><span class="sig-name descname"><span class="pre">PurityAguena16LnProxy</span></span><a class="reference internal" href="../_modules/crow/cluster_modules/purity_models.html#PurityAguena16LnProxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.purity_models.PurityAguena16LnProxy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#crow.cluster_modules.purity_models.PurityAguena16" title="crow.cluster_modules.purity_models.PurityAguena16"><code class="xref py py-class docutils literal notranslate"><span class="pre">PurityAguena16</span></code></a></p>
+<p>Purity model following Aguena et al. (2016) parametrisation.</p>
+<p>The model computes a sigmoid-like purity as a function of a mass proxy
+and redshift using a pivot mass and a redshift-dependent power-law index.
+This class makes a smaller update on the previous model changing some
+modeling parameters to Ln scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference internal" href="crow.cluster_modules.parameters.html#crow.cluster_modules.parameters.Parameters" title="crow.cluster_modules.parameters.Parameters"><em>Parameters</em></a>) -- Container holding default parameters defined in
+<code class="docutils literal notranslate"><span class="pre">REDMAPPER_DEFAULT_PARAMETERS_LN</span></code>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="crow.cluster_modules.purity_models.PurityAguena16LnProxy.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_mass_proxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/crow/cluster_modules/purity_models.html#PurityAguena16LnProxy.distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#crow.cluster_modules.purity_models.PurityAguena16LnProxy.distribution" title="Link to this definition"></a></dt>
+<dd><p>Compute the purity fraction for given mass-proxy and redshift.
+The purity is given by the sigmoid-like expression</p>
+<blockquote>
+<div><p>p(M, z) = ( ( ln M / ln M_piv(z) ) ** n_c(z) ) / ( 1 + ( ln M / ln M_piv(z) ) ** n_c(z) ),</p>
 </div></blockquote>
 <p>where M = 10**(log_mass_proxy), M_piv(z) = 10**(a_logm_piv + b_logm_piv*(1 + z))
 and n_c(z) = a_n + b_n*(1 + z).</p>
