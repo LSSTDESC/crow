@@ -22,6 +22,7 @@ __all__ = [
     "completeness_models",
     "kernel",
     "parameters",
+    "projection_effects",
     "purity_models",
     "_clmm_patches",
     "shear_profile",
