@@ -205,90 +205,90 @@ class CostanziRichnessBias:
         pdf = 0.5 * (gauss + term1 + term23 - term4)  # (n_obs, n_tru,)
         return pdf
 
-    # def Sprob_at_richtru(
-    #    self,
-    #    rich_obs_eds: npt.NDArray[np.float64],
-    #    rich_obs_res: npt.NDArray[np.float64],
-    #    rich_tru: npt.NDArray[np.float64],
-    # ) -> npt.NDArray[np.floating]:
-    #    """
-    #    Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
+    def Sprob_at_richtru(
+        self,
+        rich_obs_eds: npt.NDArray[np.float64],
+        rich_obs_res: npt.NDArray[np.float64],
+        rich_tru: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.floating]:
+        """
+        Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
 
-    #    Parameters:
-    #    ----------------------------------------------------------
-    #    rich_obs_eds: ndarray
-    #        The boundaries defining the richness intervals.
-    #        It has a dimension of 1 and length at least 2.
-    #    rich_obs_res: ndarray
-    #        The resolution used in the integration over each richness integral.
-    #        If a constant is provided, all richness integrals use the same resolution.
-    #        If an array provided, it has a dimension of 1 and length exactly of len(rich_obs_eds) - 1.
-    #        The resolution is defined as the fractional increase of 1 + rich_obs_res.
-    #        Smaller rich_obs_res means higher resolutions.
-    #    rich_tru: ndarray
-    #        The true richness
+        Parameters:
+        ----------------------------------------------------------
+        rich_obs_eds: ndarray
+            The boundaries defining the richness intervals.
+            It has a dimension of 1 and length at least 2.
+        rich_obs_res: ndarray
+            The resolution used in the integration over each richness integral.
+            If a constant is provided, all richness integrals use the same resolution.
+            If an array provided, it has a dimension of 1 and length exactly of len(rich_obs_eds) - 1.
+            The resolution is defined as the fractional increase of 1 + rich_obs_res.
+            Smaller rich_obs_res means higher resolutions.
+        rich_tru: ndarray
+            The true richness
 
-    #    Return:
-    #    ----------------------------------------------------------
-    #    Sprob_at_richtru: ndarray
-    #        The probability of \\int drich_obs P(rich_obs | rich_tru).
-    #        The shape is (len(rich_obs_eds) - 1, len(rich_tru))
-    #    """
-    #    # sanitize
-    #    rich_obs_eds = np.asarray(rich_obs_eds)
-    #    rich_obs_res = np.asarray(rich_obs_res)
-    #    rich_tru = np.asarray(rich_tru)
+        Return:
+        ----------------------------------------------------------
+        Sprob_at_richtru: ndarray
+            The probability of \\int drich_obs P(rich_obs | rich_tru).
+            The shape is (len(rich_obs_eds) - 1, len(rich_tru))
+        """
+        # sanitize
+        rich_obs_eds = np.asarray(rich_obs_eds)
+        rich_obs_res = np.asarray(rich_obs_res)
+        rich_tru = np.asarray(rich_tru)
 
-    #    # define integral boundaries
-    #    if rich_obs_eds.ndim != 1:
-    #        raise ValueError(
-    #            "The array rich_obs_eds ndim is not 1. "
-    #            "Integral boundaries cannot be defined."
-    #        )
-    #    if not np.all(np.diff(rich_obs_eds) > 0):
-    #        raise ValueError(
-    #            "The array rich_obs_eds has to be monotonically increasing."
-    #        )
+        # define integral boundaries
+        if rich_obs_eds.ndim != 1:
+            raise ValueError(
+                "The array rich_obs_eds ndim is not 1. "
+                "Integral boundaries cannot be defined."
+            )
+        if not np.all(np.diff(rich_obs_eds) > 0):
+            raise ValueError(
+                "The array rich_obs_eds has to be monotonically increasing."
+            )
 
-    #    rich_obs_low = rich_obs_eds[:-1]
-    #    rich_obs_hgh = rich_obs_eds[1:]
+        rich_obs_low = rich_obs_eds[:-1]
+        rich_obs_hgh = rich_obs_eds[1:]
 
-    #    # define integral resolution
-    #    rich_obs_res = np.broadcast_to(
-    #        np.asarray(rich_obs_res, dtype=float), rich_obs_low.shape
-    #    )
+        # define integral resolution
+        rich_obs_res = np.broadcast_to(
+            np.asarray(rich_obs_res, dtype=float), rich_obs_low.shape
+        )
 
-    #    rich_obs_nst = (np.log(rich_obs_hgh / rich_obs_low) / rich_obs_res).astype(int)
-    #    rich_obs_edges = np.hstack(
-    #        [
-    #            (
-    #                np.geomspace(rich_obs_low[n], rich_obs_hgh[n], rich_obs_nst[n])
-    #                if n == 0
-    #                else np.geomspace(
-    #                    rich_obs_low[n], rich_obs_hgh[n], rich_obs_nst[n]
-    #                )[1:]
-    #            )
-    #            for n in range(len(rich_obs_low))
-    #        ]
-    #    )
-    #    rich_obs_bins = np.sqrt(rich_obs_edges[:-1] * rich_obs_edges[1:])
-    #    rich_obs_steps = np.diff(rich_obs_edges)
-    #    rich_obs_digit = np.digitize(rich_obs_bins, bins=rich_obs_eds)
+        rich_obs_nst = (np.log(rich_obs_hgh / rich_obs_low) / rich_obs_res).astype(int)
+        rich_obs_edges = np.hstack(
+            [
+                (
+                    np.geomspace(rich_obs_low[n], rich_obs_hgh[n], rich_obs_nst[n])
+                    if n == 0
+                    else np.geomspace(
+                        rich_obs_low[n], rich_obs_hgh[n], rich_obs_nst[n]
+                    )[1:]
+                )
+                for n in range(len(rich_obs_low))
+            ]
+        )
+        rich_obs_bins = np.sqrt(rich_obs_edges[:-1] * rich_obs_edges[1:])
+        rich_obs_steps = np.diff(rich_obs_edges)
+        rich_obs_digit = np.digitize(rich_obs_bins, bins=rich_obs_eds)
 
-    #    # calc
-    #    prob_obs = self.prob_richobs_at_richtru(
-    #        rich_obs=rich_obs_bins,
-    #        rich_tru=rich_tru,
-    #    )
+        # calc
+        prob_obs = self.prob_richobs_at_richtru(
+            rich_obs=rich_obs_bins,
+            rich_tru=rich_tru,
+        )
 
-    #    Sprob_obs = np.array(
-    #        [
-    #            np.sum(
-    #                rich_obs_steps[rich_obs_digit == ith][:, np.newaxis]
-    #                * prob_obs[rich_obs_digit == ith],
-    #                axis=0,
-    #            )
-    #            for ith in range(1, len(rich_obs_eds))
-    #        ]
-    #    )
-    #    return Sprob_obs
+        Sprob_obs = np.array(
+            [
+                np.sum(
+                    rich_obs_steps[rich_obs_digit == ith][:, np.newaxis]
+                    * prob_obs[rich_obs_digit == ith],
+                    axis=0,
+                )
+                for ith in range(1, len(rich_obs_eds))
+            ]
+        )
+        return Sprob_obs
