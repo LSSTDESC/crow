@@ -104,11 +104,11 @@ class CostanziRichnessBias:
         Calculate the probability of observing the observed richness given the true richness.
         Equation 15 in Costanzi+19.
 
-        Parameters:
-        ----------------------------------------------------------
-        rich_obs: ndarray
+        Parameters
+        ----------
+        rich_obs : ndarray
             The observed richness
-        rich_tru: ndarray
+        rich_tru : ndarray
             The true richness
 
         Notes
@@ -116,9 +116,9 @@ class CostanziRichnessBias:
         This calculation uses ``tau``, ``delta_mu``, ``fractional_sig_pure``,
         ``fprj``, and ``fmsk`` from :attr:`parameters`.
 
-        Return:
-        ----------------------------------------------------------
-        prob: ndarray
+        Returns
+        -------
+        prob : ndarray
             The probability of P(rich_obs | rich_tru).
             The shape is (len(rich_obs), len(rich_tru))
         """
@@ -214,23 +214,23 @@ class CostanziRichnessBias:
         """
         Integrate the observed richness over an interval defined by (rich_obs_low, rich_obs_hgh, rich_obs_res)
 
-        Parameters:
-        ----------------------------------------------------------
-        rich_obs_eds: ndarray
+        Parameters
+        ----------
+        rich_obs_eds : ndarray
             The boundaries defining the richness intervals.
             It has a dimension of 1 and length at least 2.
-        rich_obs_res: ndarray
+        rich_obs_res : ndarray
             The resolution used in the integration over each richness integral.
             If a constant is provided, all richness integrals use the same resolution.
             If an array provided, it has a dimension of 1 and length exactly of len(rich_obs_eds) - 1.
             The resolution is defined as the fractional increase of 1 + rich_obs_res.
             Smaller rich_obs_res means higher resolutions.
-        rich_tru: ndarray
+        rich_tru : ndarray
             The true richness
 
-        Return:
-        ----------------------------------------------------------
-        Sprob_at_richtru: ndarray
+        Returns
+        -------
+        Sprob_at_richtru : ndarray
             The probability of \\int drich_obs P(rich_obs | rich_tru).
             The shape is (len(rich_obs_eds) - 1, len(rich_tru))
         """
