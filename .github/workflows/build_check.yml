@@ -169,11 +169,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos"]
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
         include:
           - os: ubuntu
             python-version: "3.12"
             coverage: true
+          - python-version: "3.10"
+            env_file: "crow/environment_no_numcosmo.yml"
+            coverage: false
     steps:
       - uses: actions/checkout@v4
       - name: Set up Miniconda

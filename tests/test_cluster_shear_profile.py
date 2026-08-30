@@ -240,7 +240,7 @@ def test_shear_profile_miscentering_fast(cluster_reduced_profile):
     )
 
 
-@pytest.mark.slow
+@pytest.mark.numcosmo
 def test_shear_profile_miscentering(
     cluster_deltasigma_profile, cluster_reduced_profile
 ):
