@@ -22,6 +22,7 @@ import pyccl as ccl
 from scipy.integrate import simpson
 
 from crow.cluster_modules.completeness_models import Completeness
+from crow.cluster_modules.projection_effects import CostanziRichnessBias
 from crow.cluster_modules.purity_models import Purity
 from crow.properties import ClusterProperty
 
@@ -70,6 +71,11 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         Number of grid points in redshift.
     mass_grid_size : int, optional
         Number of grid points in log-mass.
+    projection_model : CostanziRichnessBias, optional
+        Projection model used by the projected-richness grid helper. When using
+        this helper, mass_distribution must describe the intrinsic true-richness
+        density per unit ln richness. The standard counts and lensing evaluation
+        methods do not yet apply this projection model.
 
     Attributes
     ----------
@@ -79,6 +85,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         Cache of halo mass function × volume grids.
     _mass_richness_grid : dict
         Cache of mass–richness probability grids.
+    _mass_truerich_grid : dict
+        Cache of intrinsic true-richness probability grids.
+    _projected_mass_richness_grid : dict
+        Cache of projected observed-richness probability grids.
     _completeness_grid : dict
         Cache of completeness grids.
     _purity_grid : dict
@@ -99,6 +109,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         proxy_grid_size: int = 30,
         redshift_grid_size: int = 30,
         mass_grid_size: int = 30,
+        projection_model: CostanziRichnessBias | None = None,
     ) -> None:
         super().__init__(
             cluster_theory=cluster_theory,
@@ -112,11 +123,14 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self.proxy_grid_size = proxy_grid_size
         self.redshift_grid_size = redshift_grid_size
         self.mass_grid_size = mass_grid_size
+        self.projection_model = projection_model
         self.log_mass_grid = np.linspace(
             mass_interval[0], mass_interval[1], self.mass_grid_size
         )
         self._hmf_grid = {}  # (n_z, n_mass)
         self._mass_richness_grid = {}  # (n_proxy, n_z, n_mass)
+        self._mass_truerich_grid = {}  # (n_tru, n_z, n_mass)
+        self._projected_mass_richness_grid = {}  # (n_obs, n_z, n_mass)
         self._completeness_grid = {}  # (n_z, n_mass)
         self._purity_grid = {}  # (n_proxy, n_z)
         self._shear_grids = {}  # (n_z, n_mass)
@@ -170,6 +184,8 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         """
         self._hmf_grid = {}
         self._mass_richness_grid = {}
+        self._mass_truerich_grid = {}
+        self._projected_mass_richness_grid = {}
         self._completeness_grid = {}
         self._purity_grid = {}
         self._shear_grids = {}
@@ -215,6 +231,149 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             # assign
             self._hmf_grid[key] = vol[:, np.newaxis] * mass_function_2d
         return self._hmf_grid[key]
+
+    def _get_mass_truerich_grid(
+        self,
+        z: npt.NDArray[np.float64],
+        ln_rich_tru: npt.NDArray[np.float64],
+        key,
+    ) -> npt.NDArray[np.float64]:
+        """Compute and cache the intrinsic mass–richness distribution grid.
+
+        This method evaluates the probability density of natural-log true
+        richness given halo mass and redshift. The supplied mass distribution
+        must describe intrinsic richness and return a density per ln richness.
+
+        Parameters
+        ----------
+        z : numpy.ndarray
+            Redshift grid.
+        ln_rich_tru : numpy.ndarray
+            Natural logarithm of the dimensionless true-richness grid. Must
+            contain at least three finite, strictly increasing points.
+        key : hashable
+            Cache key identifying the redshift grid. The true-richness
+            coordinates are included in the cache key internally.
+
+        Returns
+        -------
+        numpy.ndarray
+            Density per unit ln(true richness), with shape
+            (n_tru, n_z, n_mass).
+
+        Notes
+        -----
+        Call setup() after changing the mass grid or model parameters. The
+        density is not renormalized over the supplied true-richness interval.
+        """
+        if ln_rich_tru.ndim != 1 or len(ln_rich_tru) < 3:
+            raise ValueError(
+                "ln_rich_tru must be a 1D array with at least three points."
+            )
+        if not np.all(np.isfinite(ln_rich_tru)) or not np.all(np.diff(ln_rich_tru) > 0):
+            raise ValueError(
+                "ln_rich_tru must contain finite, strictly increasing points."
+            )
+
+        cache_key = (key, tuple(ln_rich_tru))
+
+        if cache_key not in self._mass_truerich_grid:
+            # sizes
+            n_z = len(z)
+            n_m = len(self.log_mass_grid)
+            n_t = len(ln_rich_tru)
+
+            # quantities
+            # Murata takes log10 richness and returns a density per ln richness.
+            log_rich_tru = ln_rich_tru / np.log(10.0)
+            grid_3d_flat = self.mass_distribution.distribution(
+                # flatten arrays to vectorize function
+                np.tile(np.repeat(self.log_mass_grid, n_z), n_t),
+                np.tile(z, n_m * n_t),
+                np.repeat(log_rich_tru, n_z * n_m),
+            )
+            grid_3d_temp = grid_3d_flat.reshape(n_t, n_m, n_z)
+
+            # assign
+            self._mass_truerich_grid[cache_key] = grid_3d_temp.transpose(0, 2, 1)
+
+        return self._mass_truerich_grid[cache_key]
+
+    def _get_projected_mass_richness_grid(
+        self,
+        z: npt.NDArray[np.float64],
+        log_proxy: npt.NDArray[np.float64],
+        ln_rich_tru: npt.NDArray[np.float64],
+        key,
+    ) -> npt.NDArray[np.float64]:
+        """Compute and cache the projected mass–richness distribution grid.
+
+        This method convolves the intrinsic true-richness distribution with
+        the projection probability and integrates over ln(true richness).
+        The same projection calibration is used at every mass and redshift.
+
+        Parameters
+        ----------
+        z : numpy.ndarray
+            Redshift grid.
+        log_proxy : numpy.ndarray
+            Base-10 logarithm of the observed-richness grid.
+        ln_rich_tru : numpy.ndarray
+            Natural logarithm of the dimensionless true-richness grid. Must
+            contain at least three finite, strictly increasing points.
+        key : hashable
+            Cache key identifying the redshift and observed-richness grids.
+            The true-richness coordinates are included internally.
+
+        Returns
+        -------
+        numpy.ndarray
+            Density per unit ln(observed richness), with shape
+            (n_obs, n_z, n_mass).
+
+        Notes
+        -----
+        True-richness limits and resolution are supplied by the caller and
+        require convergence checks. Projection parameter arrays must correspond
+        to this true-richness grid. Call setup() after changing either model,
+        its parameters, or the mass grid.
+        """
+        if self.projection_model is None:
+            raise ValueError("projection_model is required for the projected grid.")
+
+        # shape: (n_tru, n_z, n_mass)
+        mass_truerich_grid = self._get_mass_truerich_grid(z, ln_rich_tru, tuple(z))
+        cache_key = (key, tuple(ln_rich_tru))
+
+        if cache_key not in self._projected_mass_richness_grid:
+            # quantities
+            rich_obs = 10.0**log_proxy
+            rich_tru = np.exp(ln_rich_tru)
+
+            # Density per unit linear observed richness.
+            # shape: (n_obs, n_tru)
+            projection_grid = self.projection_model.prob_richobs_at_richtru(
+                rich_obs=rich_obs,
+                rich_tru=rich_tru,
+            )
+
+            # shape: (n_obs, n_tru, n_z, n_mass)
+            integrand = (
+                projection_grid[:, :, np.newaxis, np.newaxis]
+                * mass_truerich_grid[np.newaxis, :, :, :]
+            )
+
+            # Integrate over ln(true richness).
+            # shape: (n_obs, n_z, n_mass)
+            projected_grid = simpson(y=integrand, x=ln_rich_tru, axis=1)
+
+            # Convert from density per rich_obs to density per ln(rich_obs).
+            projected_grid *= rich_obs[:, np.newaxis, np.newaxis]
+
+            # assign
+            self._projected_mass_richness_grid[cache_key] = projected_grid
+
+        return self._projected_mass_richness_grid[cache_key]
 
     def _get_mass_richness_grid(
         self,
