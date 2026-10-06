@@ -521,7 +521,9 @@ def test_counts_tau_array_updates_after_setup(counts_recipe):
         z_edges, log_proxy_edges, 440.0, projection=True
     )
     assert not np.isclose(on, updated)
-    np.testing.assert_array_equal(recipe.projection_model.parameters["tau"], tau_updated)
+    np.testing.assert_array_equal(
+        recipe.projection_model.parameters["tau"], tau_updated
+    )
     np.testing.assert_allclose(
         recipe.evaluate_theory_prediction_counts(z_edges, log_proxy_edges, 440.0),
         off,
