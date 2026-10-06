@@ -72,10 +72,16 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
     mass_grid_size : int, optional
         Number of grid points in log-mass.
     projection_model : CostanziRichnessBias, optional
-        Projection model used by the projected-richness grid helper. When using
-        this helper, mass_distribution must describe the intrinsic true-richness
-        density per unit ln richness. The standard counts and lensing evaluation
-        methods do not yet apply this projection model.
+        Projection model used when evaluating counts with projection=True.
+        In that case, mass_distribution must describe the intrinsic true-richness
+        density per unit ln richness. Lensing predictions do not apply this model.
+    ln_rich_tru : numpy.ndarray, optional
+        Natural logarithm of the dimensionless true-richness integration grid.
+        Copied and stored at initialization; required for counts with
+        projection=True. Must contain at least three finite, strictly increasing
+        points, checked when evaluating the projected density. Bounds and
+        resolution require convergence checks; the density is not renormalized
+        over this interval. Projection parameter arrays must match this grid.
 
     Attributes
     ----------
@@ -110,6 +116,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         redshift_grid_size: int = 30,
         mass_grid_size: int = 30,
         projection_model: CostanziRichnessBias | None = None,
+        ln_rich_tru: npt.NDArray[np.float64] | None = None,
     ) -> None:
         super().__init__(
             cluster_theory=cluster_theory,
@@ -124,6 +131,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         self.redshift_grid_size = redshift_grid_size
         self.mass_grid_size = mass_grid_size
         self.projection_model = projection_model
+        self.ln_rich_tru = None
+        if ln_rich_tru is not None:
+            self.ln_rich_tru = np.array(ln_rich_tru, dtype=np.float64, copy=True)
         self.log_mass_grid = np.linspace(
             mass_interval[0], mass_interval[1], self.mass_grid_size
         )
@@ -180,7 +190,9 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         This method clears all internally stored grids used for caching intermediate
         quantities (e.g., halo mass function, mass–richness relation, etc.). It
         should be called whenever model parameters or cosmology are updated to
-        ensure consistency in subsequent computations.
+        ensure consistency in subsequent computations, including changes to
+        projection parameters. The configured models and ln_rich_tru grid are
+        retained.
         """
         self._hmf_grid = {}
         self._mass_richness_grid = {}
@@ -490,9 +502,10 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         integ_arrays,
         sky_area: float,
         ignore_purity: bool = False,
+        projection: bool = False,
     ) -> float:
-        """Evaluate the theory prediction for this cluster recipe using triple Simpson integration."""
-        """
+        """Evaluate the theory prediction using triple Simpson integration.
+
         Parameters
         ----------
         probe_kernel : numpy.ndarray
@@ -500,11 +513,28 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         integ_arrays: dict
             Dictionary with information on `"redshift"` and `"log_proxy"` for integration.
             Each entry must be of the type ``{"points":np.ndarray, "key":tuple}``
+        sky_area : float
+            Survey area in square degrees.
+        ignore_purity : bool, optional
+            If True, omit the inverse-purity factor from the integrand.
+        projection : bool, optional
+            If True, use the projected density with the stored projection model
+            and true-richness grid. Otherwise, use the original richness density.
 
         Returns
         -------
         integrated_kernel : numpy.ndarray
         """
+        if projection:
+            if self.projection_model is None:
+                raise ValueError(
+                    "projection=True requires a configured projection_model."
+                )
+            if self.ln_rich_tru is None:
+                raise ValueError(
+                    "projection=True requires ln_rich_tru to be provided "
+                    "when initializing the recipe."
+                )
 
         ##############################
         # get basic kernel and combine
@@ -528,11 +558,19 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             hmf_key,
         )
         # shape: (n_proxy, n_z, n_mass)
-        mass_richness_grid = self._get_mass_richness_grid(
-            integ_arrays["redshift"]["points"],
-            integ_arrays["log_proxy"]["points"],
-            mass_richness_key,
-        )
+        if projection:
+            mass_richness_grid = self._get_projected_mass_richness_grid(
+                z=integ_arrays["redshift"]["points"],
+                log_proxy=integ_arrays["log_proxy"]["points"],
+                ln_rich_tru=self.ln_rich_tru,
+                key=mass_richness_key,
+            )
+        else:
+            mass_richness_grid = self._get_mass_richness_grid(
+                integ_arrays["redshift"]["points"],
+                integ_arrays["log_proxy"]["points"],
+                mass_richness_key,
+            )
         # shape: (n_z, n_mass)
         completeness_grid = self._get_completeness_grid(
             integ_arrays["redshift"]["points"],
@@ -591,6 +629,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         log_proxy_edges,
         sky_area: float,
         average_on: None | ClusterProperty = None,
+        projection: bool = False,
     ) -> float:
         """Compute predicted cluster number counts in a bin.
 
@@ -603,16 +642,33 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
         z_edges : tuple of float
             Lower and upper bounds of the redshift bin.
         log_proxy_edges : tuple of float
-            Bounds of the observable proxy bin (log-space).
+            Bounds of the observed proxy bin in log10 space.
         sky_area : float
             Survey area in square degrees.
         average_on : ClusterProperty or None, optional
             Optional weighting of the observable (e.g., mass-weighted counts).
+        projection : bool, optional
+            If True, convolve the intrinsic richness density with the stored
+            projection_model over ln_rich_tru. The default, False, uses the
+            original richness density even when a projection model is configured.
+            Observed bin definitions and integration measures are unchanged.
 
         Returns
         -------
         float
             Predicted number of clusters in the bin.
+
+        Raises
+        ------
+        ValueError
+            If projection=True without a configured projection_model or
+            ln_rich_tru grid, or if the true-richness grid is invalid.
+
+        Notes
+        -----
+        When projection=True, mass_distribution must describe intrinsic true
+        richness. Call setup() after updating model parameters or cosmology,
+        including projection_model.parameters, before evaluating any bins.
         """
         ######################
         # grid arrays and keys
@@ -654,6 +710,7 @@ class GridBinnedClusterRecipe(BinnedClusterRecipe):
             probe_kernel,
             integ_arrays,
             sky_area,
+            projection=projection,
         )
         return counts
 
